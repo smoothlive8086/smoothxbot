@@ -4,27 +4,29 @@ const API_URL = window.location.port === '5173' || window.location.port === '517
 
 export const setToken = (token) => {
   if (token) {
-    localStorage.setItem('timoxiter_token', token);
+    localStorage.setItem('smooth_token', token);
   } else {
+    localStorage.removeItem('smooth_token');
     localStorage.removeItem('timoxiter_token');
   }
 };
 
 export const getToken = () => {
-  return localStorage.getItem('timoxiter_token');
+  return localStorage.getItem('smooth_token') || localStorage.getItem('timoxiter_token');
 };
 
 export const setUser = (user) => {
   if (user) {
-    localStorage.setItem('timoxiter_user', JSON.stringify(user));
+    localStorage.setItem('smooth_user', JSON.stringify(user));
   } else {
+    localStorage.removeItem('smooth_user');
     localStorage.removeItem('timoxiter_user');
   }
 };
 
 export const getUser = () => {
   try {
-    const userStr = localStorage.getItem('timoxiter_user');
+    const userStr = localStorage.getItem('smooth_user') || localStorage.getItem('timoxiter_user');
     return userStr ? JSON.parse(userStr) : null;
   } catch {
     return null;

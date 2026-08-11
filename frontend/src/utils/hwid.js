@@ -3,7 +3,7 @@
  */
 export const getDeviceHWID = () => {
   try {
-    let hwid = localStorage.getItem('timoxiter_device_hwid');
+    let hwid = localStorage.getItem('smooth_device_hwid') || localStorage.getItem('timoxiter_device_hwid');
     if (!hwid) {
       const screenInfo = `${window.screen.width}x${window.screen.height}x${window.screen.colorDepth}`;
       const navInfo = `${navigator.userAgent}-${navigator.language}-${navigator.hardwareConcurrency || 4}`;
@@ -19,7 +19,7 @@ export const getDeviceHWID = () => {
       
       const randomPart = Math.random().toString(36).substring(2, 10);
       hwid = `WEB-${Math.abs(hash).toString(16).toUpperCase()}-${randomPart.toUpperCase()}`;
-      localStorage.setItem('timoxiter_device_hwid', hwid);
+      localStorage.setItem('smooth_device_hwid', hwid);
     }
     return hwid;
   } catch (e) {

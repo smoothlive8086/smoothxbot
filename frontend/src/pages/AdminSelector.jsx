@@ -928,7 +928,7 @@ export default function AdminSelector({ user, onSelectGuild, onLogout }) {
                             {/* User details */}
                             <div style={{ marginTop: '10px' }}>
                               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                <span style={{ fontWeight: '700', fontSize: '1.1rem' }}>{botUser?.username || 'TIMOXITER'}</span>
+                                <span style={{ fontWeight: '700', fontSize: '1.1rem' }}>{botUser?.username || 'SMOOTH'}</span>
                                 <span style={{
                                   backgroundColor: '#5865f2',
                                   color: '#fff',
@@ -939,7 +939,7 @@ export default function AdminSelector({ user, onSelectGuild, onLogout }) {
                                   textTransform: 'uppercase'
                                 }}>Bot</span>
                               </div>
-                              <div style={{ fontSize: '0.78rem', color: '#b9bbbe', marginTop: '2px' }}>{botUser?.tag || 'TIMOXITER#0000'}</div>
+                              <div style={{ fontSize: '0.78rem', color: '#b9bbbe', marginTop: '2px' }}>{botUser?.tag || 'SMOOTH#0000'}</div>
                             </div>
 
                             <hr style={{ borderColor: 'rgba(255,255,255,0.06)', margin: '14px 0' }} />

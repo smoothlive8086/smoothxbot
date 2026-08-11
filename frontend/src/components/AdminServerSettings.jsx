@@ -276,7 +276,7 @@ export default function AdminServerSettings({ guildId, onHasUnsavedChangesChange
       resolved = resolved.trim() ? `${resolved.trim()}\n{url}` : '{url}';
     }
     resolved = resolved
-      .replace(/{channel}/gi, channelName || 'Timo Xiter')
+      .replace(/{channel}/gi, channelName || 'Smooth')
       .replace(/{title}/gi, 'My Awesome New Video!')
       .replace(/{url}/gi, 'https://www.youtube.com/watch?v=dQw4w9WgXcQ');
     
@@ -1600,7 +1600,7 @@ export default function AdminServerSettings({ guildId, onHasUnsavedChangesChange
                       onChange={() => setNicknameCasing('original')}
                       disabled={applyingBulk}
                     />
-                    Keep Original (e.g. {nicknameSource === 'username' ? 'timoxit' : 'TimoXit'})
+                    Keep Original (e.g. {nicknameSource === 'username' ? 'smooth' : 'Smooth'})
                   </label>
                   <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.9rem' }}>
                     <input 
@@ -1611,7 +1611,7 @@ export default function AdminServerSettings({ guildId, onHasUnsavedChangesChange
                       onChange={() => setNicknameCasing('upper')}
                       disabled={applyingBulk}
                     />
-                    UPPERCASE (e.g. TIMOXIT)
+                    UPPERCASE (e.g. SMOOTH)
                   </label>
                   <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.9rem' }}>
                     <input 
@@ -1622,7 +1622,7 @@ export default function AdminServerSettings({ guildId, onHasUnsavedChangesChange
                       onChange={() => setNicknameCasing('lower')}
                       disabled={applyingBulk}
                     />
-                    lowercase (e.g. timoxit)
+                    lowercase (e.g. smooth)
                   </label>
                 </div>
               </div>
@@ -1862,7 +1862,7 @@ export default function AdminServerSettings({ guildId, onHasUnsavedChangesChange
                           value={settings.youtube?.channelUrl || ''} 
                           onChange={(e) => handleInputChange('youtube.channelUrl', e.target.value)}
                           className="glass-input"
-                          placeholder="e.g. @timo_xiter or https://youtube.com/channel/UC..."
+                          placeholder="e.g. @smooth or https://youtube.com/channel/UC..."
                         />
                         <button
                           type="button"
@@ -2001,7 +2001,7 @@ export default function AdminServerSettings({ guildId, onHasUnsavedChangesChange
                           <div style={{ display: 'flex', flexDirection: 'column' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                               <span style={{ fontWeight: '600', color: '#f2f3f5', fontSize: '0.95rem' }}>
-                                TIMO X MODE
+                                SMOOTH MODE
                               </span>
                               <span style={{
                                 backgroundColor: '#5865F2',

@@ -20,10 +20,10 @@ const Youtube = ({ size = 16, className = '', style = {} }) => (
 
 function BotTerminal({ onAdminLogin }) {
   const [logs, setLogs] = useState([
-    { type: 'system', text: 'TIMOXITER BOT OS v1.0.0 Booting...' },
+    { type: 'system', text: 'SMOOTH BOT OS v1.0.0 Booting...' },
     { type: 'system', text: 'Initializing Gateway connection...' },
     { type: 'success', text: '[OK] Connected to Discord API Gateway' },
-    { type: 'success', text: '[OK] Logged in as TIMOXITER#1507' },
+    { type: 'success', text: '[OK] Logged in as SMOOTH#1507' },
     { type: 'info', text: '[INFO] Syncing commands on 14 servers...' },
     { type: 'info', text: '[INFO] Loaded Shield, Welcome & Ticket modules' }
   ]);
@@ -144,7 +144,7 @@ function BotTerminal({ onAdminLogin }) {
           <span style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#ffbd2e', display: 'inline-block' }} />
           <span style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#27c93f', display: 'inline-block' }} />
         </div>
-        <span style={{ color: 'var(--text-secondary)', fontSize: '0.75rem', fontWeight: '600' }}>timoxiter@bot-status: ~</span>
+        <span style={{ color: 'var(--text-secondary)', fontSize: '0.75rem', fontWeight: '600' }}>smooth@bot-status: ~</span>
         <div style={{ width: '30px' }} />
       </div>
       {/* Terminal logs list */}
@@ -268,7 +268,7 @@ export default function LandingPage({ onAdminLogin }) {
               lineHeight: '1.1',
               marginBottom: '14px'
             }}>
-              TIMOXITER
+              SMOOTH
             </h1>
 
             <p style={{

@@ -177,7 +177,7 @@ function DiscordMessagePreview({
           {/* Header */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '2px', flexWrap: 'wrap' }}>
             <span style={{ fontWeight: '600', color: '#f2f3f5', fontSize: '1rem' }}>
-              TIMO X MODE
+              SMOOTH MODE
             </span>
             <span style={{
               backgroundColor: '#5865F2',
@@ -4703,7 +4703,7 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                                 />
                                 <div className="discord-message-content">
                                   <div className="discord-author-header">
-                                    <span className="discord-author-name">TIMO X MODE</span>
+                                    <span className="discord-author-name">SMOOTH MODE</span>
                                     <span className="discord-bot-tag">BOT</span>
                                     <span className="discord-message-timestamp">Today at {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                                   </div>
@@ -5317,9 +5317,9 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                               className="glass-input"
                               style={{ width: '100%', cursor: 'pointer', backgroundColor: 'rgba(0,0,0,0.5)', border: '1px solid var(--border-color)', color: '#ffffff' }}
                             >
-                              <option value="original">Keep Original (e.g. TimoXit)</option>
-                              <option value="upper">UPPERCASE (e.g. TIMOXIT)</option>
-                              <option value="lower">lowercase (e.g. timoxit)</option>
+                              <option value="original">Keep Original (e.g. Smooth)</option>
+                              <option value="upper">UPPERCASE (e.g. SMOOTH)</option>
+                              <option value="lower">lowercase (e.g. smooth)</option>
                             </select>
                           </div>
                         </div>
@@ -5331,7 +5331,7 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                               const t = settings.autoNickname.template !== undefined ? settings.autoNickname.template : (settings.autoNickname.format || '{DISPLAY_NAME}');
                               const s = settings.autoNickname.sourceName || 'displayName';
                               const c = settings.autoNickname.casing || 'original';
-                              const nameSample = 'TimoXit';
+                              const nameSample = 'Smooth';
                               let formatted = nameSample;
                               if (c === 'upper') formatted = nameSample.toUpperCase();
                               if (c === 'lower') formatted = nameSample.toLowerCase();
@@ -6775,7 +6775,7 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                               value={settings.youtube?.channelUrl || ''}
                               onChange={(e) => handleInputChange('youtube.channelUrl', e.target.value)}
                               className="glass-input"
-                              placeholder="e.g. @timo_xiter or https://youtube.com/channel/UC..."
+                              placeholder="e.g. @smooth or https://youtube.com/channel/UC..."
                             />
                             <button
                               type="button"
@@ -6916,7 +6916,7 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                               <div style={{ display: 'flex', flexDirection: 'column' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                                   <span style={{ fontWeight: '600', color: '#f2f3f5', fontSize: '0.95rem' }}>
-                                    TIMO X MODE
+                                    SMOOTH MODE
                                   </span>
                                   <span style={{
                                     backgroundColor: '#5865F2',
@@ -6961,7 +6961,7 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                                       resolved = resolved.trim() ? `${resolved.trim()}\n{url}` : '{url}';
                                     }
                                     resolved = resolved
-                                      .replace(/{channel}/gi, settings.youtube?.channelName || 'Timo Xiter')
+                                      .replace(/{channel}/gi, settings.youtube?.channelName || 'Smooth')
                                       .replace(/{title}/gi, 'My Awesome New Video!')
                                       .replace(/{url}/gi, 'https://www.youtube.com/watch?v=dQw4w9WgXcQ');
 
