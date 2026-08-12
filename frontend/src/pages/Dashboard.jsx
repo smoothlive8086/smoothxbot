@@ -2646,11 +2646,21 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                           className="form-control"
                           value={settings?.logging?.logChannelId || ''}
                           onChange={(e) => handleInputChange('logging.logChannelId', e.target.value)}
-                          style={{ width: '100%', padding: '10px', borderRadius: '8px', backgroundColor: 'var(--card-bg)', color: 'var(--text-primary)', border: '1px solid var(--border-color)' }}
+                          style={{
+                            width: '100%',
+                            padding: '11px 14px',
+                            borderRadius: '8px',
+                            backgroundColor: '#0f172a',
+                            color: '#ffffff',
+                            border: '1px solid rgba(59, 130, 246, 0.4)',
+                            outline: 'none',
+                            fontWeight: '600',
+                            fontSize: '0.9rem'
+                          }}
                         >
-                          <option value="">-- No Channel Selected (Disabled) --</option>
+                          <option value="" style={{ backgroundColor: '#0f172a', color: '#94a3b8' }}>-- No Channel Selected (Disabled) --</option>
                           {channels.map(ch => (
-                            <option key={ch.id} value={ch.id}>#{ch.name}</option>
+                            <option key={ch.id} value={ch.id} style={{ backgroundColor: '#0f172a', color: '#f8fafc' }}>#{ch.name}</option>
                           ))}
                         </select>
                         <button
@@ -5656,11 +5666,21 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                             className="form-control"
                             value={settings?.logging?.logChannelId || ''}
                             onChange={(e) => handleInputChange('logging.logChannelId', e.target.value)}
-                            style={{ width: '100%', padding: '10px', borderRadius: '8px', backgroundColor: 'var(--card-bg)', color: 'var(--text-primary)', border: '1px solid var(--border-color)' }}
+                            style={{
+                              width: '100%',
+                              padding: '11px 14px',
+                              borderRadius: '8px',
+                              backgroundColor: '#0f172a',
+                              color: '#ffffff',
+                              border: '1px solid rgba(59, 130, 246, 0.4)',
+                              outline: 'none',
+                              fontWeight: '600',
+                              fontSize: '0.9rem'
+                            }}
                           >
-                            <option value="">-- Disabled (No Channel Selected) --</option>
+                            <option value="" style={{ backgroundColor: '#0f172a', color: '#94a3b8' }}>-- Disabled (No Channel Selected) --</option>
                             {channels.map(ch => (
-                              <option key={ch.id} value={ch.id}>#{ch.name}</option>
+                              <option key={ch.id} value={ch.id} style={{ backgroundColor: '#0f172a', color: '#f8fafc' }}>#{ch.name}</option>
                             ))}
                           </select>
                           <button
