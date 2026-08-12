@@ -425,7 +425,7 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
   const [logs, setLogs] = useState([]);
   const [logFilterCategory, setLogFilterCategory] = useState('ALL');
   const [logSearchQuery, setLogSearchQuery] = useState('');
-  const [showLogSettingsPanel, setShowLogSettingsPanel] = useState(false);
+  const [showLogSettingsPanel, setShowLogSettingsPanel] = useState(true);
   const [selectedLogDetail, setSelectedLogDetail] = useState(null);
   const [clearingLogs, setClearingLogs] = useState(false);
   const [uploadFile, setUploadFile] = useState(null);
@@ -2612,6 +2612,82 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                           </span>
                         </div>
                       ))}
+                    </div>
+                  </div>
+
+                  {/* Overview Quick Config: Discord Audit Log Channel */}
+                  <div className="glass-panel" style={{ padding: '24px', marginTop: '24px', backgroundColor: 'rgba(37, 99, 235, 0.03)', border: '1px solid rgba(37, 99, 235, 0.2)' }}>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '16px', marginBottom: '16px' }}>
+                      <div>
+                        <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: '700', color: 'var(--primary)' }}>
+                          🛡️ Discord Server Audit Log Channel Dispatch
+                        </h3>
+                        <p style={{ margin: '4px 0 0 0', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                          Send all server audit logs (bans, kicks, mutes, voice activity, roles, channels, messages) as text & embeds to your Discord channel.
+                        </p>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => handleTabClick('logs')}
+                        className="btn"
+                        style={{ padding: '8px 16px', fontSize: '0.85rem', borderRadius: '8px', backgroundColor: 'rgba(255,255,255,0.05)', color: '#fff', border: '1px solid var(--border-color)', cursor: 'pointer' }}
+                      >
+                        View Live Audit Logs →
+                      </button>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px' }}>
+                      <div>
+                        <label className="form-label" style={{ fontWeight: '600', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <Hash size={16} /> Select Discord Audit Log Text Channel
+                        </label>
+                        <select
+                          className="form-control"
+                          value={settings?.logging?.logChannelId || ''}
+                          onChange={(e) => handleInputChange('logging.logChannelId', e.target.value)}
+                          style={{ width: '100%', padding: '10px', borderRadius: '8px', backgroundColor: 'var(--card-bg)', color: 'var(--text-primary)', border: '1px solid var(--border-color)' }}
+                        >
+                          <option value="">-- No Channel Selected (Disabled) --</option>
+                          {channels.map(ch => (
+                            <option key={ch.id} value={ch.id}>#{ch.name}</option>
+                          ))}
+                        </select>
+                        <button
+                          type="button"
+                          onClick={() => handleApplyChannelToAllLogs(settings?.logging?.logChannelId)}
+                          disabled={!settings?.logging?.logChannelId}
+                          style={{
+                            marginTop: '8px',
+                            padding: '8px 12px',
+                            fontSize: '0.8rem',
+                            fontWeight: '600',
+                            borderRadius: '6px',
+                            backgroundColor: 'rgba(59, 130, 246, 0.15)',
+                            color: '#3b82f6',
+                            border: '1px solid rgba(59, 130, 246, 0.3)',
+                            cursor: settings?.logging?.logChannelId ? 'pointer' : 'not-allowed',
+                            width: '100%'
+                          }}
+                        >
+                          ⚡ Route ALL Server Logs & Audits to This Channel
+                        </button>
+                      </div>
+
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 18px', backgroundColor: 'rgba(255,255,255,0.02)', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+                        <div>
+                          <div style={{ fontWeight: '600', fontSize: '0.92rem' }}>Audit Logger Master Switch</div>
+                          <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>Send live server audit logs to Discord chat</div>
+                        </div>
+                        <label className="switch">
+                          <input
+                            type="checkbox"
+                            checked={settings?.logging?.enabled !== false}
+                            onChange={() => handleToggle('logging.enabled')}
+                          />
+                          <span className="slider round"></span>
+                        </label>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -5457,7 +5533,7 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
               {/* TAB 6: SERVER AUDIT LOGS */}
               {activeTab === 'logs' && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                  
+
                   {/* Header & Controls Bar */}
                   <div className="glass-panel" style={{ padding: '20px 24px', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '16px', backgroundColor: 'rgba(255,255,255,0.01)' }}>
                     <div>
