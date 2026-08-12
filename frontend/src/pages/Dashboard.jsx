@@ -2191,6 +2191,17 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
     }
   };
 
+  const handleApplyChannelToAllLogs = (channelId) => {
+    if (!channelId) {
+      setErrorMsg('Please select a valid text channel first.');
+      return;
+    }
+    handleInputChange('logging.logChannelId', channelId);
+    handleInputChange('antinuke.logChannelId', channelId);
+    handleInputChange('moderation.wordFilter.logChannelId', channelId);
+    showNotification('Assigned text channel to ALL server log modules!');
+  };
+
   const handleExportLogs = () => {
     if (!logs || logs.length === 0) return;
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(logs, null, 2));
@@ -5576,6 +5587,25 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                               <option key={ch.id} value={ch.id}>#{ch.name}</option>
                             ))}
                           </select>
+                          <button
+                            type="button"
+                            onClick={() => handleApplyChannelToAllLogs(settings?.logging?.logChannelId)}
+                            disabled={!settings?.logging?.logChannelId}
+                            style={{
+                              marginTop: '8px',
+                              padding: '6px 12px',
+                              fontSize: '0.78rem',
+                              fontWeight: '600',
+                              borderRadius: '6px',
+                              backgroundColor: 'rgba(59, 130, 246, 0.15)',
+                              color: '#3b82f6',
+                              border: '1px solid rgba(59, 130, 246, 0.3)',
+                              cursor: settings?.logging?.logChannelId ? 'pointer' : 'not-allowed',
+                              width: '100%'
+                            }}
+                          >
+                            ⚡ Send ALL Server Logs to This Text Channel
+                          </button>
                         </div>
 
                         {/* Master Enable Switch */}
