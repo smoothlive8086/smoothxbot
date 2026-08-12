@@ -1213,3 +1213,26 @@ input:checked + .slider:before {
   color: #10b981;
   border: 1px solid rgba(16, 185, 129, 0.2);
 }
+
+/* Universal Select & Option Popover Styling Fix for Dark Mode */
+select {
+  background-color: #0f172a !important;
+  color: #f8fafc !important;
+}
+
+select option {
+  background-color: #0f172a !important;
+  color: #f8fafc !important;
+  padding: 10px 14px !important;
+  font-size: 0.9rem !important;
+  font-weight: 500 !important;
+}
+
+select option:hover,
+select option:focus,
+select option:active,
+select option:checked {
+  background-color: #2563eb !important;
+  color: #ffffff !important;
+}
+
