@@ -31,7 +31,10 @@ import {
   Mic,
   UploadCloud,
   X,
-  Check
+  Check,
+  Hash,
+  Search,
+  Settings
 } from 'lucide-react';
 
 const Youtube = ({ size = 24, className = '', style = {} }) => (
@@ -420,6 +423,11 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
   const [modWhitelistSearchLoading, setModWhitelistSearchLoading] = useState(false);
 
   const [logs, setLogs] = useState([]);
+  const [logFilterCategory, setLogFilterCategory] = useState('ALL');
+  const [logSearchQuery, setLogSearchQuery] = useState('');
+  const [showLogSettingsPanel, setShowLogSettingsPanel] = useState(false);
+  const [selectedLogDetail, setSelectedLogDetail] = useState(null);
+  const [clearingLogs, setClearingLogs] = useState(false);
   const [uploadFile, setUploadFile] = useState(null);
   const [showCropModal, setShowCropModal] = useState(false);
 
@@ -1160,6 +1168,20 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
       setChannels(chData);
       setRoles(rData);
       if (sData) {
+        if (!sData.logging) {
+          sData.logging = {
+            enabled: true,
+            logChannelId: '',
+            logBans: true,
+            logKicks: true,
+            logMutes: true,
+            logVoice: true,
+            logRoles: true,
+            logChannels: true,
+            logMessages: true,
+            logMembers: true
+          };
+        }
         if (!sData.antinuke) {
           sData.antinuke = {
             enabled: false,
@@ -2151,6 +2173,82 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
       setErrorMsg('Failed to save settings. Please verify details.');
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleClearLogs = async () => {
+    if (!window.confirm('Are you sure you want to clear all audit logs for this server? This action cannot be undone.')) return;
+    setClearingLogs(true);
+    try {
+      await api.clearLogs(guildId);
+      setLogs([]);
+      showNotification('Audit logs cleared successfully!');
+    } catch (err) {
+      console.error(err);
+      setErrorMsg('Failed to clear audit logs: ' + err.message);
+    } finally {
+      setClearingLogs(false);
+    }
+  };
+
+  const handleExportLogs = () => {
+    if (!logs || logs.length === 0) return;
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(logs, null, 2));
+    const downloadAnchor = document.createElement('a');
+    downloadAnchor.setAttribute("href", dataStr);
+    downloadAnchor.setAttribute("download", `sidcord_audit_logs_${guildId}_${Date.now()}.json`);
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.remove();
+  };
+
+  const getLogActionInfo = (type) => {
+    const action = (type || '').toLowerCase();
+    switch (action) {
+      case 'ban':
+        return { label: 'BANNED', color: '#ef4444', bg: 'rgba(239, 68, 68, 0.12)', icon: '🔨' };
+      case 'unban':
+        return { label: 'UNBANNED', color: '#22c55e', bg: 'rgba(34, 197, 94, 0.12)', icon: '🔓' };
+      case 'kick':
+        return { label: 'KICKED', color: '#f97316', bg: 'rgba(249, 115, 22, 0.12)', icon: '👢' };
+      case 'timeout':
+        return { label: 'TIMED OUT', color: '#eab308', bg: 'rgba(234, 179, 8, 0.12)', icon: '🔇' };
+      case 'untimeout':
+        return { label: 'UNMUTED', color: '#10b981', bg: 'rgba(16, 185, 129, 0.12)', icon: '🔊' };
+      case 'voice_join':
+        return { label: 'JOINED VC', color: '#3b82f6', bg: 'rgba(59, 130, 246, 0.12)', icon: '🎤' };
+      case 'voice_disconnect':
+        return { label: 'LEFT VC', color: '#64748b', bg: 'rgba(100, 116, 139, 0.12)', icon: '🚪' };
+      case 'voice_move':
+        return { label: 'MOVED VC', color: '#8b5cf6', bg: 'rgba(139, 92, 246, 0.12)', icon: '🔀' };
+      case 'voice_mute':
+        return { label: 'VOICE MUTED', color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.12)', icon: '🎙️' };
+      case 'voice_deafen':
+        return { label: 'VOICE DEAFENED', color: '#ec4899', bg: 'rgba(236, 72, 153, 0.12)', icon: '🎧' };
+      case 'role_add':
+        return { label: 'ROLE ADDED', color: '#06b6d4', bg: 'rgba(6, 182, 212, 0.12)', icon: '🏷️' };
+      case 'role_remove':
+        return { label: 'ROLE REMOVED', color: '#f43f5e', bg: 'rgba(244, 63, 94, 0.12)', icon: '🏷️' };
+      case 'role_update':
+        return { label: 'ROLES UPDATED', color: '#06b6d4', bg: 'rgba(6, 182, 212, 0.12)', icon: '🏷️' };
+      case 'channel_create':
+        return { label: 'CHANNEL CREATED', color: '#10b981', bg: 'rgba(16, 185, 129, 0.12)', icon: '📁' };
+      case 'channel_delete':
+        return { label: 'CHANNEL DELETED', color: '#ef4444', bg: 'rgba(239, 68, 68, 0.12)', icon: '📁' };
+      case 'channel_update':
+        return { label: 'CHANNEL UPDATED', color: '#14b8a6', bg: 'rgba(20, 184, 166, 0.12)', icon: '📁' };
+      case 'role_create':
+        return { label: 'ROLE CREATED', color: '#10b981', bg: 'rgba(16, 185, 129, 0.12)', icon: '🎭' };
+      case 'role_delete':
+        return { label: 'ROLE DELETED', color: '#ef4444', bg: 'rgba(239, 68, 68, 0.12)', icon: '🎭' };
+      case 'message_delete':
+        return { label: 'MESSAGE DELETED', color: '#f43f5e', bg: 'rgba(244, 63, 94, 0.12)', icon: '🗑️' };
+      case 'member_join':
+        return { label: 'MEMBER JOINED', color: '#22c55e', bg: 'rgba(34, 197, 94, 0.12)', icon: '📥' };
+      case 'member_leave':
+        return { label: 'MEMBER LEFT', color: '#94a3b8', bg: 'rgba(148, 163, 184, 0.12)', icon: '📤' };
+      default:
+        return { label: (type || 'ACTION').toUpperCase(), color: '#3b82f6', bg: 'rgba(59, 130, 246, 0.12)', icon: '🛡️' };
     }
   };
 
@@ -5345,43 +5443,324 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                 </div>
               )}
 
-              {/* TAB 6: SERVER LOGS */}
+              {/* TAB 6: SERVER AUDIT LOGS */}
               {activeTab === 'logs' && (
-                <div>
-
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', maxHeight: '550px', overflowY: 'auto', paddingRight: '6px' }}>
-                    {logs.length === 0 ? (
-                      <div className="glass-panel" style={{ padding: '40px', textAlign: 'center', backgroundColor: 'rgba(255,255,255,0.01)' }}>
-                        <p style={{ color: 'var(--text-secondary)' }}>No moderation logs available. Live monitoring is active.</p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                  
+                  {/* Header & Controls Bar */}
+                  <div className="glass-panel" style={{ padding: '20px 24px', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '16px', backgroundColor: 'rgba(255,255,255,0.01)' }}>
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <h2 style={{ margin: 0, fontSize: '1.4rem', fontWeight: '700', color: 'var(--text-primary)' }}>
+                          🛡️ Sidcord Audit Logs
+                        </h2>
+                        <span style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          padding: '3px 10px',
+                          borderRadius: '12px',
+                          fontSize: '0.72rem',
+                          fontWeight: '600',
+                          backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                          color: '#22c55e',
+                          border: '1px solid rgba(34, 197, 94, 0.2)'
+                        }}>
+                          <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#22c55e', boxShadow: '0 0 8px #22c55e' }}></span>
+                          Live WebSocket Feed Active
+                        </span>
                       </div>
-                    ) : (
-                      logs.map((log, idx) => {
-                        let badgeColor = 'var(--text-secondary)';
-                        let badgeBg = 'rgba(255,255,255,0.05)';
-                        let actionLabel = (log.actionType || 'action').toUpperCase();
+                      <p style={{ margin: '4px 0 0 0', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                        Real-time audit log stream for bans, kicks, mutes, voice activity, roles, channels, and member actions.
+                      </p>
+                    </div>
 
-                        if (log.actionType === 'timeout') {
-                          badgeColor = 'var(--warning)';
-                          badgeBg = 'rgba(251, 191, 36, 0.1)';
-                        } else if (log.actionType === 'ban') {
-                          badgeColor = 'var(--danger)';
-                          badgeBg = 'rgba(244, 63, 94, 0.1)';
-                        } else if (log.actionType === 'kick') {
-                          badgeColor = '#f97316';
-                          badgeBg = 'rgba(249, 115, 22, 0.1)';
-                        } else if (log.actionType === 'warn') {
-                          badgeColor = '#fbbf24';
-                          badgeBg = 'rgba(251, 191, 36, 0.1)';
-                        } else if (log.actionType === 'message_delete') {
-                          badgeColor = '#3b82f6';
-                          badgeBg = 'rgba(59, 130, 246, 0.1)';
-                          actionLabel = 'DELETE';
-                        } else if (log.actionType === 'role_update') {
-                          badgeColor = 'var(--secondary)';
-                          badgeBg = 'rgba(6, 182, 212, 0.1)';
-                          actionLabel = 'ROLES';
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                      <button
+                        type="button"
+                        onClick={() => setShowLogSettingsPanel(!showLogSettingsPanel)}
+                        className="btn"
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          padding: '8px 16px',
+                          fontSize: '0.85rem',
+                          borderRadius: '8px',
+                          backgroundColor: showLogSettingsPanel ? 'var(--primary)' : 'rgba(255,255,255,0.05)',
+                          color: '#fff',
+                          border: '1px solid var(--border-color)',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        <Settings size={15} />
+                        {showLogSettingsPanel ? 'Close Config' : 'Log Channel Config'}
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={handleExportLogs}
+                        disabled={!logs || logs.length === 0}
+                        className="btn"
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          padding: '8px 16px',
+                          fontSize: '0.85rem',
+                          borderRadius: '8px',
+                          backgroundColor: 'rgba(255,255,255,0.05)',
+                          color: 'var(--text-primary)',
+                          border: '1px solid var(--border-color)',
+                          cursor: logs && logs.length > 0 ? 'pointer' : 'not-allowed',
+                          opacity: logs && logs.length > 0 ? 1 : 0.5
+                        }}
+                      >
+                        <FileText size={15} />
+                        Export JSON
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={handleClearLogs}
+                        disabled={clearingLogs || !logs || logs.length === 0}
+                        className="btn"
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          padding: '8px 16px',
+                          fontSize: '0.85rem',
+                          borderRadius: '8px',
+                          backgroundColor: 'rgba(244, 63, 94, 0.1)',
+                          color: '#f43f5e',
+                          border: '1px solid rgba(244, 63, 94, 0.2)',
+                          cursor: logs && logs.length > 0 ? 'pointer' : 'not-allowed',
+                          opacity: logs && logs.length > 0 ? 1 : 0.5
+                        }}
+                      >
+                        <Trash2 size={15} />
+                        {clearingLogs ? 'Clearing...' : 'Clear Logs'}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Log Channel & Logging Toggle Configuration Panel */}
+                  {showLogSettingsPanel && (
+                    <div className="glass-panel" style={{ padding: '24px', backgroundColor: 'rgba(37, 99, 235, 0.03)', border: '1px solid rgba(37, 99, 235, 0.2)' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+                        <div>
+                          <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: '700', color: 'var(--primary)' }}>
+                            📢 Discord Server Audit Log Channel Settings
+                          </h3>
+                          <p style={{ margin: '4px 0 0 0', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                            Select the Discord text channel in your server where audit log embeds will be automatically posted.
+                          </p>
+                        </div>
+                      </div>
+
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px', marginBottom: '20px' }}>
+                        {/* Target Channel Selector */}
+                        <div>
+                          <label className="form-label" style={{ fontWeight: '600', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <Hash size={16} /> Audit Log Text Channel
+                          </label>
+                          <select
+                            className="form-control"
+                            value={settings?.logging?.logChannelId || ''}
+                            onChange={(e) => handleInputChange('logging.logChannelId', e.target.value)}
+                            style={{ width: '100%', padding: '10px', borderRadius: '8px', backgroundColor: 'var(--card-bg)', color: 'var(--text-primary)', border: '1px solid var(--border-color)' }}
+                          >
+                            <option value="">-- Disabled (No Channel Selected) --</option>
+                            {channels.map(ch => (
+                              <option key={ch.id} value={ch.id}>#{ch.name}</option>
+                            ))}
+                          </select>
+                        </div>
+
+                        {/* Master Enable Switch */}
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', backgroundColor: 'rgba(255,255,255,0.02)', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+                          <div>
+                            <div style={{ fontWeight: '600', fontSize: '0.9rem' }}>Enable Audit Logger</div>
+                            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Global toggle for bot audit events</div>
+                          </div>
+                          <label className="switch">
+                            <input
+                              type="checkbox"
+                              checked={settings?.logging?.enabled !== false}
+                              onChange={() => handleToggle('logging.enabled')}
+                            />
+                            <span className="slider round"></span>
+                          </label>
+                        </div>
+                      </div>
+
+                      <div style={{ fontSize: '0.85rem', fontWeight: '700', marginBottom: '12px', color: 'var(--text-primary)' }}>
+                        Filter Which Events Are Logged:
+                      </div>
+
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '12px', marginBottom: '20px' }}>
+                        {[
+                          { key: 'logBans', label: '🔨 Member Bans & Unbans' },
+                          { key: 'logKicks', label: '👢 Member Kicks' },
+                          { key: 'logMutes', label: '🔇 Mutes / Timeouts' },
+                          { key: 'logVoice', label: '🎤 Voice VC Activity' },
+                          { key: 'logRoles', label: '🏷️ Member Role Changes' },
+                          { key: 'logChannels', label: '📁 Channel Edits' },
+                          { key: 'logMessages', label: '🗑️ Message Deletions' },
+                          { key: 'logMembers', label: '📥 Member Joins & Leaves' }
+                        ].map(item => (
+                          <div key={item.key} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', backgroundColor: 'rgba(255,255,255,0.02)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                            <span style={{ fontSize: '0.8rem', fontWeight: '500' }}>{item.label}</span>
+                            <label className="switch">
+                              <input
+                                type="checkbox"
+                                checked={settings?.logging?.[item.key] !== false}
+                                onChange={() => handleToggle(`logging.${item.key}`)}
+                              />
+                              <span className="slider round"></span>
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                        <button
+                          type="button"
+                          onClick={(e) => handleSave(e)}
+                          className="btn btn-primary"
+                          style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '10px 24px', fontWeight: '600' }}
+                        >
+                          <Check size={16} /> Save Audit Log Settings
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Summary Stats Overview */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '14px' }}>
+                    <div className="glass-panel" style={{ padding: '16px 20px', backgroundColor: 'rgba(255,255,255,0.01)' }}>
+                      <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Total Logs</div>
+                      <div style={{ fontSize: '1.6rem', fontWeight: '800', color: 'var(--text-primary)', marginTop: '4px' }}>{logs.length}</div>
+                    </div>
+
+                    <div className="glass-panel" style={{ padding: '16px 20px', backgroundColor: 'rgba(239, 68, 68, 0.02)', borderLeft: '4px solid #ef4444' }}>
+                      <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Moderation Actions</div>
+                      <div style={{ fontSize: '1.6rem', fontWeight: '800', color: '#ef4444', marginTop: '4px' }}>
+                        {logs.filter(l => ['ban', 'unban', 'kick', 'timeout', 'untimeout'].includes((l.actionType || '').toLowerCase())).length}
+                      </div>
+                    </div>
+
+                    <div className="glass-panel" style={{ padding: '16px 20px', backgroundColor: 'rgba(59, 130, 246, 0.02)', borderLeft: '4px solid #3b82f6' }}>
+                      <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Voice Activity</div>
+                      <div style={{ fontSize: '1.6rem', fontWeight: '800', color: '#3b82f6', marginTop: '4px' }}>
+                        {logs.filter(l => (l.actionType || '').toLowerCase().startsWith('voice_')).length}
+                      </div>
+                    </div>
+
+                    <div className="glass-panel" style={{ padding: '16px 20px', backgroundColor: 'rgba(6, 182, 212, 0.02)', borderLeft: '4px solid #06b6d4' }}>
+                      <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Role Changes</div>
+                      <div style={{ fontSize: '1.6rem', fontWeight: '800', color: '#06b6d4', marginTop: '4px' }}>
+                        {logs.filter(l => (l.actionType || '').toLowerCase().startsWith('role_')).length}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Filter Tabs & Search Bar */}
+                  <div className="glass-panel" style={{ padding: '14px 18px', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '14px', backgroundColor: 'rgba(255,255,255,0.01)' }}>
+                    {/* Category Filter Pills */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                      {[
+                        { id: 'ALL', label: 'All Logs' },
+                        { id: 'MODERATION', label: '🔨 Moderation' },
+                        { id: 'VOICE', label: '🎤 Voice VC' },
+                        { id: 'ROLES', label: '🏷️ Roles' },
+                        { id: 'CHANNELS', label: '📁 Channels' },
+                        { id: 'MESSAGES', label: '💬 Messages & Members' }
+                      ].map(tab => (
+                        <button
+                          key={tab.id}
+                          type="button"
+                          onClick={() => setLogFilterCategory(tab.id)}
+                          style={{
+                            padding: '6px 14px',
+                            borderRadius: '20px',
+                            fontSize: '0.8rem',
+                            fontWeight: '600',
+                            border: '1px solid',
+                            borderColor: logFilterCategory === tab.id ? 'var(--primary)' : 'rgba(255,255,255,0.1)',
+                            backgroundColor: logFilterCategory === tab.id ? 'var(--primary)' : 'rgba(255,255,255,0.03)',
+                            color: logFilterCategory === tab.id ? '#fff' : 'var(--text-secondary)',
+                            cursor: 'pointer',
+                            transition: 'all 0.15s ease'
+                          }}
+                        >
+                          {tab.label}
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Search Input */}
+                    <div style={{ position: 'relative', width: '260px' }}>
+                      <Search size={15} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+                      <input
+                        type="text"
+                        placeholder="Search logs by user or reason..."
+                        value={logSearchQuery}
+                        onChange={(e) => setLogSearchQuery(e.target.value)}
+                        style={{
+                          width: '100%',
+                          padding: '7px 12px 7px 34px',
+                          borderRadius: '20px',
+                          fontSize: '0.82rem',
+                          backgroundColor: 'rgba(255,255,255,0.03)',
+                          border: '1px solid var(--border-color)',
+                          color: 'var(--text-primary)'
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Logs Feed List */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', maxHeight: '600px', overflowY: 'auto', paddingRight: '6px' }}>
+                    {(() => {
+                      const filteredLogs = logs.filter(log => {
+                        const action = (log.actionType || '').toLowerCase();
+                        if (logFilterCategory === 'MODERATION') {
+                          if (!['ban', 'unban', 'kick', 'timeout', 'untimeout', 'warn'].includes(action)) return false;
+                        } else if (logFilterCategory === 'VOICE') {
+                          if (!action.startsWith('voice_')) return false;
+                        } else if (logFilterCategory === 'ROLES') {
+                          if (!action.startsWith('role_')) return false;
+                        } else if (logFilterCategory === 'CHANNELS') {
+                          if (!action.startsWith('channel_')) return false;
+                        } else if (logFilterCategory === 'MESSAGES') {
+                          if (!['message_delete', 'member_join', 'member_leave'].includes(action)) return false;
                         }
 
+                        if (logSearchQuery.trim()) {
+                          const q = logSearchQuery.toLowerCase();
+                          const modName = log.moderator?.username?.toLowerCase() || '';
+                          const targetName = log.target?.username?.toLowerCase() || '';
+                          const details = (log.details || '').toLowerCase();
+                          return modName.includes(q) || targetName.includes(q) || details.includes(q) || action.includes(q);
+                        }
+                        return true;
+                      });
+
+                      if (filteredLogs.length === 0) {
+                        return (
+                          <div className="glass-panel" style={{ padding: '50px 20px', textAlign: 'center', backgroundColor: 'rgba(255,255,255,0.01)' }}>
+                            <FileText size={40} style={{ color: 'var(--text-muted)', marginBottom: '12px', opacity: 0.5 }} />
+                            <p style={{ color: 'var(--text-secondary)', margin: 0, fontWeight: '500' }}>
+                              {logs.length === 0 ? 'No audit logs recorded yet. Live monitoring is active.' : 'No audit logs found matching your filters.'}
+                            </p>
+                          </div>
+                        );
+                      }
+
+                      return filteredLogs.map((log, idx) => {
+                        const info = getLogActionInfo(log.actionType);
                         const modAvatar = (log.moderator && log.moderator.avatar && log.moderator.id)
                           ? `https://cdn.discordapp.com/avatars/${log.moderator.id}/${log.moderator.avatar}.png`
                           : 'https://cdn.discordapp.com/embed/avatars/0.png';
@@ -5394,6 +5773,7 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                           <div
                             key={log._id || idx}
                             className="glass-panel"
+                            onClick={() => setSelectedLogDetail(log)}
                             style={{
                               padding: '14px 18px',
                               display: 'flex',
@@ -5401,33 +5781,35 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                               justifyContent: 'space-between',
                               gap: '16px',
                               backgroundColor: 'rgba(255,255,255,0.01)',
-                              borderLeft: `4px solid ${badgeColor}`,
-                              flexShrink: 0
+                              borderLeft: `4px solid ${info.color}`,
+                              cursor: 'pointer',
+                              transition: 'all 0.15s ease'
                             }}
                           >
                             <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexGrow: 1 }}>
+                              {/* Avatar stack */}
                               <div style={{ display: 'flex', alignItems: 'center', position: 'relative', width: '54px', height: '32px', flexShrink: 0 }}>
                                 <img
                                   src={modAvatar}
                                   alt="Mod"
-                                  title={`Moderator: ${log.moderator?.username || 'Unknown Moderator'}`}
+                                  title={`Executor / Mod: ${log.moderator?.username || 'Unknown Moderator'}`}
                                   style={{ width: '28px', height: '28px', borderRadius: '50%', border: '2px solid var(--border-color)', position: 'absolute', left: 0, zIndex: 2 }}
                                 />
                                 <img
                                   src={targetAvatar}
-                                  alt="User"
-                                  title={`User: ${log.target?.username || 'Unknown User'}`}
-                                  style={{ width: '28px', height: '28px', borderRadius: '50%', border: '2px solid var(--primary)', position: 'absolute', left: '18px', zIndex: 1 }}
+                                  alt="Target"
+                                  title={`Target: ${log.target?.username || 'Unknown Target'}`}
+                                  style={{ width: '28px', height: '28px', borderRadius: '50%', border: `2px solid ${info.color}`, position: 'absolute', left: '18px', zIndex: 1 }}
                                 />
                               </div>
 
                               <div style={{ flexGrow: 1 }}>
-                                <div style={{ fontSize: '0.9rem', fontWeight: '600' }}>
+                                <div style={{ fontSize: '0.9rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '6px' }}>
                                   <span style={{ color: 'var(--text-primary)' }}>{log.moderator?.username || 'Unknown Moderator'}</span>
-                                  <span style={{ color: 'var(--text-secondary)', fontWeight: '400' }}> performed action on </span>
-                                  <span style={{ color: 'var(--primary)' }}>{log.target?.username || 'Unknown User'}</span>
+                                  <span style={{ color: 'var(--text-secondary)', fontWeight: '400' }}>→</span>
+                                  <span style={{ color: info.color, fontWeight: '700' }}>{log.target?.username || 'Target User'}</span>
                                 </div>
-                                <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
+                                <div style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', marginTop: '3px' }}>
                                   {log.details}
                                 </div>
                               </div>
@@ -5435,25 +5817,72 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
 
                             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px', flexShrink: 0 }}>
                               <span style={{
-                                fontSize: '0.65rem',
-                                fontWeight: '700',
-                                padding: '2px 8px',
-                                borderRadius: '10px',
-                                color: badgeColor,
-                                backgroundColor: badgeBg,
-                                border: `1px solid ${badgeColor}22`
+                                fontSize: '0.68rem',
+                                fontWeight: '800',
+                                padding: '3px 10px',
+                                borderRadius: '12px',
+                                color: info.color,
+                                backgroundColor: info.bg,
+                                border: `1px solid ${info.color}33`,
+                                letterSpacing: '0.5px',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '4px'
                               }}>
-                                {actionLabel}
+                                <span>{info.icon}</span>
+                                <span>{info.label}</span>
                               </span>
-                              <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+                              <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
                                 {log.timestamp ? new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : 'Unknown Time'}
                               </span>
                             </div>
                           </div>
                         );
-                      })
-                    )}
+                      });
+                    })()}
                   </div>
+
+                  {/* Log Detail Modal */}
+                  {selectedLogDetail && (
+                    <div className="modal-backdrop" onClick={() => setSelectedLogDetail(null)} style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.7)', zIndex: 999, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <div className="glass-panel" onClick={(e) => e.stopPropagation()} style={{ width: '90%', maxWidth: '500px', padding: '24px', backgroundColor: 'var(--card-bg)', border: '1px solid var(--border-color)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                          <h3 style={{ margin: 0, fontSize: '1.2rem', color: 'var(--text-primary)' }}>
+                            🛡️ Audit Log Entry Details
+                          </h3>
+                          <button type="button" onClick={() => setSelectedLogDetail(null)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '1.2rem' }}>✕</button>
+                        </div>
+
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '0.88rem' }}>
+                          <div>
+                            <span style={{ color: 'var(--text-muted)' }}>Action Type: </span>
+                            <span style={{ fontWeight: '700', color: 'var(--primary)' }}>{selectedLogDetail.actionType}</span>
+                          </div>
+                          <div>
+                            <span style={{ color: 'var(--text-muted)' }}>Moderator: </span>
+                            <span style={{ fontWeight: '600' }}>{selectedLogDetail.moderator?.username}</span> (ID: {selectedLogDetail.moderator?.id})
+                          </div>
+                          <div>
+                            <span style={{ color: 'var(--text-muted)' }}>Target: </span>
+                            <span style={{ fontWeight: '600' }}>{selectedLogDetail.target?.username}</span> (ID: {selectedLogDetail.target?.id})
+                          </div>
+                          <div>
+                            <span style={{ color: 'var(--text-muted)' }}>Details: </span>
+                            <div>{selectedLogDetail.details}</div>
+                          </div>
+                          <div>
+                            <span style={{ color: 'var(--text-muted)' }}>Timestamp: </span>
+                            <div>{selectedLogDetail.timestamp ? new Date(selectedLogDetail.timestamp).toLocaleString() : 'N/A'}</div>
+                          </div>
+                        </div>
+
+                        <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'flex-end' }}>
+                          <button type="button" className="btn btn-secondary" onClick={() => setSelectedLogDetail(null)}>Close</button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                 </div>
               )}
               {/* TAB 7: BROADCAST DMS */}

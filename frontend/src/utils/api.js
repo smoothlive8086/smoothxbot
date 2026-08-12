@@ -76,6 +76,7 @@ export const api = {
     method: 'POST'
   }),
   getLogs: (guildId) => request(`/settings/${guildId}/logs`),
+  clearLogs: (guildId) => request(`/settings/${guildId}/logs`, { method: 'DELETE' }),
   sendMassDM: (guildId, data) => request(`/settings/${guildId}/mass-dm`, {
     method: 'POST',
     body: JSON.stringify(data)
