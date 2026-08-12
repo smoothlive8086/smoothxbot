@@ -5234,184 +5234,399 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
               )}
 
               {/* TAB 9: TICKET SYSTEM */}
-              {activeTab === 'tickets' && (
-                <div>
+              {/* TAB 8: SUPPORT TICKETS */}
+              {activeTab === 'tickets' && settings && (() => {
+                const currentOptions = (Array.isArray(settings.tickets?.options) && settings.tickets.options.length > 0)
+                  ? settings.tickets.options
+                  : [{
+                      label: settings.tickets?.buttonText || 'Create Ticket',
+                      emoji: '🎫',
+                      style: 'primary',
+                      categoryId: settings.tickets?.categoryId || '',
+                      supportRoleId: settings.tickets?.supportRoleId || '',
+                      title: settings.tickets?.title || 'Support Ticket',
+                      ticketMessage: settings.tickets?.ticketMessage || 'Welcome {user}! Please describe your issue. Support staff will assist you shortly.'
+                    }];
 
-                  <div className="preview-layout-container">
-                    {/* Left Column: Form Controls */}
-                    <div className="glass-panel" style={{
-                      flex: '1 1 500px',
-                      padding: '24px',
-                      backgroundColor: 'rgba(255,255,255,0.01)',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: '20px'
-                    }}>
+                const updateTicketOptions = (newOptions) => {
+                  const updatedTickets = {
+                    ...(settings.tickets || {}),
+                    options: newOptions,
+                    buttonText: newOptions[0]?.label || 'Create Ticket',
+                    categoryId: newOptions[0]?.categoryId || '',
+                    supportRoleId: newOptions[0]?.supportRoleId || '',
+                    title: newOptions[0]?.title || 'Support Ticket',
+                    ticketMessage: newOptions[0]?.ticketMessage || 'Welcome {user}! Please describe your issue. Support staff will assist you shortly.'
+                  };
+                  handleInputChange('tickets', updatedTickets);
+                };
 
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <div>
-                          <h3 style={{ fontSize: '1.2rem', fontWeight: '700', margin: 0 }}>Enable Ticket System</h3>
-                          <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', margin: '4px 0 0 0' }}>Activate the support tickets functionality on your server.</p>
+                const handleOptionChange = (index, field, value) => {
+                  const next = currentOptions.map((item, idx) => {
+                    if (idx === index) {
+                      return { ...item, [field]: value };
+                    }
+                    return item;
+                  });
+                  updateTicketOptions(next);
+                };
+
+                const handleAddOption = () => {
+                  if (currentOptions.length >= 6) return;
+                  const next = [
+                    ...currentOptions,
+                    {
+                      label: `Option #${currentOptions.length + 1}`,
+                      emoji: '🎫',
+                      style: 'primary',
+                      categoryId: settings.tickets?.categoryId || '',
+                      supportRoleId: settings.tickets?.supportRoleId || '',
+                      title: 'Support Ticket',
+                      ticketMessage: 'Welcome {user}! Please describe your issue. Support staff will assist you shortly.'
+                    }
+                  ];
+                  updateTicketOptions(next);
+                };
+
+                const handleRemoveOption = (index) => {
+                  if (currentOptions.length <= 1) {
+                    const next = [{
+                      label: 'Create Ticket',
+                      emoji: '🎫',
+                      style: 'primary',
+                      categoryId: '',
+                      supportRoleId: '',
+                      title: 'Support Ticket',
+                      ticketMessage: 'Welcome {user}! Please describe your issue. Support staff will assist you shortly.'
+                    }];
+                    updateTicketOptions(next);
+                  } else {
+                    const next = currentOptions.filter((_, idx) => idx !== index);
+                    updateTicketOptions(next);
+                  }
+                };
+
+                const previewButtons = currentOptions.map(opt => ({
+                  label: (opt.emoji ? `${opt.emoji} ` : '') + (opt.label || 'Ticket')
+                }));
+
+                return (
+                  <div>
+                    <div className="preview-layout-container">
+                      {/* Left Column: Form Controls */}
+                      <div className="glass-panel" style={{
+                        flex: '1 1 500px',
+                        padding: '24px',
+                        backgroundColor: 'rgba(255,255,255,0.01)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '20px'
+                      }}>
+
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <div>
+                            <h3 style={{ fontSize: '1.2rem', fontWeight: '700', margin: 0 }}>Support Ticket System</h3>
+                            <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', margin: '4px 0 0 0' }}>
+                              Activate support tickets and configure up to 6 custom ticket options for your members.
+                            </p>
+                          </div>
+                          <label className="switch">
+                            <input
+                              type="checkbox"
+                              checked={settings.tickets?.enabled || false}
+                              onChange={() => handleToggle('tickets.enabled')}
+                            />
+                            <span className="slider"></span>
+                          </label>
                         </div>
-                        <label className="switch">
-                          <input
-                            type="checkbox"
-                            checked={settings.tickets?.enabled || false}
-                            onChange={() => handleToggle('tickets.enabled')}
-                          />
-                          <span className="slider"></span>
-                        </label>
+
+                        {settings.tickets?.enabled && (
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', borderTop: '1px solid var(--border-color)', paddingTop: '16px' }}>
+
+                            {/* Panel Channel & Panel Embed Settings */}
+                            <div style={{ backgroundColor: 'rgba(255,255,255,0.02)', padding: '16px', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.06)', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                              <span style={{ fontSize: '0.875rem', fontWeight: '700', color: 'var(--primary)', letterSpacing: '0.5px' }}>
+                                PANEL EMBED SETTINGS
+                              </span>
+
+                              <div>
+                                <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>
+                                  Ticket Panel Channel <span style={{ color: 'var(--danger)' }}>*</span>
+                                </label>
+                                <select
+                                  value={settings.tickets.channelId || ''}
+                                  onChange={(e) => handleInputChange('tickets.channelId', e.target.value)}
+                                  className="glass-input"
+                                >
+                                  <option value="">-- Select Channel --</option>
+                                  {channels.map(ch => (
+                                    <option key={ch.id} value={ch.id}>#{ch.name}</option>
+                                  ))}
+                                </select>
+                              </div>
+
+                              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '14px' }}>
+                                <div>
+                                  <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Panel Embed Title</label>
+                                  <input
+                                    type="text"
+                                    value={settings.tickets.title || ''}
+                                    onChange={(e) => handleInputChange('tickets.title', e.target.value)}
+                                    className="glass-input"
+                                    placeholder="Support Ticket System"
+                                  />
+                                </div>
+
+                                <div>
+                                  <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Panel Embed Description</label>
+                                  <textarea
+                                    rows="2"
+                                    value={settings.tickets.welcomeMessage || ''}
+                                    onChange={(e) => handleInputChange('tickets.welcomeMessage', e.target.value)}
+                                    className="glass-input"
+                                    placeholder="Click a button below to open a ticket. Our support team will help you shortly."
+                                  />
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Ticket Options Section */}
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '6px' }}>
+                              <span style={{ fontSize: '0.95rem', fontWeight: '700', color: 'var(--text-primary)' }}>
+                                Ticket Options ({currentOptions.length} / 6)
+                              </span>
+                              <button
+                                type="button"
+                                onClick={handleAddOption}
+                                disabled={currentOptions.length >= 6}
+                                className="btn-primary"
+                                style={{
+                                  padding: '6px 14px',
+                                  fontSize: '0.825rem',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '6px',
+                                  opacity: currentOptions.length >= 6 ? 0.5 : 1,
+                                  cursor: currentOptions.length >= 6 ? 'not-allowed' : 'pointer'
+                                }}
+                              >
+                                <span>+ Add Ticket Option</span>
+                              </button>
+                            </div>
+
+                            {/* Option List Cards */}
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                              {currentOptions.map((opt, index) => (
+                                <div
+                                  key={index}
+                                  style={{
+                                    backgroundColor: 'rgba(255, 255, 255, 0.03)',
+                                    border: '1px solid rgba(255, 255, 255, 0.08)',
+                                    borderRadius: '10px',
+                                    padding: '18px',
+                                    position: 'relative'
+                                  }}
+                                >
+                                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+                                    <span style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--primary)', letterSpacing: '0.5px' }}>
+                                      OPTION #{index + 1}
+                                    </span>
+                                    {currentOptions.length > 1 && (
+                                      <button
+                                        type="button"
+                                        onClick={() => handleRemoveOption(index)}
+                                        style={{
+                                          background: 'rgba(239, 68, 68, 0.15)',
+                                          color: '#ef4444',
+                                          border: '1px solid rgba(239, 68, 68, 0.3)',
+                                          borderRadius: '6px',
+                                          padding: '4px 10px',
+                                          fontSize: '0.75rem',
+                                          fontWeight: '600',
+                                          cursor: 'pointer',
+                                          transition: 'all 0.2s'
+                                        }}
+                                      >
+                                        Remove Option
+                                      </button>
+                                    )}
+                                  </div>
+
+                                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '14px', marginBottom: '14px' }}>
+                                    {/* Button Label */}
+                                    <div>
+                                      <label style={{ display: 'block', fontSize: '0.825rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>
+                                        Button Label <span style={{ color: 'var(--danger)' }}>*</span>
+                                      </label>
+                                      <input
+                                        type="text"
+                                        value={opt.label || ''}
+                                        onChange={(e) => handleOptionChange(index, 'label', e.target.value)}
+                                        className="glass-input"
+                                        placeholder="e.g. General Support"
+                                      />
+                                    </div>
+
+                                    {/* Emoji */}
+                                    <div>
+                                      <label style={{ display: 'block', fontSize: '0.825rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>
+                                        Button Emoji
+                                      </label>
+                                      <input
+                                        type="text"
+                                        value={opt.emoji || ''}
+                                        onChange={(e) => handleOptionChange(index, 'emoji', e.target.value)}
+                                        className="glass-input"
+                                        placeholder="e.g. 🎫"
+                                      />
+                                    </div>
+
+                                    {/* Button Style */}
+                                    <div>
+                                      <label style={{ display: 'block', fontSize: '0.825rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>
+                                        Button Style
+                                      </label>
+                                      <select
+                                        value={opt.style || 'primary'}
+                                        onChange={(e) => handleOptionChange(index, 'style', e.target.value)}
+                                        className="glass-input"
+                                      >
+                                        <option value="primary">Primary (Blue)</option>
+                                        <option value="secondary">Secondary (Grey)</option>
+                                        <option value="success">Success (Green)</option>
+                                        <option value="danger">Danger (Red)</option>
+                                      </select>
+                                    </div>
+                                  </div>
+
+                                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '14px', marginBottom: '14px' }}>
+                                    {/* Target Category */}
+                                    <div>
+                                      <label style={{ display: 'block', fontSize: '0.825rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>
+                                        Ticket Parent Category
+                                      </label>
+                                      <select
+                                        value={opt.categoryId || ''}
+                                        onChange={(e) => handleOptionChange(index, 'categoryId', e.target.value)}
+                                        className="glass-input"
+                                      >
+                                        <option value="">-- Select Category --</option>
+                                        {categories.map(cat => (
+                                          <option key={cat.id} value={cat.id}>{cat.name}</option>
+                                        ))}
+                                      </select>
+                                    </div>
+
+                                    {/* Support Team Role */}
+                                    <div>
+                                      <label style={{ display: 'block', fontSize: '0.825rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>
+                                        Support Team Role
+                                      </label>
+                                      <select
+                                        value={opt.supportRoleId || ''}
+                                        onChange={(e) => handleOptionChange(index, 'supportRoleId', e.target.value)}
+                                        className="glass-input"
+                                      >
+                                        <option value="">-- Select Role --</option>
+                                        {roles.map(role => (
+                                          <option key={role.id} value={role.id} style={{ color: role.color }}>{role.name}</option>
+                                        ))}
+                                      </select>
+                                    </div>
+                                  </div>
+
+                                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                    {/* Ticket Channel Title */}
+                                    <div>
+                                      <label style={{ display: 'block', fontSize: '0.825rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>
+                                        Ticket Channel Title
+                                      </label>
+                                      <input
+                                        type="text"
+                                        value={opt.title || ''}
+                                        onChange={(e) => handleOptionChange(index, 'title', e.target.value)}
+                                        className="glass-input"
+                                        placeholder="Support Ticket"
+                                      />
+                                    </div>
+
+                                    {/* Ticket Channel Welcome Message */}
+                                    <div>
+                                      <label style={{ display: 'block', fontSize: '0.825rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>
+                                        Ticket Channel Welcome Message (Supports {`{user}`}, {`{server}`})
+                                      </label>
+                                      <textarea
+                                        rows="2"
+                                        value={opt.ticketMessage || ''}
+                                        onChange={(e) => handleOptionChange(index, 'ticketMessage', e.target.value)}
+                                        className="glass-input"
+                                        placeholder="Welcome {user}! Please describe your issue. Support staff will assist you shortly."
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+
+                            {/* Publish Panel Component */}
+                            <div className="glass-panel" style={{ padding: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'rgba(16, 185, 129, 0.05)', borderColor: 'rgba(16, 185, 129, 0.2)' }}>
+                              <div>
+                                <h4 style={{ fontWeight: '700', fontSize: '0.95rem', marginBottom: '2px' }}>Publish Panel to Discord</h4>
+                                <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                                  Send the support ticket panel embed with all {currentOptions.length} interactive buttons directly to the selected channel.
+                                </p>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={handlePublishTickets}
+                                disabled={saving || !settings.tickets.channelId}
+                                className="btn-success"
+                                style={{ padding: '8px 16px', fontSize: '0.85rem' }}
+                              >
+                                Publish Embed
+                              </button>
+                            </div>
+                          </div>
+                        )}
                       </div>
 
-                      {settings.tickets?.enabled && (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', borderTop: '1px solid var(--border-color)', paddingTop: '16px' }}>
-
-                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
-                            <div>
-                              <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Ticket Panel Channel</label>
-                              <select
-                                value={settings.tickets.channelId || ''}
-                                onChange={(e) => handleInputChange('tickets.channelId', e.target.value)}
-                                className="glass-input"
-                              >
-                                <option value="">-- Select Channel --</option>
-                                {channels.map(ch => (
-                                  <option key={ch.id} value={ch.id}>#{ch.name}</option>
-                                ))}
-                              </select>
-                            </div>
-
-                            <div>
-                              <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Ticket Parent Category</label>
-                              <select
-                                value={settings.tickets.categoryId || ''}
-                                onChange={(e) => handleInputChange('tickets.categoryId', e.target.value)}
-                                className="glass-input"
-                              >
-                                <option value="">-- Select Category --</option>
-                                {categories.map(cat => (
-                                  <option key={cat.id} value={cat.id}>{cat.name}</option>
-                                ))}
-                              </select>
-                            </div>
-
-                            <div>
-                              <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Support Team Role</label>
-                              <select
-                                value={settings.tickets.supportRoleId || ''}
-                                onChange={(e) => handleInputChange('tickets.supportRoleId', e.target.value)}
-                                className="glass-input"
-                              >
-                                <option value="">-- Select Role --</option>
-                                {roles.map(role => (
-                                  <option key={role.id} value={role.id} style={{ color: role.color }}>{role.name}</option>
-                                ))}
-                              </select>
-                            </div>
-                          </div>
-
-                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
-                            <div>
-                              <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Panel Button Label</label>
-                              <input
-                                type="text"
-                                value={settings.tickets.buttonText || ''}
-                                onChange={(e) => handleInputChange('tickets.buttonText', e.target.value)}
-                                className="glass-input"
-                                placeholder="Create Ticket"
-                              />
-                            </div>
-
-                            <div>
-                              <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Panel Embed Title</label>
-                              <input
-                                type="text"
-                                value={settings.tickets.title || ''}
-                                onChange={(e) => handleInputChange('tickets.title', e.target.value)}
-                                className="glass-input"
-                                placeholder="Support Ticket"
-                              />
-                            </div>
-                          </div>
-
-                          <div>
-                            <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Panel Embed Description</label>
-                            <textarea
-                              rows="3"
-                              value={settings.tickets.welcomeMessage || ''}
-                              onChange={(e) => handleInputChange('tickets.welcomeMessage', e.target.value)}
-                              className="glass-input"
-                              placeholder="Click the button below to open a ticket. Our support team will help you shortly."
-                            />
-                          </div>
-
-                          <div>
-                            <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Ticket Channel Welcome Message (Supports {`{user}`}, {`{server}`})</label>
-                            <textarea
-                              rows="3"
-                              value={settings.tickets.ticketMessage || ''}
-                              onChange={(e) => handleInputChange('tickets.ticketMessage', e.target.value)}
-                              className="glass-input"
-                              placeholder="Welcome {user}! Please describe your issue. Support staff will assist you shortly."
-                            />
-                          </div>
-
-                          <div className="glass-panel" style={{ padding: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'rgba(16, 185, 129, 0.05)', borderColor: 'rgba(16, 185, 129, 0.2)' }}>
-                            <div>
-                              <h4 style={{ fontWeight: '700', fontSize: '0.95rem', marginBottom: '2px' }}>Publish Panel to Discord</h4>
-                              <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Send the support ticket box with the interactive button directly to the selected channel.</p>
-                            </div>
-                            <button
-                              type="button"
-                              onClick={handlePublishTickets}
-                              disabled={saving || !settings.tickets.channelId}
-                              className="btn-success"
-                              style={{ padding: '8px 16px', fontSize: '0.85rem' }}
-                            >
-                              Publish Embed
-                            </button>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Right Column: Live Discord Preview */}
-                    <div style={{
-                      flex: '1 0 350px',
-                      maxWidth: '520px',
-                      position: 'sticky',
-                      top: '24px',
-                      zIndex: 10,
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: '12px'
-                    }}>
-                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem', color: 'var(--text-secondary)', textTransform: 'uppercase', fontWeight: 'bold' }}>
-                        <Eye size={14} />
-                        Live Discord Preview
-                      </span>
-                      {settings.tickets?.enabled && (
-                        <DiscordMessagePreview
-                          botUser={{ username: user?.username }}
-                          guildName={guildName}
-                          guildIcon={guildIcon}
-                          message=""
-                          buttonEnabled={true}
-                          buttonLabel={settings.tickets.buttonText || 'Create Ticket'}
-                          buttonUrl=""
-                          embedEnabled={true}
-                          embedTitle={settings.tickets.title || 'Support Ticket'}
-                          embedDesc={settings.tickets.welcomeMessage || 'Click the button below to open a ticket. Our support team will help you shortly.'}
-                          embedColor="#2563eb"
-                          embedThumb=""
-                          embedImage=""
-                          isDM={false}
-                        />
-                      )}
+                      {/* Right Column: Live Discord Preview */}
+                      <div style={{
+                        flex: '1 0 350px',
+                        maxWidth: '520px',
+                        position: 'sticky',
+                        top: '24px',
+                        zIndex: 10,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '12px'
+                      }}>
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem', color: 'var(--text-secondary)', textTransform: 'uppercase', fontWeight: 'bold' }}>
+                          <Eye size={14} />
+                          Live Discord Preview
+                        </span>
+                        {settings.tickets?.enabled && (
+                          <DiscordMessagePreview
+                            botUser={{ username: user?.username }}
+                            guildName={guildName}
+                            guildIcon={guildIcon}
+                            message=""
+                            buttonEnabled={false}
+                            buttons={previewButtons}
+                            embedEnabled={true}
+                            embedTitle={settings.tickets.title || 'Support Ticket System'}
+                            embedDesc={settings.tickets.welcomeMessage || 'Click a button below to open a ticket. Our support team will help you shortly.'}
+                            embedColor="#2563eb"
+                            embedThumb=""
+                            embedImage=""
+                            isDM={false}
+                          />
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              )}
+                );
+              })()}
 
               {/* TAB 5: ROLES & NICKNAMES */}
               {activeTab === 'roles' && (
