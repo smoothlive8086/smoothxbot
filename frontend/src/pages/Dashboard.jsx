@@ -7542,90 +7542,205 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
               )}
 
               {/* TAB 9: TEMPORARY VOICE CHANNELS */}
-              {activeTab === 'tempvoice' && settings && (
-                <div>
+              {activeTab === 'tempvoice' && settings && (() => {
+                const currentChannels = (Array.isArray(settings.tempVoice?.channels) && settings.tempVoice.channels.length > 0)
+                  ? settings.tempVoice.channels
+                  : [{
+                      channelId: settings.tempVoice?.channelId || '',
+                      categoryId: settings.tempVoice?.categoryId || '',
+                      nameTemplate: settings.tempVoice?.nameTemplate || "🔊 {username}'s Room"
+                    }];
 
-                  <div className="glass-panel" style={{ padding: '24px', backgroundColor: 'rgba(255,255,255,0.01)' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                      <div>
-                        <h3 style={{ fontSize: '1.2rem', fontWeight: '700' }}>Join-to-Create Voice Channels</h3>
-                        <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Toggle the automated temporary voice channel creation system.</p>
-                      </div>
-                      <label className="switch">
-                        <input
-                          type="checkbox"
-                          checked={settings.tempVoice?.enabled || false}
-                          onChange={() => handleToggle('tempVoice.enabled')}
-                        />
-                        <span className="slider"></span>
-                      </label>
-                    </div>
+                const updateTempVoiceChannels = (newChannels) => {
+                  const updatedTempVoice = {
+                    ...(settings.tempVoice || {}),
+                    channels: newChannels,
+                    channelId: newChannels[0]?.channelId || '',
+                    categoryId: newChannels[0]?.categoryId || '',
+                    nameTemplate: newChannels[0]?.nameTemplate || "🔊 {username}'s Room"
+                  };
+                  handleInputChange('tempVoice', updatedTempVoice);
+                };
 
-                    {(settings.tempVoice?.enabled) && (
-                      <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '20px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                const handleChannelChange = (index, field, value) => {
+                  const next = currentChannels.map((item, idx) => {
+                    if (idx === index) {
+                      return { ...item, [field]: value };
+                    }
+                    return item;
+                  });
+                  updateTempVoiceChannels(next);
+                };
 
-                        {/* Dropdown triggers */}
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '16px' }}>
+                const handleAddChannel = () => {
+                  if (currentChannels.length >= 10) return;
+                  const next = [
+                    ...currentChannels,
+                    { channelId: '', categoryId: '', nameTemplate: "🔊 {username}'s Room" }
+                  ];
+                  updateTempVoiceChannels(next);
+                };
 
-                          {/* Join to Create Channel */}
-                          <div>
-                            <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Trigger Channel (Join to Create)</label>
-                            <select
-                              value={settings.tempVoice?.channelId || ''}
-                              onChange={(e) => handleInputChange('tempVoice.channelId', e.target.value)}
-                              className="glass-input"
-                            >
-                              <option value="">-- Select voice channel --</option>
-                              {voiceChannels.map(ch => (
-                                <option key={ch.id} value={ch.id}>🔊 {ch.name}</option>
-                              ))}
-                            </select>
-                            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginTop: '4px' }}>
-                              When members join this channel, the bot will create their private room and move them.
-                            </span>
-                          </div>
+                const handleRemoveChannel = (index) => {
+                  if (currentChannels.length <= 1) {
+                    const next = [{ channelId: '', categoryId: '', nameTemplate: "🔊 {username}'s Room" }];
+                    updateTempVoiceChannels(next);
+                  } else {
+                    const next = currentChannels.filter((_, idx) => idx !== index);
+                    updateTempVoiceChannels(next);
+                  }
+                };
 
-                          {/* Target Category */}
-                          <div>
-                            <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Target Category (Optional)</label>
-                            <select
-                              value={settings.tempVoice?.categoryId || ''}
-                              onChange={(e) => handleInputChange('tempVoice.categoryId', e.target.value)}
-                              className="glass-input"
-                            >
-                              <option value="">-- Use same category as trigger channel --</option>
-                              {categories.map(cat => (
-                                <option key={cat.id} value={cat.id}>{cat.name}</option>
-                              ))}
-                            </select>
-                            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginTop: '4px' }}>
-                              Specify the category where newly generated voice rooms will be grouped.
-                            </span>
-                          </div>
-
-                        </div>
-
-                        {/* Name Template */}
+                return (
+                  <div>
+                    <div className="glass-panel" style={{ padding: '24px', backgroundColor: 'rgba(255,255,255,0.01)' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                         <div>
-                          <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Channel Name Template</label>
-                          <input
-                            type="text"
-                            value={settings.tempVoice?.nameTemplate || ''}
-                            onChange={(e) => handleInputChange('tempVoice.nameTemplate', e.target.value)}
-                            className="glass-input"
-                            style={{ maxWidth: '400px' }}
-                            placeholder="🔊 {username}'s Room"
-                          />
-                          <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginTop: '6px' }}>
-                            Supports placeholders: Use <code>{`{username}`}</code> to insert the creator's username.
-                          </span>
+                          <h3 style={{ fontSize: '1.2rem', fontWeight: '700' }}>Join-to-Create Voice Channels</h3>
+                          <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                            Configure up to 10 automated temporary voice channel triggers for your server.
+                          </p>
                         </div>
-
+                        <label className="switch">
+                          <input
+                            type="checkbox"
+                            checked={settings.tempVoice?.enabled || false}
+                            onChange={() => handleToggle('tempVoice.enabled')}
+                          />
+                          <span className="slider"></span>
+                        </label>
                       </div>
-                    )}
+
+                      {settings.tempVoice?.enabled && (
+                        <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '20px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <span style={{ fontSize: '0.9rem', fontWeight: '600', color: 'var(--text-primary)' }}>
+                              Trigger Channels ({currentChannels.length} / 10)
+                            </span>
+                            <button
+                              type="button"
+                              onClick={handleAddChannel}
+                              disabled={currentChannels.length >= 10}
+                              className="btn-primary"
+                              style={{
+                                padding: '6px 14px',
+                                fontSize: '0.825rem',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '6px',
+                                opacity: currentChannels.length >= 10 ? 0.5 : 1,
+                                cursor: currentChannels.length >= 10 ? 'not-allowed' : 'pointer'
+                              }}
+                            >
+                              <span>+ Add Trigger Channel</span>
+                            </button>
+                          </div>
+
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                            {currentChannels.map((chConfig, index) => (
+                              <div
+                                key={index}
+                                style={{
+                                  backgroundColor: 'rgba(255, 255, 255, 0.03)',
+                                  border: '1px solid rgba(255, 255, 255, 0.08)',
+                                  borderRadius: '10px',
+                                  padding: '18px',
+                                  position: 'relative'
+                                }}
+                              >
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+                                  <span style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--primary)', letterSpacing: '0.5px' }}>
+                                    OPTION #{index + 1}
+                                  </span>
+                                  {currentChannels.length > 1 && (
+                                    <button
+                                      type="button"
+                                      onClick={() => handleRemoveChannel(index)}
+                                      style={{
+                                        background: 'rgba(239, 68, 68, 0.15)',
+                                        color: '#ef4444',
+                                        border: '1px solid rgba(239, 68, 68, 0.3)',
+                                        borderRadius: '6px',
+                                        padding: '4px 10px',
+                                        fontSize: '0.75rem',
+                                        fontWeight: '600',
+                                        cursor: 'pointer',
+                                        transition: 'all 0.2s'
+                                      }}
+                                    >
+                                      Remove Option
+                                    </button>
+                                  )}
+                                </div>
+
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px', marginBottom: '14px' }}>
+                                  {/* Trigger Voice Channel */}
+                                  <div>
+                                    <label style={{ display: 'block', fontSize: '0.825rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>
+                                      Trigger Channel (Join to Create) <span style={{ color: 'var(--danger)' }}>*</span>
+                                    </label>
+                                    <select
+                                      value={chConfig.channelId || ''}
+                                      onChange={(e) => handleChannelChange(index, 'channelId', e.target.value)}
+                                      className="glass-input"
+                                    >
+                                      <option value="">-- Select voice channel --</option>
+                                      {voiceChannels.map(vc => (
+                                        <option key={vc.id} value={vc.id}>🔊 {vc.name}</option>
+                                      ))}
+                                    </select>
+                                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginTop: '4px' }}>
+                                      Members joining this voice channel will get their own temporary channel.
+                                    </span>
+                                  </div>
+
+                                  {/* Target Category */}
+                                  <div>
+                                    <label style={{ display: 'block', fontSize: '0.825rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>
+                                      Target Category (Optional)
+                                    </label>
+                                    <select
+                                      value={chConfig.categoryId || ''}
+                                      onChange={(e) => handleChannelChange(index, 'categoryId', e.target.value)}
+                                      className="glass-input"
+                                    >
+                                      <option value="">-- Use same category as trigger channel --</option>
+                                      {categories.map(cat => (
+                                        <option key={cat.id} value={cat.id}>{cat.name}</option>
+                                      ))}
+                                    </select>
+                                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginTop: '4px' }}>
+                                      Where newly generated voice rooms will be created.
+                                    </span>
+                                  </div>
+                                </div>
+
+                                {/* Channel Name Template */}
+                                <div>
+                                  <label style={{ display: 'block', fontSize: '0.825rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>
+                                    Channel Name Template
+                                  </label>
+                                  <input
+                                    type="text"
+                                    value={chConfig.nameTemplate || ''}
+                                    onChange={(e) => handleChannelChange(index, 'nameTemplate', e.target.value)}
+                                    className="glass-input"
+                                    style={{ maxWidth: '450px' }}
+                                    placeholder="🔊 {username}'s Room"
+                                  />
+                                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginTop: '4px' }}>
+                                    Supports placeholder: <code>{`{username}`}</code>
+                                  </span>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              )}
+                );
+              })()}
 
               {/* TAB 8.8: PREMIUM POLLS */}
               {activeTab === 'polls' && (
