@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { api } from '../utils/api';
 import { 
-  Shield, Sparkles, UserCheck, MessageSquare, ArrowRight, FileText, 
+  Shield, UserPlus, UserCheck, MessageSquare, ArrowRight, FileText, 
   Send, Ticket, Megaphone, Info, BarChart2, Volume2, ShieldAlert 
 } from 'lucide-react';
 
@@ -392,7 +392,7 @@ export default function LandingPage({ onAdminLogin }) {
               color: '#3b82f6',
               marginBottom: '10px'
             }}>
-              <Sparkles size={16} />
+              <UserPlus size={16} />
             </div>
             <h3 style={{ marginBottom: '4px', fontSize: '1rem', fontWeight: '700' }}>Welcome System</h3>
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', lineHeight: '1.4' }}>
