@@ -286,7 +286,7 @@ export default function AdminSelector({ user, onSelectGuild, onLogout }) {
             
             {/* Sidebar Heading / Portal Title */}
             <div style={{ textAlign: 'center', padding: '10px 0 20px 0', borderBottom: '1px solid rgba(255, 255, 255, 0.05)' }}>
-              <div className="pulse-glow" style={{
+              <div style={{
                 width: '52px',
                 height: '52px',
                 borderRadius: '14px',
