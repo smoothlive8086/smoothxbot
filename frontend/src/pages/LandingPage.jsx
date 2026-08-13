@@ -243,6 +243,19 @@ export default function LandingPage({ onAdminLogin }) {
         alignItems: 'center'
       }}>
         
+        <div style={{
+          position: 'absolute',
+          top: '5%',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          width: '300px',
+          height: '300px',
+          borderRadius: '50%',
+          background: 'radial-gradient(circle, var(--primary-glow) 0%, transparent 70%)',
+          filter: 'blur(50px)',
+          zIndex: -1
+        }} />
+
         <div className="hero-layout">
           {/* Left Column: Title & CTA */}
           <div className="hero-left">
@@ -287,7 +300,7 @@ export default function LandingPage({ onAdminLogin }) {
               <button 
                 onClick={handleLogin} 
                 disabled={loading}
-                className="btn-primary" 
+                className="btn-primary pulse-glow" 
                 style={{ fontSize: '1rem', height: '48px', padding: '0 28px', borderRadius: '10px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px', lineHeight: '1' }}
               >
                 {loading ? 'Connecting...' : 'Connect Discord Account'}
@@ -317,10 +330,12 @@ export default function LandingPage({ onAdminLogin }) {
                 onMouseEnter={(e) => {
                   e.currentTarget.style.background = 'rgba(88, 101, 242, 0.3)';
                   e.currentTarget.style.borderColor = 'rgba(88, 101, 242, 0.6)';
+                  e.currentTarget.style.transform = 'translateY(-2px)';
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.background = 'rgba(88, 101, 242, 0.15)';
                   e.currentTarget.style.borderColor = 'rgba(88, 101, 242, 0.4)';
+                  e.currentTarget.style.transform = 'translateY(0)';
                 }}
               >
                 <svg width="18" height="18" viewBox="0 0 127.14 96.36" fill="currentColor">

@@ -2528,7 +2528,7 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
         <main className="dashboard-right-content">
           {/* Global Notifications */}
           {successMsg && (
-            <div className="glass-panel" style={{
+            <div className="glass-panel pulse-glow" style={{
               position: 'fixed',
               bottom: '20px',
               right: '20px',
@@ -6779,7 +6779,7 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                           type="button"
                           onClick={handleSendBroadcast}
                           disabled={broadcasting}
-                          className="btn-primary"
+                          className="btn-primary pulse-glow"
                           style={{ gap: '10px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', height: '42px', padding: '0 20px', fontSize: '0.85rem' }}
                         >
                           <Send size={18} />
@@ -7453,7 +7453,7 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                           type="button"
                           onClick={handleSendChannelMessage}
                           disabled={publishing}
-                          className="btn-primary"
+                          className="btn-primary pulse-glow"
                           style={{ gap: '10px' }}
                         >
                           <Send size={18} />
@@ -8175,7 +8175,7 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                           type="button"
                           onClick={handleCreatePoll}
                           disabled={creatingPoll}
-                          className="btn-primary"
+                          className="btn-primary pulse-glow"
                           style={{ gap: '10px' }}
                         >
                           <Send size={18} />
@@ -8311,7 +8311,7 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                                   {/* Status Badge */}
                                   {isPollActive ? (
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '3px 10px', borderRadius: '999px', background: 'rgba(34,197,94,0.12)', border: '1px solid rgba(34,197,94,0.3)', fontSize: '0.7rem', fontWeight: '700', color: '#4ade80', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                                      <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#22c55e', display: 'inline-block' }} />
+                                      <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#22c55e', display: 'inline-block', animation: 'pulse 2s infinite', boxShadow: '0 0 6px #22c55e' }} />
                                       Active
                                     </div>
                                   ) : (
@@ -8515,7 +8515,7 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                   <button
                     type="submit"
                     disabled={saving}
-                    className="btn-primary"
+                    className="btn-primary pulse-glow"
                     style={{ gap: '10px' }}
                   >
                     <Save size={18} />

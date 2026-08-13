@@ -44,6 +44,30 @@ export default function AdminLogin({ onBack, onLoginSuccess }) {
       position: 'relative',
       overflow: 'hidden'
     }}>
+      {/* Background glow effects */}
+      <div style={{
+        position: 'absolute',
+        top: '20%',
+        left: '30%',
+        width: '400px',
+        height: '400px',
+        borderRadius: '50%',
+        background: 'radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%)',
+        filter: 'blur(60px)',
+        zIndex: -1
+      }} />
+      <div style={{
+        position: 'absolute',
+        bottom: '20%',
+        right: '30%',
+        width: '400px',
+        height: '400px',
+        borderRadius: '50%',
+        background: 'radial-gradient(circle, rgba(6, 182, 212, 0.12) 0%, transparent 70%)',
+        filter: 'blur(60px)',
+        zIndex: -1
+      }} />
+
       <div className="container" style={{ maxWidth: '440px', width: '100%', zIndex: 2 }}>
         
         {/* Back Button */}
@@ -64,7 +88,7 @@ export default function AdminLogin({ onBack, onLoginSuccess }) {
         </button>
 
         {/* Login Card */}
-        <div className="glass-panel" style={{ 
+        <div className="glass-panel pulse-glow" style={{ 
           padding: '40px 32px', 
           width: '100%',
           borderColor: 'rgba(99, 102, 241, 0.3)',
