@@ -6,7 +6,7 @@ import AdminServerSettings from '../components/AdminServerSettings';
 import {
   Shield,
   UserCheck,
-  Sparkles,
+  UserPlus,
   MessageSquare,
   Info,
   ChevronLeft,
@@ -2431,7 +2431,7 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
               onClick={() => handleTabClick('welcome')}
               className={`sidebar-menu-item ${activeTab === 'welcome' ? 'active' : ''}`}
             >
-              <Sparkles size={16} />
+              <UserPlus size={16} />
               Welcome
             </button>
 
