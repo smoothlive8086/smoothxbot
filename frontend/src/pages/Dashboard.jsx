@@ -3,6 +3,7 @@ import { api } from '../utils/api';
 import { io } from 'socket.io-client';
 import CropModal from '../components/CropModal';
 import AdminServerSettings from '../components/AdminServerSettings';
+import ChannelMentionInput from '../components/ChannelMentionInput';
 import {
   Shield,
   UserCheck,
@@ -1799,7 +1800,7 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
       .replace(/{username}/g, user?.username || 'Member')
       .replace(/{server}/g, guildName || 'Server');
 
-    const parts = text.split(/({user}|{channel}|{channel2}|{channel3})/g);
+    const parts = text.split(/({user}|{channel}|{channel2}|{channel3}|<#\d+>)/g);
 
     return parts.map((part, index) => {
       if (part === '{user}') {
@@ -1827,6 +1828,15 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
         return (
           <span key={`mention-ch3-${index}`} className="discord-mention-channel">
             #{channelName3}
+          </span>
+        );
+      }
+      if (part.startsWith('<#') && part.endsWith('>')) {
+        const targetId = part.slice(2, -1);
+        const ch = channels.find(c => c.id === targetId);
+        return (
+          <span key={`mention-chid-${index}`} className="discord-mention-channel">
+            #{ch ? ch.name : 'channel'}
           </span>
         );
       }
@@ -4093,13 +4103,15 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
 
                           {/* Welcome Message Text */}
                           <div>
-                            <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Welcome Message Template (Supports {`{user}`}, {`{username}`}, {`{server}`}, {`{channel}`}, {`{channel2}`}, {`{channel3}`})</label>
-                            <textarea
-                              value={settings.welcome.message}
+                            <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Welcome Message Template (Type # to select channel, supports {`{user}`}, {`{username}`}, {`{server}`})</label>
+                            <ChannelMentionInput
+                              value={settings.welcome.message || ''}
                               onChange={(e) => handleInputChange('welcome.message', e.target.value)}
+                              channels={channels}
                               className="glass-input"
-                              placeholder="Welcome {user} to the server!"
-                              rows="3"
+                              placeholder="Welcome {user} to the server! Type # to mention channel"
+                              rows={3}
+                              multiline={true}
                               style={{ minHeight: '80px', resize: 'vertical', fontFamily: 'inherit' }}
                             />
                             <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginTop: '4px' }}>
@@ -4111,10 +4123,10 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
                             <div>
                               <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Card Title Text Template</label>
-                              <input
-                                type="text"
+                              <ChannelMentionInput
                                 value={settings.welcome.titleText !== undefined ? settings.welcome.titleText : 'WELCOME'}
                                 onChange={(e) => handleInputChange('welcome.titleText', e.target.value)}
+                                channels={channels}
                                 className="glass-input"
                                 placeholder="e.g. WELCOME"
                               />
@@ -4122,10 +4134,10 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
 
                             <div>
                               <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Card Subtext Template (Supports {`{server}`})</label>
-                              <input
-                                type="text"
+                              <ChannelMentionInput
                                 value={settings.welcome.subtextText !== undefined ? settings.welcome.subtextText : 'TO {server}'}
                                 onChange={(e) => handleInputChange('welcome.subtextText', e.target.value)}
+                                channels={channels}
                                 className="glass-input"
                                 placeholder="e.g. TO {server}"
                               />
@@ -4380,11 +4392,10 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                                 >
                                   <LinkIcon size={16} />
                                 </button>
-
-                                <input
-                                  type="text"
+                                <ChannelMentionInput
                                   value={settings.welcome.embedAuthorName || ''}
                                   onChange={(e) => handleInputChange('welcome.embedAuthorName', e.target.value)}
+                                  channels={channels}
                                   className="glass-input"
                                   placeholder="HERE IS OUR WEBSITE"
                                   style={{ flex: 1 }}
@@ -4417,10 +4428,10 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                                   <LinkIcon size={16} />
                                 </button>
 
-                                <input
-                                  type="text"
+                                <ChannelMentionInput
                                   value={settings.welcome.embedTitle || ''}
                                   onChange={(e) => handleInputChange('welcome.embedTitle', e.target.value)}
+                                  channels={channels}
                                   className="glass-input"
                                   placeholder="Website"
                                   style={{ flex: 1 }}
@@ -4443,11 +4454,13 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                                   {(settings.welcome.message || '').length} / 4096
                                 </span>
                               </div>
-                              <textarea
+                              <ChannelMentionInput
                                 value={settings.welcome.message || ''}
                                 onChange={(e) => handleInputChange('welcome.message', e.target.value)}
+                                channels={channels}
                                 className="glass-input"
-                                rows="3"
+                                rows={3}
+                                multiline={true}
                                 placeholder="**BUY ALL THINGS FROM HERE <#153338781401100410>**"
                                 style={{ width: '100%', minHeight: '80px', resize: 'vertical', fontFamily: 'inherit' }}
                               />
@@ -4477,14 +4490,14 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                                   {settings.welcome.embedFields.map((field, idx) => (
                                     <div key={idx} style={{ padding: '10px', borderRadius: '8px', backgroundColor: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.05)', display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                       <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                                        <input
-                                          type="text"
+                                        <ChannelMentionInput
                                           value={field.name || ''}
                                           onChange={(e) => {
                                             const newFields = [...(settings.welcome.embedFields || [])];
                                             newFields[idx].name = e.target.value;
                                             handleInputChange('welcome.embedFields', newFields);
                                           }}
+                                          channels={channels}
                                           className="glass-input"
                                           placeholder="Field Name"
                                           style={{ flex: 1, fontSize: '0.85rem' }}
@@ -4512,15 +4525,17 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                                           <Trash2 size={16} />
                                         </button>
                                       </div>
-                                      <textarea
+                                      <ChannelMentionInput
                                         value={field.value || ''}
                                         onChange={(e) => {
                                           const newFields = [...(settings.welcome.embedFields || [])];
                                           newFields[idx].value = e.target.value;
                                           handleInputChange('welcome.embedFields', newFields);
                                         }}
+                                        channels={channels}
                                         className="glass-input"
-                                        rows="2"
+                                        rows={2}
+                                        multiline={true}
                                         placeholder="Field Value"
                                         style={{ width: '100%', fontSize: '0.85rem', resize: 'vertical' }}
                                       />
@@ -4632,10 +4647,10 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                                   />
                                 </label>
 
-                                <input
-                                  type="text"
+                                <ChannelMentionInput
                                   value={settings.welcome.embedFooterText || ''}
                                   onChange={(e) => handleInputChange('welcome.embedFooterText', e.target.value)}
+                                  channels={channels}
                                   className="glass-input"
                                   placeholder="@everyone Welcome to my Server"
                                   style={{ flex: 1 }}
