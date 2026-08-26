@@ -34,7 +34,9 @@ import {
   Check,
   Hash,
   Search,
-  Settings
+  Settings,
+  Image as ImageIcon,
+  Link as LinkIcon
 } from 'lucide-react';
 
 const Youtube = ({ size = 24, className = '', style = {} }) => (
@@ -4172,6 +4174,491 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                             </div>
                           </div>
 
+                          {/* Welcome Embed Customizer Section (Matching Example Image 1) */}
+                          <div className="glass-panel" style={{
+                            padding: '20px',
+                            borderRadius: '12px',
+                            backgroundColor: 'rgba(24, 25, 30, 0.95)',
+                            border: '1px solid rgba(255, 255, 255, 0.08)',
+                            marginTop: '16px',
+                            marginBottom: '16px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '16px'
+                          }}>
+                            <div style={{ borderBottom: '1px solid rgba(255,255,255,0.08)', paddingBottom: '10px' }}>
+                              <h4 style={{ fontSize: '1.05rem', fontWeight: '700', color: '#ffffff', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <Sparkles size={18} style={{ color: 'var(--primary)' }} />
+                                Welcome Embed Customizer
+                              </h4>
+                              <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', margin: '2px 0 0 0' }}>
+                                Customize color, thumbnail, author, title, description markdown, fields, main image banner, and footer icon.
+                              </p>
+                            </div>
+
+                            {/* Top Row: Color & Thumbnail */}
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 120px', gap: '16px', alignItems: 'flex-start' }}>
+                              
+                              {/* Color Picker & Swatches */}
+                              <div>
+                                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-secondary)', marginBottom: '8px' }}>
+                                  Color
+                                </label>
+                                <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '10px' }}>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', backgroundColor: '#0f1013', border: '1px solid var(--border-color)', borderRadius: '6px', padding: '4px 8px' }}>
+                                    <input
+                                      type="color"
+                                      value={settings.welcome.embedColor?.startsWith('#') ? settings.welcome.embedColor : `#${settings.welcome.embedColor || '2563eb'}`}
+                                      onChange={(e) => handleInputChange('welcome.embedColor', e.target.value)}
+                                      style={{ width: '28px', height: '28px', padding: '0', border: 'none', borderRadius: '4px', cursor: 'pointer', background: 'none' }}
+                                    />
+                                    <input
+                                      type="text"
+                                      value={settings.welcome.embedColor || '#2563eb'}
+                                      onChange={(e) => handleInputChange('welcome.embedColor', e.target.value)}
+                                      style={{ width: '75px', background: 'none', border: 'none', color: '#ffffff', fontSize: '0.85rem', fontFamily: 'monospace', outline: 'none' }}
+                                      placeholder="#2563eb"
+                                    />
+                                  </div>
+
+                                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', alignItems: 'center' }}>
+                                    {[
+                                      '#000000', '#2ecc71', '#3498db', '#9b59b6', '#e91e63',
+                                      '#f1c40f', '#e67e22', '#e74c3c', '#95a5a6', '#34495e', '#ffffff'
+                                    ].map(colorHex => (
+                                      <button
+                                        key={colorHex}
+                                        type="button"
+                                        onClick={() => handleInputChange('welcome.embedColor', colorHex)}
+                                        style={{
+                                          width: '20px',
+                                          height: '20px',
+                                          borderRadius: '50%',
+                                          backgroundColor: colorHex,
+                                          border: settings.welcome.embedColor === colorHex ? '2px solid #ffffff' : '1px solid rgba(255,255,255,0.2)',
+                                          cursor: 'pointer',
+                                          scale: settings.welcome.embedColor === colorHex ? '1.2' : '1',
+                                          transition: 'all 0.15s ease'
+                                        }}
+                                        title={colorHex}
+                                      />
+                                    ))}
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Thumbnail Section */}
+                              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                                <span style={{ fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-secondary)', marginBottom: '6px', display: 'block', width: '100%', textAlign: 'right' }}>
+                                  Thumbnail
+                                </span>
+                                <div style={{
+                                  position: 'relative',
+                                  width: '85px',
+                                  height: '85px',
+                                  borderRadius: '8px',
+                                  backgroundColor: '#111216',
+                                  border: '1px solid rgba(255,255,255,0.1)',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  overflow: 'hidden'
+                                }}>
+                                  {(() => {
+                                    const t = settings.welcome.embedThumbnail;
+                                    let thumbSrc = null;
+                                    if (t === '{server_icon}') thumbSrc = guildIcon || 'https://cdn.discordapp.com/embed/avatars/0.png';
+                                    else if (t === 'none') thumbSrc = null;
+                                    else if (t && t !== '{user_avatar}') thumbSrc = resolveUploadUrl(t);
+                                    else thumbSrc = user.avatar ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png` : 'https://cdn.discordapp.com/embed/avatars/0.png';
+
+                                    if (thumbSrc) {
+                                      return (
+                                        <>
+                                          <img src={thumbSrc} alt="Thumbnail preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                          <button
+                                            type="button"
+                                            onClick={() => handleInputChange('welcome.embedThumbnail', 'none')}
+                                            style={{
+                                              position: 'absolute',
+                                              top: '4px',
+                                              right: '4px',
+                                              width: '18px',
+                                              height: '18px',
+                                              borderRadius: '50%',
+                                              backgroundColor: 'rgba(0,0,0,0.85)',
+                                              color: '#ffffff',
+                                              border: 'none',
+                                              cursor: 'pointer',
+                                              display: 'flex',
+                                              alignItems: 'center',
+                                              justifyContent: 'center'
+                                            }}
+                                            title="Remove Thumbnail"
+                                          >
+                                            <X size={12} />
+                                          </button>
+                                        </>
+                                      );
+                                    }
+                                    return (
+                                      <label style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', gap: '4px' }}>
+                                        <ImageIcon size={22} style={{ color: 'var(--text-muted)' }} />
+                                        <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>Upload</span>
+                                        <input
+                                          type="file"
+                                          accept="image/*"
+                                          style={{ display: 'none' }}
+                                          onChange={async (e) => {
+                                            const file = e.target.files[0];
+                                            if (file) {
+                                              const res = await api.uploadBackground(guildId, file).catch(() => null);
+                                              if (res && res.url) handleInputChange('welcome.embedThumbnail', res.url);
+                                            }
+                                            e.target.value = null;
+                                          }}
+                                        />
+                                      </label>
+                                    );
+                                  })()}
+                                </div>
+
+                                <div style={{ display: 'flex', gap: '4px', marginTop: '6px' }}>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleInputChange('welcome.embedThumbnail', '{user_avatar}')}
+                                    className="btn-secondary"
+                                    style={{ padding: '2px 6px', fontSize: '0.62rem', borderRadius: '4px', background: settings.welcome.embedThumbnail === '{user_avatar}' || !settings.welcome.embedThumbnail ? 'var(--primary)' : undefined }}
+                                  >
+                                    User Avatar
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleInputChange('welcome.embedThumbnail', '{server_icon}')}
+                                    className="btn-secondary"
+                                    style={{ padding: '2px 6px', fontSize: '0.62rem', borderRadius: '4px', background: settings.welcome.embedThumbnail === '{server_icon}' ? 'var(--primary)' : undefined }}
+                                  >
+                                    Server Icon
+                                  </button>
+                                </div>
+                              </div>
+
+                            </div>
+
+                            {/* Author Section */}
+                            <div>
+                              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-secondary)', marginBottom: '6px' }}>
+                                Author
+                              </label>
+                              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                <label className="btn-secondary" style={{ padding: '8px 10px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '38px', borderRadius: '6px' }} title="Upload Author Icon">
+                                  <ImageIcon size={16} />
+                                  <input
+                                    type="file"
+                                    accept="image/*"
+                                    style={{ display: 'none' }}
+                                    onChange={async (e) => {
+                                      const file = e.target.files[0];
+                                      if (file) {
+                                        const res = await api.uploadBackground(guildId, file).catch(() => null);
+                                        if (res && res.url) handleInputChange('welcome.embedAuthorIcon', res.url);
+                                      }
+                                      e.target.value = null;
+                                    }}
+                                  />
+                                </label>
+
+                                <button
+                                  type="button"
+                                  className="btn-secondary"
+                                  onClick={() => {
+                                    const url = prompt('Enter Author Link URL:', settings.welcome.embedAuthorUrl || '');
+                                    if (url !== null) handleInputChange('welcome.embedAuthorUrl', url);
+                                  }}
+                                  style={{ padding: '8px 10px', height: '38px', borderRadius: '6px', background: settings.welcome.embedAuthorUrl ? 'var(--primary-glow)' : undefined }}
+                                  title="Set Author Link URL"
+                                >
+                                  <LinkIcon size={16} />
+                                </button>
+
+                                <input
+                                  type="text"
+                                  value={settings.welcome.embedAuthorName || ''}
+                                  onChange={(e) => handleInputChange('welcome.embedAuthorName', e.target.value)}
+                                  className="glass-input"
+                                  placeholder="HERE IS OUR WEBSITE"
+                                  style={{ flex: 1 }}
+                                />
+                              </div>
+                              {(settings.welcome.embedAuthorIcon || settings.welcome.embedAuthorUrl) && (
+                                <div style={{ display: 'flex', gap: '12px', fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '4px' }}>
+                                  {settings.welcome.embedAuthorIcon && <span>Icon: {settings.welcome.embedAuthorIcon}</span>}
+                                  {settings.welcome.embedAuthorUrl && <span>URL: {settings.welcome.embedAuthorUrl}</span>}
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Title Section */}
+                            <div>
+                              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-secondary)', marginBottom: '6px' }}>
+                                Title
+                              </label>
+                              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                <button
+                                  type="button"
+                                  className="btn-secondary"
+                                  onClick={() => {
+                                    const url = prompt('Enter Title Link URL:', settings.welcome.embedTitleUrl || '');
+                                    if (url !== null) handleInputChange('welcome.embedTitleUrl', url);
+                                  }}
+                                  style={{ padding: '8px 10px', height: '38px', borderRadius: '6px', background: settings.welcome.embedTitleUrl ? 'var(--primary-glow)' : undefined }}
+                                  title="Set Title Link URL"
+                                >
+                                  <LinkIcon size={16} />
+                                </button>
+
+                                <input
+                                  type="text"
+                                  value={settings.welcome.embedTitle || ''}
+                                  onChange={(e) => handleInputChange('welcome.embedTitle', e.target.value)}
+                                  className="glass-input"
+                                  placeholder="Website"
+                                  style={{ flex: 1 }}
+                                />
+                              </div>
+                              {settings.welcome.embedTitleUrl && (
+                                <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', display: 'block', marginTop: '4px' }}>
+                                  Link URL: {settings.welcome.embedTitleUrl}
+                                </span>
+                              )}
+                            </div>
+
+                            {/* Description Section */}
+                            <div>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                                <label style={{ fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-secondary)' }}>
+                                  Description
+                                </label>
+                                <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                                  {(settings.welcome.message || '').length} / 4096
+                                </span>
+                              </div>
+                              <textarea
+                                value={settings.welcome.message || ''}
+                                onChange={(e) => handleInputChange('welcome.message', e.target.value)}
+                                className="glass-input"
+                                rows="3"
+                                placeholder="**BUY ALL THINGS FROM HERE <#153338781401100410>**"
+                                style={{ width: '100%', minHeight: '80px', resize: 'vertical', fontFamily: 'inherit' }}
+                              />
+                            </div>
+
+                            {/* Fields Section */}
+                            <div>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                                <label style={{ fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-secondary)' }}>
+                                  Fields
+                                </label>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const currentFields = settings.welcome.embedFields || [];
+                                    handleInputChange('welcome.embedFields', [...currentFields, { name: '', value: '', inline: false }]);
+                                  }}
+                                  className="btn-secondary"
+                                  style={{ padding: '4px 10px', fontSize: '0.75rem', borderRadius: '6px', display: 'flex', alignItems: 'center', gap: '4px' }}
+                                >
+                                  <Plus size={14} /> Add Field
+                                </button>
+                              </div>
+
+                              {Array.isArray(settings.welcome.embedFields) && settings.welcome.embedFields.length > 0 && (
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                  {settings.welcome.embedFields.map((field, idx) => (
+                                    <div key={idx} style={{ padding: '10px', borderRadius: '8px', backgroundColor: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.05)', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                      <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                        <input
+                                          type="text"
+                                          value={field.name || ''}
+                                          onChange={(e) => {
+                                            const newFields = [...(settings.welcome.embedFields || [])];
+                                            newFields[idx].name = e.target.value;
+                                            handleInputChange('welcome.embedFields', newFields);
+                                          }}
+                                          className="glass-input"
+                                          placeholder="Field Name"
+                                          style={{ flex: 1, fontSize: '0.85rem' }}
+                                        />
+                                        <label style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.75rem', cursor: 'pointer' }}>
+                                          <input
+                                            type="checkbox"
+                                            checked={Boolean(field.inline)}
+                                            onChange={(e) => {
+                                              const newFields = [...(settings.welcome.embedFields || [])];
+                                              newFields[idx].inline = e.target.checked;
+                                              handleInputChange('welcome.embedFields', newFields);
+                                            }}
+                                          />
+                                          Inline
+                                        </label>
+                                        <button
+                                          type="button"
+                                          onClick={() => {
+                                            const newFields = settings.welcome.embedFields.filter((_, i) => i !== idx);
+                                            handleInputChange('welcome.embedFields', newFields);
+                                          }}
+                                          style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', padding: '4px' }}
+                                        >
+                                          <Trash2 size={16} />
+                                        </button>
+                                      </div>
+                                      <textarea
+                                        value={field.value || ''}
+                                        onChange={(e) => {
+                                          const newFields = [...(settings.welcome.embedFields || [])];
+                                          newFields[idx].value = e.target.value;
+                                          handleInputChange('welcome.embedFields', newFields);
+                                        }}
+                                        className="glass-input"
+                                        rows="2"
+                                        placeholder="Field Value"
+                                        style={{ width: '100%', fontSize: '0.85rem', resize: 'vertical' }}
+                                      />
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Image Section (Main Banner Image) */}
+                            <div>
+                              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-secondary)', marginBottom: '6px' }}>
+                                Image
+                              </label>
+                              <div style={{
+                                position: 'relative',
+                                width: '100%',
+                                minHeight: '90px',
+                                borderRadius: '8px',
+                                backgroundColor: '#111216',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                padding: '10px',
+                                overflow: 'hidden'
+                              }}>
+                                {settings.welcome.embedImage ? (
+                                  <div style={{ position: 'relative', width: '100%', textAlign: 'center' }}>
+                                    <img src={resolveUploadUrl(settings.welcome.embedImage)} alt="Embed Main Image" style={{ maxHeight: '160px', maxWidth: '100%', objectFit: 'contain', borderRadius: '4px' }} />
+                                    <button
+                                      type="button"
+                                      onClick={() => handleInputChange('welcome.embedImage', '')}
+                                      style={{
+                                        position: 'absolute',
+                                        top: '4px',
+                                        right: '4px',
+                                        width: '22px',
+                                        height: '22px',
+                                        borderRadius: '50%',
+                                        backgroundColor: 'rgba(0,0,0,0.85)',
+                                        color: '#ffffff',
+                                        border: 'none',
+                                        cursor: 'pointer',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center'
+                                      }}
+                                      title="Remove Main Image"
+                                    >
+                                      <X size={14} />
+                                    </button>
+                                  </div>
+                                ) : (
+                                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', padding: '12px 0' }}>
+                                    <ImageIcon size={28} style={{ color: 'var(--text-muted)' }} />
+                                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                      <label className="btn-secondary" style={{ padding: '6px 14px', fontSize: '0.8rem', cursor: 'pointer' }}>
+                                        Upload Image
+                                        <input
+                                          type="file"
+                                          accept="image/*"
+                                          style={{ display: 'none' }}
+                                          onChange={async (e) => {
+                                            const file = e.target.files[0];
+                                            if (file) {
+                                              const res = await api.uploadBackground(guildId, file).catch(() => null);
+                                              if (res && res.url) handleInputChange('welcome.embedImage', res.url);
+                                            }
+                                            e.target.value = null;
+                                          }}
+                                        />
+                                      </label>
+                                      <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>or paste URL below</span>
+                                    </div>
+                                    <input
+                                      type="text"
+                                      value={settings.welcome.embedImage || ''}
+                                      onChange={(e) => handleInputChange('welcome.embedImage', e.target.value)}
+                                      className="glass-input"
+                                      placeholder="https://example.com/banner.png"
+                                      style={{ width: '280px', fontSize: '0.8rem', textAlign: 'center' }}
+                                    />
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Footer Section */}
+                            <div>
+                              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-secondary)', marginBottom: '6px' }}>
+                                Footer
+                              </label>
+                              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                <label className="btn-secondary" style={{ padding: '8px 10px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '38px', borderRadius: '6px' }} title="Upload Footer Icon">
+                                  <ImageIcon size={16} />
+                                  <input
+                                    type="file"
+                                    accept="image/*"
+                                    style={{ display: 'none' }}
+                                    onChange={async (e) => {
+                                      const file = e.target.files[0];
+                                      if (file) {
+                                        const res = await api.uploadBackground(guildId, file).catch(() => null);
+                                        if (res && res.url) handleInputChange('welcome.embedFooterIcon', res.url);
+                                      }
+                                      e.target.value = null;
+                                    }}
+                                  />
+                                </label>
+
+                                <input
+                                  type="text"
+                                  value={settings.welcome.embedFooterText || ''}
+                                  onChange={(e) => handleInputChange('welcome.embedFooterText', e.target.value)}
+                                  className="glass-input"
+                                  placeholder="@everyone Welcome to my Server"
+                                  style={{ flex: 1 }}
+                                />
+
+                                <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', cursor: 'pointer', whiteSpace: 'nowrap', color: 'var(--text-secondary)' }}>
+                                  <input
+                                    type="checkbox"
+                                    checked={settings.welcome.embedTimestamp !== false}
+                                    onChange={(e) => handleInputChange('welcome.embedTimestamp', e.target.checked)}
+                                  />
+                                  • Add timestamp
+                                </label>
+                              </div>
+                              {settings.welcome.embedFooterIcon && (
+                                <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', display: 'block', marginTop: '4px' }}>
+                                  Footer Icon URL: {settings.welcome.embedFooterIcon}
+                                </span>
+                              )}
+                            </div>
+
+                          </div>
+
                           {/* Control Customizers and Live Preview Grid */}
                           <div className="welcome-preview-grid">
 
@@ -4919,78 +5406,129 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                                     </>
                                   )}
 
-                                  {settings.welcome.layoutType === 'embed-only' && (
-                                    <>
-                                      <div className="discord-message-text" style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontStyle: 'italic', marginBottom: '4px' }}>
-                                        Mentions {`@${user?.username || 'Member'}`}
-                                      </div>
-                                      <div className="discord-embed" style={{ borderLeftColor: settings.welcome.textColor || '#2563eb' }}>
-                                        <div className="discord-embed-inner">
-                                          <div className="discord-embed-content">
-                                            <div className="discord-embed-title">
-                                              Welcome to {guildName || 'Server'}!
-                                            </div>
-                                            <div className="discord-embed-description">
-                                              {formatWelcomeText(settings.welcome.message)}
-                                            </div>
-                                          </div>
-                                          <img
-                                            src={user.avatar ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png` : 'https://cdn.discordapp.com/embed/avatars/0.png'}
-                                            alt="member avatar"
-                                            className="discord-embed-thumbnail"
-                                          />
-                                        </div>
-                                      </div>
-                                      {renderRedirectButton()}
-                                      <div className="discord-info-banner">
-                                        <Info size={16} style={{ flexShrink: 0 }} />
-                                        <span>
-                                          <strong>Embed Only</strong> layout is selected. The Canvas Card image is disabled. Select <strong>Classic Card</strong> or <strong>Embed with Card</strong> to design and position your canvas elements.
-                                        </span>
-                                      </div>
-                                    </>
-                                  )}
+                                  {/* Render rich embed for embed-only and embed-card */}
+                                  {(settings.welcome.layoutType === 'embed-only' || settings.welcome.layoutType === 'embed-card') && (() => {
+                                    let previewThumbUrl = null;
+                                    const thumbSetting = settings.welcome.embedThumbnail;
+                                    if (thumbSetting === '{server_icon}') {
+                                      previewThumbUrl = guildIcon || 'https://cdn.discordapp.com/embed/avatars/0.png';
+                                    } else if (thumbSetting === 'none') {
+                                      previewThumbUrl = null;
+                                    } else if (thumbSetting && thumbSetting !== '{user_avatar}') {
+                                      previewThumbUrl = resolveUploadUrl(thumbSetting);
+                                    } else {
+                                      previewThumbUrl = user.avatar ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png` : 'https://cdn.discordapp.com/embed/avatars/0.png';
+                                    }
 
-                                  {settings.welcome.layoutType === 'classic' && (
-                                    <>
-                                      <div className="discord-message-text">
-                                        {formatWelcomeText(settings.welcome.message)}
-                                      </div>
-                                      <div className="discord-attachment-image">
-                                        {renderCanvasCard()}
-                                      </div>
-                                      {renderRedirectButton()}
-                                    </>
-                                  )}
+                                    const authorIconUrl = settings.welcome.embedAuthorIcon ? resolveUploadUrl(settings.welcome.embedAuthorIcon) : null;
+                                    const footerIconUrl = settings.welcome.embedFooterIcon ? resolveUploadUrl(settings.welcome.embedFooterIcon) : null;
+                                    const mainImageUrl = settings.welcome.embedImage ? resolveUploadUrl(settings.welcome.embedImage) : null;
 
-                                  {settings.welcome.layoutType === 'embed-card' && (
-                                    <>
-                                      <div className="discord-message-text" style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontStyle: 'italic', marginBottom: '4px' }}>
-                                        Mentions {`@${user?.username || 'Member'}`}
-                                      </div>
-                                      <div className="discord-embed" style={{ borderLeftColor: settings.welcome.textColor || '#2563eb' }}>
-                                        <div className="discord-embed-inner">
-                                          <div className="discord-embed-content">
-                                            <div className="discord-embed-title">
-                                              Welcome to {guildName || 'Server'}!
+                                    return (
+                                      <>
+                                        <div className="discord-message-text" style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontStyle: 'italic', marginBottom: '4px' }}>
+                                          Mentions <span style={{ backgroundColor: 'rgba(88, 101, 242, 0.3)', color: '#c9cdfb', padding: '0 4px', borderRadius: '3px' }}>@{user?.username || 'Member'}</span>
+                                        </div>
+
+                                        <div className="discord-embed" style={{ borderLeftColor: settings.welcome.embedColor || settings.welcome.textColor || '#2563eb', padding: '12px 16px', borderRadius: '4px', backgroundColor: '#2b2d31' }}>
+                                          
+                                          {/* Author Section */}
+                                          {settings.welcome.embedAuthorName && (
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                                              {authorIconUrl && (
+                                                <img src={authorIconUrl} alt="" style={{ width: '22px', height: '22px', borderRadius: '50%', objectFit: 'cover' }} />
+                                              )}
+                                              {settings.welcome.embedAuthorUrl ? (
+                                                <a href={settings.welcome.embedAuthorUrl} target="_blank" rel="noreferrer" style={{ fontSize: '0.85rem', fontWeight: '600', color: '#ffffff', textDecoration: 'none' }} onClick={e => e.preventDefault()}>
+                                                  {formatWelcomeText(settings.welcome.embedAuthorName)} ⮩
+                                                </a>
+                                              ) : (
+                                                <span style={{ fontSize: '0.85rem', fontWeight: '600', color: '#ffffff' }}>
+                                                  {formatWelcomeText(settings.welcome.embedAuthorName)}
+                                                </span>
+                                              )}
                                             </div>
-                                            <div className="discord-embed-description">
-                                              {formatWelcomeText(settings.welcome.message)}
+                                          )}
+
+                                          {/* Title & Thumbnail Row */}
+                                          <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px' }}>
+                                            <div style={{ flex: 1 }}>
+                                              <div style={{ fontWeight: '700', color: '#38bdf8', fontSize: '1rem', marginBottom: '6px' }}>
+                                                {settings.welcome.embedTitleUrl ? (
+                                                  <a href={settings.welcome.embedTitleUrl} target="_blank" rel="noreferrer" style={{ color: '#38bdf8', textDecoration: 'none' }} onClick={e => e.preventDefault()}>
+                                                    {formatWelcomeText(settings.welcome.embedTitle || `Welcome to ${guildName || 'Server'}!`)}
+                                                  </a>
+                                                ) : (
+                                                  formatWelcomeText(settings.welcome.embedTitle || `Welcome to ${guildName || 'Server'}!`)
+                                                )}
+                                              </div>
+
+                                              {/* Description */}
+                                              {settings.welcome.message && (
+                                                <div style={{ fontSize: '0.875rem', color: '#dbdee1', whiteSpace: 'pre-wrap', marginBottom: '8px', wordBreak: 'break-word' }}>
+                                                  {formatWelcomeText(settings.welcome.message)}
+                                                </div>
+                                              )}
                                             </div>
+
+                                            {/* Thumbnail */}
+                                            {previewThumbUrl && (
+                                              <img
+                                                src={previewThumbUrl}
+                                                alt="embed thumbnail"
+                                                style={{ width: '70px', height: '70px', borderRadius: '4px', objectFit: 'cover', flexShrink: 0 }}
+                                              />
+                                            )}
                                           </div>
-                                          <img
-                                            src={user.avatar ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png` : 'https://cdn.discordapp.com/embed/avatars/0.png'}
-                                            alt="member avatar"
-                                            className="discord-embed-thumbnail"
-                                          />
+
+                                          {/* Fields */}
+                                          {Array.isArray(settings.welcome.embedFields) && settings.welcome.embedFields.length > 0 && (
+                                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px 16px', marginTop: '8px', marginBottom: '8px' }}>
+                                              {settings.welcome.embedFields.map((f, idx) => (
+                                                <div key={idx} style={{ flex: f.inline ? '1 0 120px' : '100%', maxWidth: f.inline ? 'calc(33.3% - 11px)' : '100%' }}>
+                                                  <div style={{ fontSize: '0.85rem', fontWeight: '600', color: '#ffffff' }}>{formatWelcomeText(f.name)}</div>
+                                                  <div style={{ fontSize: '0.825rem', color: '#dbdee1' }}>{formatWelcomeText(f.value)}</div>
+                                                </div>
+                                              ))}
+                                            </div>
+                                          )}
+
+                                          {/* Main Image Banner */}
+                                          {settings.welcome.layoutType === 'embed-card' ? (
+                                            <div style={{ marginTop: '10px', borderRadius: '4px', overflow: 'hidden' }}>
+                                              {renderCanvasCard()}
+                                            </div>
+                                          ) : (
+                                            (mainImageUrl || (settings.welcome.gifSupport && settings.welcome.background)) && (
+                                              <div style={{ marginTop: '10px', borderRadius: '4px', overflow: 'hidden' }}>
+                                                <img src={mainImageUrl || resolveUploadUrl(settings.welcome.background)} alt="embed main banner" style={{ maxWidth: '100%', maxHeight: '250px', borderRadius: '4px', objectFit: 'cover' }} />
+                                              </div>
+                                            )
+                                          )}
+
+                                          {/* Footer & Timestamp */}
+                                          {(settings.welcome.embedFooterText || footerIconUrl || settings.welcome.embedTimestamp !== false) && (
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '10px', color: '#949ba4', fontSize: '0.75rem' }}>
+                                              {footerIconUrl && (
+                                                <img src={footerIconUrl} alt="" style={{ width: '18px', height: '18px', borderRadius: '50%', objectFit: 'cover' }} />
+                                              )}
+                                              {settings.welcome.embedFooterText && (
+                                                <span>{formatWelcomeText(settings.welcome.embedFooterText)}</span>
+                                              )}
+                                              {settings.welcome.embedTimestamp !== false && (
+                                                <>
+                                                  {settings.welcome.embedFooterText && <span>•</span>}
+                                                  <span>Today at {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                                </>
+                                              )}
+                                            </div>
+                                          )}
+
                                         </div>
-                                        <div className="discord-embed-image">
-                                          {renderCanvasCard()}
-                                        </div>
-                                      </div>
-                                      {renderRedirectButton()}
-                                    </>
-                                  )}
+                                        {renderRedirectButton()}
+                                      </>
+                                    );
+                                  })()}
 
                                 </div>
                               </div>
