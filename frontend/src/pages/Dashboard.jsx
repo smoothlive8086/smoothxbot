@@ -53,6 +53,174 @@ const Youtube = ({ size = 24, className = '', style = {} }) => (
 );
 
 
+// Interactive Emoji Picker Component
+function EmojiPickerPopover({ emojis = [], onSelectEmoji, onClose }) {
+  const [activeTab, setActiveTab] = useState('server'); // 'server' | 'unicode'
+  const [search, setSearch] = useState('');
+
+  const commonUnicode = [
+    '😀','😃','😄','😁','😆','😅','🤣','😂','🙂','😉','😊','😇','🥰','😍','🤩','😘',
+    '😗','😚','😋','😛','😜','🤪','😝','🤑','🤗','🤭','🤫','🤔','🤐','🤨','😐','😑',
+    '😶','😏','😒','🙄','😬','🤥','😌','😔','😪','🤤','😴','😷','🤒','🤕','🤢','🤮',
+    '🤧','🥵','🥶','🥴','😵','🤯','🤠','🥳','😎','🤓','🧐','😕','😟','🙁','😮','😯',
+    '😲','😳','🥺','😦','😧','📁','🔥','✨','⭐','🌟','💥','⚡','🎉','🎊','🚀','❤️',
+    '🧡','💛','💚','💙','💜','🖤','🤍','🤎','💯','👍','👎','👏','🙌','👐','🤲','🤝',
+    '🙏','✍️','💪','👑','🤖','💎','🔔','🎁','📌','📣','📢','🔒','🔑','⚙️','🛠️','🎫','✅','❌','⚠️'
+  ];
+
+  const filteredServerEmojis = emojis.filter(e => e.name && e.name.toLowerCase().includes(search.toLowerCase()));
+
+  return (
+    <div style={{
+      position: 'absolute',
+      zIndex: 9999,
+      backgroundColor: '#2b2d31',
+      border: '1px solid rgba(255,255,255,0.15)',
+      borderRadius: '8px',
+      boxShadow: '0 8px 24px rgba(0,0,0,0.6)',
+      width: '320px',
+      padding: '12px',
+      marginTop: '4px'
+    }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+        <div style={{ display: 'flex', gap: '6px' }}>
+          <button
+            type="button"
+            onClick={() => setActiveTab('server')}
+            style={{
+              padding: '4px 10px',
+              borderRadius: '4px',
+              fontSize: '0.8rem',
+              fontWeight: '600',
+              border: 'none',
+              cursor: 'pointer',
+              backgroundColor: activeTab === 'server' ? '#5865F2' : '#383a40',
+              color: '#ffffff'
+            }}
+          >
+            Server Emojis ({emojis.length})
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('unicode')}
+            style={{
+              padding: '4px 10px',
+              borderRadius: '4px',
+              fontSize: '0.8rem',
+              fontWeight: '600',
+              border: 'none',
+              cursor: 'pointer',
+              backgroundColor: activeTab === 'unicode' ? '#5865F2' : '#383a40',
+              color: '#ffffff'
+            }}
+          >
+            Standard 😀
+          </button>
+        </div>
+        <button
+          type="button"
+          onClick={onClose}
+          style={{
+            background: 'none',
+            border: 'none',
+            color: '#949ba4',
+            cursor: 'pointer',
+            fontSize: '1rem',
+            lineHeight: 1
+          }}
+        >
+          ✕
+        </button>
+      </div>
+
+      <input
+        type="text"
+        placeholder="Search emoji..."
+        value={search}
+        onChange={e => setSearch(e.target.value)}
+        style={{
+          width: '100%',
+          padding: '6px 10px',
+          borderRadius: '4px',
+          backgroundColor: '#1e1f22',
+          border: '1px solid rgba(255,255,255,0.1)',
+          color: '#ffffff',
+          fontSize: '0.85rem',
+          marginBottom: '8px'
+        }}
+      />
+
+      <div style={{
+        maxHeight: '180px',
+        overflowY: 'auto',
+        display: 'grid',
+        gridTemplateColumns: 'repeat(6, 1fr)',
+        gap: '6px',
+        padding: '4px'
+      }}>
+        {activeTab === 'server' ? (
+          filteredServerEmojis.length > 0 ? (
+            filteredServerEmojis.map(e => (
+              <button
+                key={e.id}
+                type="button"
+                title={`:${e.name}:`}
+                onClick={() => {
+                  onSelectEmoji(e.identifier);
+                  onClose();
+                }}
+                style={{
+                  background: 'none',
+                  border: '1px solid transparent',
+                  borderRadius: '4px',
+                  padding: '4px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transition: 'background 0.15s'
+                }}
+                onMouseEnter={el => el.currentTarget.style.backgroundColor = '#35373c'}
+                onMouseLeave={el => el.currentTarget.style.backgroundColor = 'transparent'}
+              >
+                <img src={e.url} alt={e.name} style={{ width: '24px', height: '24px', objectFit: 'contain' }} />
+              </button>
+            ))
+          ) : (
+            <div style={{ gridColumn: 'span 6', color: '#949ba4', fontSize: '0.8rem', textAlign: 'center', padding: '12px' }}>
+              No custom emojis found
+            </div>
+          )
+        ) : (
+          commonUnicode.filter(u => !search || u.includes(search)).map((char, idx) => (
+            <button
+              key={idx}
+              type="button"
+              onClick={() => {
+                onSelectEmoji(char);
+                onClose();
+              }}
+              style={{
+                background: 'none',
+                border: 'none',
+                borderRadius: '4px',
+                padding: '4px',
+                cursor: 'pointer',
+                fontSize: '1.2rem',
+                textAlign: 'center'
+              }}
+              onMouseEnter={el => el.currentTarget.style.backgroundColor = '#35373c'}
+              onMouseLeave={el => el.currentTarget.style.backgroundColor = 'transparent'}
+            >
+              {char}
+            </button>
+          ))
+        )}
+      </div>
+    </div>
+  );
+}
+
 // Discord Message Preview Component
 function DiscordMessagePreview({
   botUser,
@@ -100,15 +268,38 @@ function DiscordMessagePreview({
     }
   }
 
-  // Parse markdown bold **text** to <strong> tags for visual correctness
+  // Parse markdown bold **text** and custom Discord emojis <:name:id> / <a:name:id> to JSX elements
   const formatMarkdown = (text) => {
     if (!text) return null;
-    const parts = text.split(/(\*\*.*?\*\*)/g);
-    return parts.map((part, index) => {
-      if (part.startsWith('**') && part.endsWith('**')) {
-        return <strong key={index} style={{ color: '#ffffff' }}>{part.slice(2, -2)}</strong>;
+    const tokens = text.split(/(\*\*.*?\*\*|<a?:[a-zA-Z0-9_]+:\d+>)/g);
+    return tokens.map((token, index) => {
+      if (token.startsWith('**') && token.endsWith('**')) {
+        return <strong key={index} style={{ color: '#ffffff' }}>{token.slice(2, -2)}</strong>;
       }
-      return part;
+      const emojiMatch = token.match(/^<(a)?:([a-zA-Z0-9_]+):(\d+)>$/);
+      if (emojiMatch) {
+        const isAnimated = !!emojiMatch[1];
+        const emojiName = emojiMatch[2];
+        const emojiId = emojiMatch[3];
+        const ext = isAnimated ? 'gif' : 'png';
+        const url = `https://cdn.discordapp.com/emojis/${emojiId}.${ext}`;
+        return (
+          <img
+            key={index}
+            src={url}
+            alt={`:${emojiName}:`}
+            title={`:${emojiName}:`}
+            style={{
+              width: '1.375em',
+              height: '1.375em',
+              verticalAlign: '-0.25em',
+              display: 'inline-block',
+              margin: '0 2px'
+            }}
+          />
+        );
+      }
+      return token;
     });
   };
 
@@ -487,6 +678,9 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
   const [pubEmbedFooterText, setPubEmbedFooterText] = useState('');
   const [pubEmbedFooterIcon, setPubEmbedFooterIcon] = useState('');
   const [pubEmbedFields, setPubEmbedFields] = useState([]); // Array of { name, value, inline }
+
+  const [emojis, setEmojis] = useState([]);
+  const [activeEmojiPickerTarget, setActiveEmojiPickerTarget] = useState(null); // field name string or null
 
   const [pubEmbedEnabled, setPubEmbedEnabled] = useState(false);
   const [pubEmbedTitle, setPubEmbedTitle] = useState('');
@@ -1156,19 +1350,21 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
     }
   };
 
-  // Load Channels, Roles, and Settings
+  // Load Channels, Roles, Settings, and Emojis
   const loadData = async (showLoadingIndicator = true) => {
     try {
       if (showLoadingIndicator) setLoading(true);
-      const [chData, rData, sData, catData, vcData] = await Promise.all([
+      const [chData, rData, sData, catData, vcData, emojiData] = await Promise.all([
         api.getChannels(guildId),
         api.getRoles(guildId),
         api.getSettings(guildId),
         api.getCategories(guildId),
-        api.getVoiceChannels(guildId)
+        api.getVoiceChannels(guildId),
+        api.getEmojis(guildId).catch(() => [])
       ]);
       setChannels(chData);
       setRoles(rData);
+      setEmojis(emojiData || []);
       if (sData) {
         if (!sData.logging) {
           sData.logging = {
@@ -7471,14 +7667,33 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
 
                       {/* Message Textarea */}
                       <div>
-                        <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Message Content</label>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                          <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Message Content</label>
+                          <div style={{ position: 'relative' }}>
+                            <button
+                              type="button"
+                              onClick={() => setActiveEmojiPickerTarget(activeEmojiPickerTarget === 'pubMessage' ? null : 'pubMessage')}
+                              className="btn-secondary"
+                              style={{ padding: '2px 8px', fontSize: '0.75rem', borderRadius: '4px', cursor: 'pointer' }}
+                            >
+                              😀 Emojis
+                            </button>
+                            {activeEmojiPickerTarget === 'pubMessage' && (
+                              <EmojiPickerPopover
+                                emojis={emojis}
+                                onSelectEmoji={(emojiStr) => setPubMessage(prev => prev + emojiStr)}
+                                onClose={() => setActiveEmojiPickerTarget(null)}
+                              />
+                            )}
+                          </div>
+                        </div>
                         <textarea
                           rows="4"
                           value={pubMessage}
                           onChange={(e) => setPubMessage(e.target.value)}
                           maxLength={2000}
                           className="glass-input"
-                          placeholder="Type your channel message here..."
+                          placeholder="Type your channel message here... (supports all unicode & server custom emojis)"
                         />
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '4px' }}>
                           <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
@@ -7669,10 +7884,29 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                               )}
                             </div>
 
-                            {/* Embed Title & Color */}
+                             {/* Embed Title & Color */}
                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
                               <div>
-                                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>Embed Title</label>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                                  <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Embed Title</label>
+                                  <div style={{ position: 'relative' }}>
+                                    <button
+                                      type="button"
+                                      onClick={() => setActiveEmojiPickerTarget(activeEmojiPickerTarget === 'pubEmbedTitle' ? null : 'pubEmbedTitle')}
+                                      className="btn-secondary"
+                                      style={{ padding: '1px 6px', fontSize: '0.7rem', borderRadius: '4px', cursor: 'pointer' }}
+                                    >
+                                      😀 Emojis
+                                    </button>
+                                    {activeEmojiPickerTarget === 'pubEmbedTitle' && (
+                                      <EmojiPickerPopover
+                                        emojis={emojis}
+                                        onSelectEmoji={(emojiStr) => setPubEmbedTitle(prev => prev + emojiStr)}
+                                        onClose={() => setActiveEmojiPickerTarget(null)}
+                                      />
+                                    )}
+                                  </div>
+                                </div>
                                 <input
                                   type="text"
                                   value={pubEmbedTitle}
@@ -7703,7 +7937,26 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
 
                             {/* Embed Description */}
                             <div>
-                              <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>Embed Description</label>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                                <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Embed Description</label>
+                                <div style={{ position: 'relative' }}>
+                                  <button
+                                    type="button"
+                                    onClick={() => setActiveEmojiPickerTarget(activeEmojiPickerTarget === 'pubEmbedDesc' ? null : 'pubEmbedDesc')}
+                                    className="btn-secondary"
+                                    style={{ padding: '1px 6px', fontSize: '0.7rem', borderRadius: '4px', cursor: 'pointer' }}
+                                  >
+                                    😀 Emojis
+                                  </button>
+                                  {activeEmojiPickerTarget === 'pubEmbedDesc' && (
+                                    <EmojiPickerPopover
+                                      emojis={emojis}
+                                      onSelectEmoji={(emojiStr) => setPubEmbedDesc(prev => prev + emojiStr)}
+                                      onClose={() => setActiveEmojiPickerTarget(null)}
+                                    />
+                                  )}
+                                </div>
+                              </div>
                               <textarea
                                 rows="3"
                                 value={pubEmbedDesc}
