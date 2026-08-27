@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { api } from '../utils/api';
 import { io } from 'socket.io-client';
 import CropModal from '../components/CropModal';
 import AdminServerSettings from '../components/AdminServerSettings';
+import EmojiPicker, { QuickEmojiBar, insertEmojiAtCursor } from '../components/EmojiPicker';
 import {
   Shield,
   UserCheck,
@@ -36,7 +37,8 @@ import {
   Search,
   Settings,
   Image as ImageIcon,
-  Link as LinkIcon
+  Link as LinkIcon,
+  Smile
 } from 'lucide-react';
 
 const Youtube = ({ size = 24, className = '', style = {} }) => (
@@ -474,6 +476,24 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
   const [pubButtonEnabled, setPubButtonEnabled] = useState(false);
   const [pubButtonLabel, setPubButtonLabel] = useState('');
   const [pubButtonUrl, setPubButtonUrl] = useState('');
+
+  // Emoji picker state & refs
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [emojiTargetField, setEmojiTargetField] = useState('message'); // 'message' | 'embedTitle' | 'embedDesc'
+  const [emojiTarget, setEmojiTarget] = useState(null); // { ref, value, onChange }
+  const pubMessageRef = useRef(null);
+  const pubEmbedTitleRef = useRef(null);
+  const pubEmbedDescRef = useRef(null);
+  const pubEmbedAuthorNameRef = useRef(null);
+  const pubEmbedFooterTextRef = useRef(null);
+  const broadcastMessageRef = useRef(null);
+  const broadcastEmbedTitleRef = useRef(null);
+  const broadcastEmbedDescRef = useRef(null);
+
+  const openEmojiPickerFor = (ref, value, onChange) => {
+    setEmojiTarget({ ref, value, onChange });
+    setShowEmojiPicker(true);
+  };
 
   // Expanded announcement features state hooks
   const [pubPingType, setPubPingType] = useState('none'); // 'none' | 'everyone' | 'here' | 'role'
@@ -6783,8 +6803,38 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
 
                       {/* Message Textarea */}
                       <div>
-                        <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Message Content</label>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                          <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', margin: 0 }}>Message Content</label>
+                          <button
+                            type="button"
+                            onClick={() => openEmojiPickerFor(broadcastMessageRef, broadcastMessage, setBroadcastMessage)}
+                            className="btn-secondary"
+                            style={{
+                              padding: '3px 9px',
+                              fontSize: '0.75rem',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '5px',
+                              borderRadius: '6px',
+                              backgroundColor: 'rgba(59, 130, 246, 0.15)',
+                              border: '1px solid rgba(59, 130, 246, 0.3)',
+                              color: '#60a5fa',
+                              cursor: 'pointer'
+                            }}
+                          >
+                            <Smile size={14} />
+                            Add Emoji
+                          </button>
+                        </div>
+
+                        {/* Quick Emoji Bar */}
+                        <QuickEmojiBar
+                          onSelectEmoji={(emoji) => insertEmojiAtCursor(broadcastMessageRef, broadcastMessage, emoji, setBroadcastMessage)}
+                          onOpenPicker={() => openEmojiPickerFor(broadcastMessageRef, broadcastMessage, setBroadcastMessage)}
+                        />
+
                         <textarea
+                          ref={broadcastMessageRef}
                           rows="4"
                           value={broadcastMessage}
                           onChange={(e) => setBroadcastMessage(e.target.value)}
@@ -7471,14 +7521,44 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
 
                       {/* Message Textarea */}
                       <div>
-                        <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Message Content</label>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                          <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', margin: 0 }}>Message Content</label>
+                          <button
+                            type="button"
+                            onClick={() => openEmojiPickerFor(pubMessageRef, pubMessage, setPubMessage)}
+                            className="btn-secondary"
+                            style={{
+                              padding: '3px 9px',
+                              fontSize: '0.75rem',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '5px',
+                              borderRadius: '6px',
+                              backgroundColor: 'rgba(59, 130, 246, 0.15)',
+                              border: '1px solid rgba(59, 130, 246, 0.3)',
+                              color: '#60a5fa',
+                              cursor: 'pointer'
+                            }}
+                          >
+                            <Smile size={14} />
+                            Add Emoji
+                          </button>
+                        </div>
+
+                        {/* Quick Emoji Bar */}
+                        <QuickEmojiBar
+                          onSelectEmoji={(emoji) => insertEmojiAtCursor(pubMessageRef, pubMessage, emoji, setPubMessage)}
+                          onOpenPicker={() => openEmojiPickerFor(pubMessageRef, pubMessage, setPubMessage)}
+                        />
+
                         <textarea
+                          ref={pubMessageRef}
                           rows="4"
                           value={pubMessage}
                           onChange={(e) => setPubMessage(e.target.value)}
                           maxLength={2000}
                           className="glass-input"
-                          placeholder="Type your channel message here..."
+                          placeholder="Type your channel message here... (Use quick emojis above or click 'Add Emoji' 🎉)"
                         />
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '4px' }}>
                           <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
@@ -7489,6 +7569,27 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                           </span>
                         </div>
                       </div>
+
+                      {/* Emoji Picker Popover Modal */}
+                      <EmojiPicker
+                        isOpen={showEmojiPicker}
+                        onClose={() => {
+                          setShowEmojiPicker(false);
+                          setEmojiTarget(null);
+                        }}
+                        onSelectEmoji={(emoji) => {
+                          if (emojiTarget && emojiTarget.onChange) {
+                            const updatedVal = insertEmojiAtCursor(emojiTarget.ref, emojiTarget.value, emoji, emojiTarget.onChange);
+                            setEmojiTarget(prev => prev ? { ...prev, value: updatedVal } : null);
+                          } else if (emojiTargetField === 'embedTitle') {
+                            insertEmojiAtCursor(pubEmbedTitleRef, pubEmbedTitle, emoji, setPubEmbedTitle);
+                          } else if (emojiTargetField === 'embedDesc') {
+                            insertEmojiAtCursor(pubEmbedDescRef, pubEmbedDesc, emoji, setPubEmbedDesc);
+                          } else {
+                            insertEmojiAtCursor(pubMessageRef, pubMessage, emoji, setPubMessage);
+                          }
+                        }}
+                      />
 
                       {/* Multiple Link Buttons Settings panel */}
                       <div className="glass-panel" style={{ padding: '16px', border: '1px solid var(--border-color)', backgroundColor: 'rgba(0,0,0,0.1)' }}>
@@ -7635,8 +7736,18 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '8px', padding: '12px', backgroundColor: 'rgba(255,255,255,0.01)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)' }}>
                                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '10px' }}>
                                     <div>
-                                      <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>Author Name</label>
+                                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                                        <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', margin: 0 }}>Author Name</label>
+                                        <button
+                                          type="button"
+                                          onClick={() => openEmojiPickerFor(pubEmbedAuthorNameRef, pubEmbedAuthorName, setPubEmbedAuthorName)}
+                                          style={{ background: 'none', border: 'none', color: '#60a5fa', fontSize: '0.75rem', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '3px' }}
+                                        >
+                                          <Smile size={12} /> Emoji
+                                        </button>
+                                      </div>
                                       <input
+                                        ref={pubEmbedAuthorNameRef}
                                         type="text"
                                         value={pubEmbedAuthorName}
                                         onChange={(e) => setPubEmbedAuthorName(e.target.value)}
@@ -7672,8 +7783,27 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                             {/* Embed Title & Color */}
                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
                               <div>
-                                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>Embed Title</label>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                                  <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', margin: 0 }}>Embed Title</label>
+                                  <button
+                                    type="button"
+                                    onClick={() => openEmojiPickerFor(pubEmbedTitleRef, pubEmbedTitle, setPubEmbedTitle)}
+                                    style={{
+                                      background: 'none',
+                                      border: 'none',
+                                      color: '#60a5fa',
+                                      fontSize: '0.75rem',
+                                      cursor: 'pointer',
+                                      display: 'inline-flex',
+                                      alignItems: 'center',
+                                      gap: '3px'
+                                    }}
+                                  >
+                                    <Smile size={12} /> Emoji
+                                  </button>
+                                </div>
                                 <input
+                                  ref={pubEmbedTitleRef}
                                   type="text"
                                   value={pubEmbedTitle}
                                   onChange={(e) => setPubEmbedTitle(e.target.value)}
@@ -7703,8 +7833,31 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
 
                             {/* Embed Description */}
                             <div>
-                              <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>Embed Description</label>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', margin: 0 }}>Embed Description</label>
+                                <button
+                                  type="button"
+                                  onClick={() => openEmojiPickerFor(pubEmbedDescRef, pubEmbedDesc, setPubEmbedDesc)}
+                                  style={{
+                                    background: 'none',
+                                    border: 'none',
+                                    color: '#60a5fa',
+                                    fontSize: '0.75rem',
+                                    cursor: 'pointer',
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '3px'
+                                  }}
+                                >
+                                  <Smile size={12} /> Emoji
+                                </button>
+                              </div>
+                              <QuickEmojiBar
+                                onSelectEmoji={(emoji) => insertEmojiAtCursor(pubEmbedDescRef, pubEmbedDesc, emoji, setPubEmbedDesc)}
+                                onOpenPicker={() => openEmojiPickerFor(pubEmbedDescRef, pubEmbedDesc, setPubEmbedDesc)}
+                              />
                               <textarea
+                                ref={pubEmbedDescRef}
                                 rows="3"
                                 value={pubEmbedDesc}
                                 onChange={(e) => setPubEmbedDesc(e.target.value)}
@@ -7773,7 +7926,23 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
 
                                       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '8px' }}>
                                         <div>
-                                          <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>Field Name</label>
+                                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                                            <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', margin: 0 }}>Field Name</label>
+                                            <button
+                                              type="button"
+                                              onClick={(e) => {
+                                                const inputElem = e.currentTarget.parentElement.nextElementSibling;
+                                                openEmojiPickerFor({ current: inputElem }, fld.name, (val) => {
+                                                  const updated = [...pubEmbedFields];
+                                                  updated[idx].name = val;
+                                                  setPubEmbedFields(updated);
+                                                });
+                                              }}
+                                              style={{ background: 'none', border: 'none', color: '#60a5fa', fontSize: '0.75rem', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '3px' }}
+                                            >
+                                              <Smile size={12} /> Emoji
+                                            </button>
+                                          </div>
                                           <input
                                             type="text"
                                             value={fld.name}
@@ -7787,7 +7956,23 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                                           />
                                         </div>
                                         <div>
-                                          <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>Field Value</label>
+                                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                                            <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', margin: 0 }}>Field Value</label>
+                                            <button
+                                              type="button"
+                                              onClick={(e) => {
+                                                const inputElem = e.currentTarget.parentElement.nextElementSibling;
+                                                openEmojiPickerFor({ current: inputElem }, fld.value, (val) => {
+                                                  const updated = [...pubEmbedFields];
+                                                  updated[idx].value = val;
+                                                  setPubEmbedFields(updated);
+                                                });
+                                              }}
+                                              style={{ background: 'none', border: 'none', color: '#60a5fa', fontSize: '0.75rem', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '3px' }}
+                                            >
+                                              <Smile size={12} /> Emoji
+                                            </button>
+                                          </div>
                                           <textarea
                                             rows="1"
                                             value={fld.value}
@@ -7848,8 +8033,18 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                               {pubEmbedFooterEnabled && (
                                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '10px', marginTop: '8px', padding: '12px', backgroundColor: 'rgba(255,255,255,0.01)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)' }}>
                                   <div>
-                                    <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>Footer Text</label>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                                      <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', margin: 0 }}>Footer Text</label>
+                                      <button
+                                        type="button"
+                                        onClick={() => openEmojiPickerFor(pubEmbedFooterTextRef, pubEmbedFooterText, setPubEmbedFooterText)}
+                                        style={{ background: 'none', border: 'none', color: '#60a5fa', fontSize: '0.75rem', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '3px' }}
+                                      >
+                                        <Smile size={12} /> Emoji
+                                      </button>
+                                    </div>
                                     <input
+                                      ref={pubEmbedFooterTextRef}
                                       type="text"
                                       value={pubEmbedFooterText}
                                       onChange={(e) => setPubEmbedFooterText(e.target.value)}
