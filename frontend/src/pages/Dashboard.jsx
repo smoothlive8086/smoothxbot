@@ -1203,13 +1203,9 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
             antiGuildUpdate: false,
             antiEmoji: false,
             antiChannelEdit: false,
-            antiBotRemoveAdmin: true,
             whitelistedUsers: []
           };
         } else {
-          if (sData.antinuke.antiBotRemoveAdmin === undefined) {
-            sData.antinuke.antiBotRemoveAdmin = true;
-          }
           if (!sData.antinuke.whitelistedUsers) {
             sData.antinuke.whitelistedUsers = [];
           } else {
@@ -3651,8 +3647,7 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                             { key: 'antiBot', title: 'Anti-Bot Additions', desc: 'Instantly kick unauthorized bots added to the server.' },
                             { key: 'antiGuildUpdate', title: 'Anti-Guild Update', desc: 'Prevents unauthorized editing of server settings.' },
                             { key: 'antiEmoji', title: 'Anti-Emoji Changes', desc: 'Prevents mass creation/deletion/editing of emojis.' },
-                            { key: 'antiChannelEdit', title: 'Anti-Channel Edit', desc: 'Prevents mass unauthorized editing of channels.' },
-                            { key: 'antiBotRemoveAdmin', title: 'Instant Remove Bot Admin Roles', desc: 'Instantly strip administrative roles from any bot on the spot when it attempts channel/role deletion or creation, within milliseconds.' }
+                            { key: 'antiChannelEdit', title: 'Anti-Channel Edit', desc: 'Prevents mass unauthorized editing of channels.' }
                           ].map(opt => (
                             <div key={opt.key} className="glass-panel" style={{ padding: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.1)' }}>
                               <div style={{ flex: 1, marginRight: '16px' }}>
