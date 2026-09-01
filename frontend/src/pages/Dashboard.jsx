@@ -53,6 +53,241 @@ const Youtube = ({ size = 24, className = '', style = {} }) => (
 );
 
 
+const EMOJI_CATEGORIES = [
+  { id: 'smileys', icon: '😀', label: 'Smileys & Emotion', list: ['😀','😃','😄','😁','😆','😅','🤣','😂','🙂','🙃','😉','😊','😇','🥰','😍','🤩','😘','😗','😚','😋','😛','😜','🤪','😝','🤑','🤗','🤭','🤫','🤔','🤐','🤨','😐','😑','😶','😏','😒','🙄','😬','🤥','😌','😔','😪','🤤','😴','😷','🤒','🤕','🤢','🤮','🤧','🥵','🥶','🥴','😵','🤯','🤠','🥳','😎','🤓','🧐','😕','😟','🙁','😮','😯','😲','😳','🥺','😦','😧','😮‍💨','🥱','😤','😡','😠','🤬','😈','👿','💀','☠️','💩','🤡','👹','👺','👻','👽','👾','🤖','🔥','✨','💥','💯','❤️','💖','🙏','👍','👎','👏','🙌','👑'] },
+  { id: 'people', icon: '👋', label: 'People & Body', list: ['👋','🤚','🖐️','✋','🖖','👌','🤌','🤏','✌️','🤞','🤟','🤘','🤙','👈','👉','👆','🖕','👇','☝️','👍','👎','✊','👊','🤛','🤜','👏','🙌','👐','🤲','🤝','🙏','✍️','💅','🤳','💪','👑','🧢','👒','🎓','🎩'] },
+  { id: 'animals', icon: '🐶', label: 'Animals & Nature', list: ['🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼','🐻‍❄️','🐨','🐯','🦁','🐮','🐷','🐽','🐸','🐵','🙈','🙉','🙊','🐒','🐔','🐧','🐦','🐤','🐣','🐥','🦆','🦅','🦉','🦇','🐺','🐗','🐴','🦄','🐝','🐛','🦋','🐌','🐞','🐜','🦟','🦗','🕷️','🦂','🐢','🐍','🦎','🐙','🦑','🦞','🦀','🐡','🐠','🐟','🐬','🐳','🐋','🦈','🐊','🐅','🐆'] },
+  { id: 'food', icon: '🍕', label: 'Food & Drink', list: ['🍏','🍎','🍐','🍊','🍋','🍌','🍉','🍇','🍓','🫐','🍈','🍒','🍑','🥭','🍍','🥥','🥝','🍅','🥑','🍆','🥔','🥕','🌽','🌶️','🫑','🥒','🥬','🥦','🧄','🧅','🍄','🥜','🍞','🥐','🥖','🫓','🥨','🥯','🥞','🧇','🧀','🍖','🍗','🥩','🥓','🍔','🍟','🍕','🌭','🥪','🌮','🌯','🥙','🧆','🥚','🍳','🥘','🍲','🥗','🍿','🍱','🍘','🍙','🍚','🍛','🍜','🍝','🍠','🍢','🍣','🍤','🥟','🍦','🍧','🍨','🍩','🍪','🎂','🍰','🧁','🥧','🍫','🍬','🍭','🍮','🥛','☕','🫖','🍵','🍶','🍾','🍷','🍸','🍹','🍺','🍻','🥂','🥃','🥤'] },
+  { id: 'activities', icon: '⚽', label: 'Activities & Sports', list: ['⚽','🏀','🏈','⚾','🥎','🎾','🏐','🏉','🥏','🎱','🪀','🏓','🏸','🏒','🏑','🥍','🏏','🏹','🎣','🤿','🥊','🥋','🎽','🛹','🛼','🛷','⛸️','🎿','🏂','🏋️','🤼','🤸','⛹️','🤺','🤾','🧘','🏄','🏊','🚣','🧗','🚵','🚴','🏆','🥇','🥈','🥉','🏅','🎖️','🎫','🎟️','🎪','🎭','🎨','🎬','🎤','🎧','🎼','🎵','🎶','🎙️','🎸','🎹','🎺','🎻','🥁','🎲','♟️','🎯',' bowling','🎮','🎰','🧩'] },
+  { id: 'travel', icon: '🚗', label: 'Travel & Places', list: ['🚗','🚕','🚙','🚌','🏎️','🚓','🚑','🚒','🚐','🛻','🚚','🚛','🚜','🛵','🚲','🛴','🚨','🚘','✈️','🛫','🛬','🛸','🚀','🛰️','🚁','🛶','⛵','🚤','🛳️','⚓','⛽','🚧','🚦','🗺️','🗿','🗽','<ctrl42>','🏰','🏯','🏟️','🎡','🎢','🏖️','🏝️','🏜️','🌋','⛰️','🏔️','🗻','🏕️','🏠','🏡','🏙️','🌅','🌄','🌇','🌆','🌃','🌌'] },
+  { id: 'objects', icon: '💡', label: 'Objects & Tools', list: ['⌚','📱','📲','💻','⌨️','🖥️','🖨️','🖱️','🕹️','💽','💾','💿','📀','📷','📸','📹','🎥','📽️','📻','🎙️','⏱️','⏲️','⏰','🕰️','⌛','⏳','📡','🔋','🔌','💡','🔦','🕯️','💸','💵','💴','💶','💷','🪙','💰','💳','💎','⚖️','🪜','🧰','🔧','🔨','⚒️','🛠️','⛏️','⚙️','💣','🔪','🗡️','⚔️','🛡️','🔮','📿','🔑','🗝️','🔒','🔓'] },
+  { id: 'symbols', icon: '🔣', label: 'Symbols & Icons', list: ['❤️','🧡','💛','💚','💙','💜','🖤','🤍','🤎','💔','❤️‍🔥','❣️','💕','💞','💓','💗','💖','💘','💝','💟','☮️','✝️','☪️','🕉️','☸️','✡️','<ctrl42>','☯️','☦️','⛎','♈','♉','♊','♋','♌','♍','♎','♏','♐','♑','♒','♓','⚛️','☢️','☣️','📴','📳','🈶','🈚','🆚','🅰️','🅱️','🆎','🅾️','🆘','❌','⭕','🛑','⛔','🚫','💯','💢','♨️','❗','❕','❓','❔','‼️','⁉️','⚠️','🔱','⚜️','🔰','🌐','💠','Ⓜ️','🌀','💤','🏧','🚾','♿','🅿️','🚻','🧹','💬','💭','🛑','✅','☑️','✔️','✖️','❌','➕','➖','➗','♾️'] },
+  { id: 'flags', icon: '🚩', label: 'Flags', list: ['🚩','🏳️','🏴','🏁','🚩','🏳️‍🌈','🏳️‍⚧️','🏴‍☠️','🇺🇸','🇬🇧','🇮🇳','🇨🇦','🇦🇺','🇩🇪','🇫🇷','🇯🇵','🇰🇷','🇨🇳','🇧🇷','🇲🇽','🇮🇹','🇪🇸','🇷🇺'] }
+];
+
+function EmojiPickerModal({ isOpen, onClose, onSelectEmoji, guildEmojis = [] }) {
+  const [activeCategory, setActiveCategory] = useState('smileys');
+  const [searchQuery, setSearchQuery] = useState('');
+
+  if (!isOpen) return null;
+
+  const currentCategoryObj = EMOJI_CATEGORIES.find(c => c.id === activeCategory);
+
+  const filteredUnicode = searchQuery.trim()
+    ? EMOJI_CATEGORIES.flatMap(c => c.list).filter((e, idx, self) => self.indexOf(e) === idx)
+    : (currentCategoryObj ? currentCategoryObj.list : []);
+
+  const filteredGuildEmojis = searchQuery.trim()
+    ? guildEmojis.filter(g => g.name.toLowerCase().includes(searchQuery.toLowerCase()))
+    : (activeCategory === 'server' ? guildEmojis : []);
+
+  return (
+    <div
+      style={{
+        position: 'fixed',
+        top: 0, left: 0, right: 0, bottom: 0,
+        backgroundColor: 'rgba(0, 0, 0, 0.75)',
+        backdropFilter: 'blur(4px)',
+        zIndex: 99999,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '16px'
+      }}
+      onClick={onClose}
+    >
+      <div
+        style={{
+          width: '100%',
+          maxWidth: '440px',
+          backgroundColor: '#2b2d31',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          borderRadius: '12px',
+          boxShadow: '0 12px 32px rgba(0, 0, 0, 0.6)',
+          padding: '16px',
+          color: '#f2f3f5',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '12px',
+          maxHeight: '85vh'
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ fontSize: '1.2rem' }}>😊</span>
+            <h4 style={{ margin: 0, fontWeight: '700', fontSize: '1rem', color: '#ffffff' }}>Emoji Picker</h4>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            style={{ background: 'none', border: 'none', color: '#949ba4', cursor: 'pointer', padding: '4px' }}
+          >
+            <X size={20} />
+          </button>
+        </div>
+
+        {/* Search */}
+        <div style={{ position: 'relative' }}>
+          <Search size={16} style={{ position: 'absolute', left: '10px', top: '10px', color: '#949ba4' }} />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search all emojis..."
+            style={{
+              width: '100%',
+              padding: '8px 12px 8px 34px',
+              backgroundColor: '#1e1f22',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              borderRadius: '6px',
+              color: '#ffffff',
+              fontSize: '0.85rem',
+              outline: 'none'
+            }}
+          />
+        </div>
+
+        {/* Category Tabs */}
+        {!searchQuery.trim() && (
+          <div style={{ display: 'flex', gap: '4px', overflowX: 'auto', paddingBottom: '4px', borderBottom: '1px solid rgba(255, 255, 255, 0.05)' }}>
+            {EMOJI_CATEGORIES.map(cat => (
+              <button
+                key={cat.id}
+                type="button"
+                onClick={() => setActiveCategory(cat.id)}
+                title={cat.label}
+                style={{
+                  background: activeCategory === cat.id ? 'rgba(88, 101, 242, 0.3)' : 'transparent',
+                  border: 'none',
+                  borderRadius: '6px',
+                  padding: '6px 8px',
+                  cursor: 'pointer',
+                  fontSize: '1.1rem',
+                  lineHeight: '1',
+                  transition: 'background 0.15s'
+                }}
+              >
+                {cat.icon}
+              </button>
+            ))}
+            {guildEmojis.length > 0 && (
+              <button
+                type="button"
+                onClick={() => setActiveCategory('server')}
+                title="Server Emojis"
+                style={{
+                  background: activeCategory === 'server' ? 'rgba(88, 101, 242, 0.3)' : 'transparent',
+                  border: 'none',
+                  borderRadius: '6px',
+                  padding: '6px 8px',
+                  cursor: 'pointer',
+                  fontSize: '0.85rem',
+                  fontWeight: '700',
+                  color: '#5865F2',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  whiteSpace: 'nowrap'
+                }}
+              >
+                🌐 Server ({guildEmojis.length})
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* Emoji Display Grid */}
+        <div style={{ overflowY: 'auto', minHeight: '220px', maxHeight: '340px', paddingRight: '4px' }}>
+          {/* Guild Emojis Section */}
+          {(activeCategory === 'server' || searchQuery.trim()) && filteredGuildEmojis.length > 0 && (
+            <div style={{ marginBottom: '12px' }}>
+              <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#949ba4', marginBottom: '8px', textTransform: 'uppercase' }}>
+                Server Emojis ({filteredGuildEmojis.length})
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(40px, 1fr))', gap: '6px' }}>
+                {filteredGuildEmojis.map(g => (
+                  <button
+                    key={g.id}
+                    type="button"
+                    title={`:${g.name}: (${g.identifier})`}
+                    onClick={() => {
+                      onSelectEmoji(g.identifier);
+                      onClose();
+                    }}
+                    style={{
+                      background: 'rgba(255, 255, 255, 0.03)',
+                      border: '1px solid rgba(255, 255, 255, 0.05)',
+                      borderRadius: '6px',
+                      padding: '6px',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      transition: 'transform 0.1s, background 0.15s'
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.15)'}
+                    onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                  >
+                    <img src={g.url} alt={g.name} style={{ width: '24px', height: '24px', objectFit: 'contain' }} />
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Standard Unicode Emojis Section */}
+          {activeCategory !== 'server' && (
+            <div>
+              {!searchQuery.trim() && (
+                <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#949ba4', marginBottom: '8px', textTransform: 'uppercase' }}>
+                  {currentCategoryObj?.label}
+                </div>
+              )}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(36px, 1fr))', gap: '4px' }}>
+                {filteredUnicode.map((emojiChar, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => {
+                      onSelectEmoji(emojiChar);
+                      onClose();
+                    }}
+                    style={{
+                      background: 'transparent',
+                      border: 'none',
+                      borderRadius: '6px',
+                      padding: '6px',
+                      fontSize: '1.3rem',
+                      lineHeight: '1',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      transition: 'transform 0.1s, background 0.15s'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = 'scale(1.2)';
+                      e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = 'scale(1)';
+                      e.currentTarget.style.background = 'transparent';
+                    }}
+                  >
+                    {emojiChar}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // Discord Message Preview Component
 function DiscordMessagePreview({
   botUser,
@@ -100,13 +335,30 @@ function DiscordMessagePreview({
     }
   }
 
-  // Parse markdown bold **text** to <strong> tags for visual correctness
+  // Parse markdown bold **text** and Discord custom emojis <a?:name:id> for visual correctness
   const formatMarkdown = (text) => {
     if (!text) return null;
-    const parts = text.split(/(\*\*.*?\*\*)/g);
+    const parts = text.split(/(<a?:[a-zA-Z0-9_]+:\d+>|\*\*.*?\*\*)/g);
     return parts.map((part, index) => {
       if (part.startsWith('**') && part.endsWith('**')) {
         return <strong key={index} style={{ color: '#ffffff' }}>{part.slice(2, -2)}</strong>;
+      }
+      const emojiMatch = part.match(/<(a)?:([a-zA-Z0-9_]+):(\d+)>/);
+      if (emojiMatch) {
+        const isAnimated = !!emojiMatch[1];
+        const emojiName = emojiMatch[2];
+        const emojiId = emojiMatch[3];
+        const ext = isAnimated ? 'gif' : 'png';
+        const url = `https://cdn.discordapp.com/emojis/${emojiId}.${ext}`;
+        return (
+          <img
+            key={index}
+            src={url}
+            alt={emojiName}
+            title={`:${emojiName}:`}
+            style={{ width: '1.3em', height: '1.3em', verticalAlign: '-0.25em', display: 'inline-block', margin: '0 2px' }}
+          />
+        );
       }
       return part;
     });
@@ -245,11 +497,11 @@ function DiscordMessagePreview({
                           style={{ fontSize: '0.875rem', fontWeight: '600', color: '#ffffff', textDecoration: 'none' }}
                           onClick={(e) => e.preventDefault()}
                         >
-                          {resolvePlaceholders(embedAuthorName)}
+                          {formatMarkdown(resolvePlaceholders(embedAuthorName))}
                         </a>
                       ) : (
                         <span style={{ fontSize: '0.875rem', fontWeight: '600', color: '#ffffff' }}>
-                          {embedAuthorEnabled ? resolvePlaceholders(embedAuthorName) : guildName}
+                          {embedAuthorEnabled ? formatMarkdown(resolvePlaceholders(embedAuthorName)) : guildName}
                         </span>
                       )}
                     </div>
@@ -258,14 +510,14 @@ function DiscordMessagePreview({
                   {/* Embed Title */}
                   {embedTitle && (
                     <div style={{ fontWeight: '600', color: '#ffffff', fontSize: '1rem', marginBottom: '8px', wordBreak: 'break-word' }}>
-                      {resolvePlaceholders(embedTitle)}
+                      {formatMarkdown(resolvePlaceholders(embedTitle))}
                     </div>
                   )}
 
                   {/* Embed Description */}
                   {embedDesc && (
                     <div style={{ fontSize: '0.875rem', color: '#dbdee1', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
-                      {resolvePlaceholders(embedDesc)}
+                      {formatMarkdown(resolvePlaceholders(embedDesc))}
                     </div>
                   )}
 
@@ -291,10 +543,10 @@ function DiscordMessagePreview({
                             }}
                           >
                             <div style={{ fontSize: '0.875rem', fontWeight: '600', color: '#ffffff', marginBottom: '2px' }}>
-                              {resolvePlaceholders(field.name)}
+                              {formatMarkdown(resolvePlaceholders(field.name))}
                             </div>
                             <div style={{ fontSize: '0.875rem', color: '#dbdee1', whiteSpace: 'pre-wrap' }}>
-                              {resolvePlaceholders(field.value)}
+                              {formatMarkdown(resolvePlaceholders(field.value))}
                             </div>
                           </div>
                         );
@@ -318,7 +570,7 @@ function DiscordMessagePreview({
                         style={{ width: '18px', height: '18px', borderRadius: '50%', objectFit: 'cover' }}
                       />
                     ) : null}
-                    <span>{embedFooterEnabled ? resolvePlaceholders(embedFooterText) : `${guildName} Official Announcement`}</span>
+                    <span>{embedFooterEnabled ? formatMarkdown(resolvePlaceholders(embedFooterText)) : `${guildName} Official Announcement`}</span>
                     <span>•</span>
                     <span>Today at {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                   </div>
@@ -357,7 +609,7 @@ function DiscordMessagePreview({
                       transition: 'background-color 0.2s',
                     }}
                   >
-                    <span>{btn.label}</span>
+                    <span>{formatMarkdown(btn.label)}</span>
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
                       <polyline points="15 3 21 3 21 9"></polyline>
@@ -474,6 +726,16 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
   const [pubButtonEnabled, setPubButtonEnabled] = useState(false);
   const [pubButtonLabel, setPubButtonLabel] = useState('');
   const [pubButtonUrl, setPubButtonUrl] = useState('');
+
+  // Emoji Picker State
+  const [guildEmojis, setGuildEmojis] = useState([]);
+  const [emojiPickerOpen, setEmojiPickerOpen] = useState(false);
+  const [emojiPickerCallback, setEmojiPickerCallback] = useState(null);
+
+  const openEmojiPicker = (onSelect) => {
+    setEmojiPickerCallback(() => onSelect);
+    setEmojiPickerOpen(true);
+  };
 
   // Expanded announcement features state hooks
   const [pubPingType, setPubPingType] = useState('none'); // 'none' | 'everyone' | 'here' | 'role'
@@ -1160,15 +1422,17 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
   const loadData = async (showLoadingIndicator = true) => {
     try {
       if (showLoadingIndicator) setLoading(true);
-      const [chData, rData, sData, catData, vcData] = await Promise.all([
+      const [chData, rData, sData, catData, vcData, emojiData] = await Promise.all([
         api.getChannels(guildId),
         api.getRoles(guildId),
         api.getSettings(guildId),
         api.getCategories(guildId),
-        api.getVoiceChannels(guildId)
+        api.getVoiceChannels(guildId),
+        api.getEmojis(guildId).catch(() => [])
       ]);
       setChannels(chData);
       setRoles(rData);
+      setGuildEmojis(emojiData || []);
       if (sData) {
         if (!sData.logging) {
           sData.logging = {
@@ -1203,13 +1467,9 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
             antiGuildUpdate: false,
             antiEmoji: false,
             antiChannelEdit: false,
-            antiBotRemoveAdmin: true,
             whitelistedUsers: []
           };
         } else {
-          if (sData.antinuke.antiBotRemoveAdmin === undefined) {
-            sData.antinuke.antiBotRemoveAdmin = true;
-          }
           if (!sData.antinuke.whitelistedUsers) {
             sData.antinuke.whitelistedUsers = [];
           } else {
@@ -3651,8 +3911,7 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                             { key: 'antiBot', title: 'Anti-Bot Additions', desc: 'Instantly kick unauthorized bots added to the server.' },
                             { key: 'antiGuildUpdate', title: 'Anti-Guild Update', desc: 'Prevents unauthorized editing of server settings.' },
                             { key: 'antiEmoji', title: 'Anti-Emoji Changes', desc: 'Prevents mass creation/deletion/editing of emojis.' },
-                            { key: 'antiChannelEdit', title: 'Anti-Channel Edit', desc: 'Prevents mass unauthorized editing of channels.' },
-                            { key: 'antiBotRemoveAdmin', title: 'Instant Remove Bot Admin Roles', desc: 'Instantly strip administrative roles from any bot on the spot when it attempts channel/role deletion or creation, within milliseconds.' }
+                            { key: 'antiChannelEdit', title: 'Anti-Channel Edit', desc: 'Prevents mass unauthorized editing of channels.' }
                           ].map(opt => (
                             <div key={opt.key} className="glass-panel" style={{ padding: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.1)' }}>
                               <div style={{ flex: 1, marginRight: '16px' }}>
@@ -7476,7 +7735,16 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
 
                       {/* Message Textarea */}
                       <div>
-                        <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Message Content</label>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                          <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', margin: 0 }}>Message Content</label>
+                          <button
+                            type="button"
+                            onClick={() => openEmojiPicker((emoji) => setPubMessage(prev => prev + emoji))}
+                            style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: '#ffffff', padding: '2px 8px', borderRadius: '4px', fontSize: '0.75rem', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                          >
+                            😊 Pick Emoji
+                          </button>
+                        </div>
                         <textarea
                           rows="4"
                           value={pubMessage}
@@ -7522,7 +7790,20 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                             {pubButtons.map((btn, idx) => (
                               <div key={idx} style={{ display: 'flex', gap: '12px', alignItems: 'flex-end', backgroundColor: 'rgba(255,255,255,0.02)', padding: '12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)' }}>
                                 <div style={{ flex: 1 }}>
-                                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>Button {idx + 1} Label</label>
+                                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                                    <label style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', margin: 0 }}>Button {idx + 1} Label</label>
+                                    <button
+                                      type="button"
+                                      onClick={() => openEmojiPicker((emoji) => {
+                                        const updated = [...pubButtons];
+                                        updated[idx].label = (updated[idx].label || '') + emoji;
+                                        setPubButtons(updated);
+                                      })}
+                                      style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: '#ffffff', padding: '1px 6px', borderRadius: '4px', fontSize: '0.7rem', cursor: 'pointer' }}
+                                    >
+                                      😊
+                                    </button>
+                                  </div>
                                   <input
                                     type="text"
                                     value={btn.label}
@@ -7579,7 +7860,16 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                             {pubButtonEnabled && (
                               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginTop: '12px' }}>
                                 <div>
-                                  <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>Button Label</label>
+                                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                                    <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', margin: 0 }}>Button Label</label>
+                                    <button
+                                      type="button"
+                                      onClick={() => openEmojiPicker((emoji) => setPubButtonLabel(prev => prev + emoji))}
+                                      style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: '#ffffff', padding: '1px 6px', borderRadius: '4px', fontSize: '0.7rem', cursor: 'pointer' }}
+                                    >
+                                      😊
+                                    </button>
+                                  </div>
                                   <input
                                     type="text"
                                     value={pubButtonLabel}
@@ -7640,7 +7930,16 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '8px', padding: '12px', backgroundColor: 'rgba(255,255,255,0.01)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)' }}>
                                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '10px' }}>
                                     <div>
-                                      <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>Author Name</label>
+                                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                                        <label style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', margin: 0 }}>Author Name</label>
+                                        <button
+                                          type="button"
+                                          onClick={() => openEmojiPicker((emoji) => setPubEmbedAuthorName(prev => prev + emoji))}
+                                          style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: '#ffffff', padding: '1px 6px', borderRadius: '4px', fontSize: '0.7rem', cursor: 'pointer' }}
+                                        >
+                                          😊
+                                        </button>
+                                      </div>
                                       <input
                                         type="text"
                                         value={pubEmbedAuthorName}
@@ -7677,7 +7976,16 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                             {/* Embed Title & Color */}
                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
                               <div>
-                                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>Embed Title</label>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                                  <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', margin: 0 }}>Embed Title</label>
+                                  <button
+                                    type="button"
+                                    onClick={() => openEmojiPicker((emoji) => setPubEmbedTitle(prev => prev + emoji))}
+                                    style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: '#ffffff', padding: '1px 6px', borderRadius: '4px', fontSize: '0.7rem', cursor: 'pointer' }}
+                                  >
+                                    😊 Pick Emoji
+                                  </button>
+                                </div>
                                 <input
                                   type="text"
                                   value={pubEmbedTitle}
@@ -7708,7 +8016,16 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
 
                             {/* Embed Description */}
                             <div>
-                              <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>Embed Description</label>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                                <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', margin: 0 }}>Embed Description</label>
+                                <button
+                                  type="button"
+                                  onClick={() => openEmojiPicker((emoji) => setPubEmbedDesc(prev => prev + emoji))}
+                                  style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: '#ffffff', padding: '1px 6px', borderRadius: '4px', fontSize: '0.7rem', cursor: 'pointer' }}
+                                >
+                                  😊 Pick Emoji
+                                </button>
+                              </div>
                               <textarea
                                 rows="3"
                                 value={pubEmbedDesc}
@@ -7778,7 +8095,20 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
 
                                       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '8px' }}>
                                         <div>
-                                          <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>Field Name</label>
+                                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                                            <label style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', margin: 0 }}>Field Name</label>
+                                            <button
+                                              type="button"
+                                              onClick={() => openEmojiPicker((emoji) => {
+                                                const updated = [...pubEmbedFields];
+                                                updated[idx].name = (updated[idx].name || '') + emoji;
+                                                setPubEmbedFields(updated);
+                                              })}
+                                              style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: '#ffffff', padding: '1px 6px', borderRadius: '4px', fontSize: '0.7rem', cursor: 'pointer' }}
+                                            >
+                                              😊
+                                            </button>
+                                          </div>
                                           <input
                                             type="text"
                                             value={fld.name}
@@ -7792,7 +8122,20 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                                           />
                                         </div>
                                         <div>
-                                          <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>Field Value</label>
+                                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                                            <label style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', margin: 0 }}>Field Value</label>
+                                            <button
+                                              type="button"
+                                              onClick={() => openEmojiPicker((emoji) => {
+                                                const updated = [...pubEmbedFields];
+                                                updated[idx].value = (updated[idx].value || '') + emoji;
+                                                setPubEmbedFields(updated);
+                                              })}
+                                              style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: '#ffffff', padding: '1px 6px', borderRadius: '4px', fontSize: '0.7rem', cursor: 'pointer' }}
+                                            >
+                                              😊
+                                            </button>
+                                          </div>
                                           <textarea
                                             rows="1"
                                             value={fld.value}
@@ -7853,7 +8196,16 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                               {pubEmbedFooterEnabled && (
                                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '10px', marginTop: '8px', padding: '12px', backgroundColor: 'rgba(255,255,255,0.01)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)' }}>
                                   <div>
-                                    <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>Footer Text</label>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                                      <label style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', margin: 0 }}>Footer Text</label>
+                                      <button
+                                        type="button"
+                                        onClick={() => openEmojiPicker((emoji) => setPubEmbedFooterText(prev => prev + emoji))}
+                                        style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: '#ffffff', padding: '1px 6px', borderRadius: '4px', fontSize: '0.7rem', cursor: 'pointer' }}
+                                      >
+                                        😊
+                                      </button>
+                                    </div>
                                     <input
                                       type="text"
                                       value={pubEmbedFooterText}
@@ -9168,6 +9520,17 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
           </div>
         </div>
       )}
+
+      <EmojiPickerModal
+        isOpen={emojiPickerOpen}
+        onClose={() => setEmojiPickerOpen(false)}
+        onSelectEmoji={(emoji) => {
+          if (typeof emojiPickerCallback === 'function') {
+            emojiPickerCallback(emoji);
+          }
+        }}
+        guildEmojis={guildEmojis}
+      />
     </div>
   );
 }
