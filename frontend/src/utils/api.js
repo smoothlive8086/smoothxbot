@@ -67,6 +67,7 @@ export const api = {
   getGuilds: () => request('/guilds'),
   getChannels: (guildId) => request(`/guilds/${guildId}/channels`),
   getRoles: (guildId) => request(`/guilds/${guildId}/roles`),
+  getEmojis: (guildId) => request(`/guilds/${guildId}/emojis`),
   getSettings: (guildId) => request(`/settings/${guildId}`),
   saveSettings: (guildId, settings) => request(`/settings/${guildId}`, {
     method: 'POST',
