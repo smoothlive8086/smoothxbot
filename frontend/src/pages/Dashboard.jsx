@@ -7683,6 +7683,14 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                       gap: '20px'
                     }}>
 
+                      {/* Emoji Tip Banner */}
+                      <div style={{ padding: '10px 14px', borderRadius: '8px', backgroundColor: 'rgba(59, 130, 246, 0.08)', border: '1px solid rgba(59, 130, 246, 0.2)', color: '#93c5fd', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <Sparkles size={16} style={{ flexShrink: 0 }} />
+                        <span>
+                          <strong>Emoji Compatibility:</strong> Standard Emojis (😀, 🔥, 🚀, ✨) work in all fields including Embed Titles & Footers. Custom Server Emojis work in Message Content, Embed Description, Fields & Buttons on Discord.
+                        </span>
+                      </div>
+
                       {/* Target Channel & Ping Target Row */}
                       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
                         {/* Target Channel Dropdown */}
