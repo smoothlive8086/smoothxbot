@@ -1,0 +1,21 @@
+{
+  "cleanUrls": true,
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "http://node-01.vexanode.gg:2049/api/:path*"
+    },
+    {
+      "source": "/uploads/:path*",
+      "destination": "http://node-01.vexanode.gg:2049/uploads/:path*"
+    },
+    {
+      "source": "/socket.io/:path*",
+      "destination": "http://node-01.vexanode.gg:2049/socket.io/:path*"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
