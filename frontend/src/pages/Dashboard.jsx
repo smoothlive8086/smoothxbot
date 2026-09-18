@@ -2053,17 +2053,21 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
     if (!rawText) return '';
 
     const redirectCh = channels.find(c => c.id === settings?.welcome?.redirectChannelId);
-    const channelName = redirectCh ? redirectCh.name : 'channel';
+    const channelName = redirectCh ? redirectCh.name : 'rules';
     const redirectCh2 = channels.find(c => c.id === settings?.welcome?.redirectChannelId2);
-    const channelName2 = redirectCh2 ? redirectCh2.name : 'channel';
+    const channelName2 = redirectCh2 ? redirectCh2.name : 'announcements';
     const redirectCh3 = channels.find(c => c.id === settings?.welcome?.redirectChannelId3);
-    const channelName3 = redirectCh3 ? redirectCh3.name : 'channel';
+    const channelName3 = redirectCh3 ? redirectCh3.name : 'chat';
+    const bullet = settings?.welcome?.bulletEmoji || '➤';
+    const websiteUrl = settings?.welcome?.websiteUrl || '';
+    const websiteText = settings?.welcome?.websiteText || 'Website';
 
     let text = rawText
       .replace(/{username}/g, user?.username || 'Member')
-      .replace(/{server}/g, guildName || 'Server');
+      .replace(/{server}/g, guildName || 'Server')
+      .replace(/{bullet}/g, bullet);
 
-    const parts = text.split(/({user}|{channel}|{channel2}|{channel3})/g);
+    const parts = text.split(/({user}|{channel}|{rules}|{channel2}|{announcements}|{channel3}|{chat}|{website})/g);
 
     return parts.map((part, index) => {
       if (part === '{user}') {
@@ -2073,25 +2077,46 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
           </span>
         );
       }
-      if (part === '{channel}') {
+      if (part === '{channel}' || part === '{rules}') {
         return (
           <span key={`mention-ch-${index}`} className="discord-mention-channel">
             #{channelName}
           </span>
         );
       }
-      if (part === '{channel2}') {
+      if (part === '{channel2}' || part === '{announcements}') {
         return (
           <span key={`mention-ch2-${index}`} className="discord-mention-channel">
             #{channelName2}
           </span>
         );
       }
-      if (part === '{channel3}') {
+      if (part === '{channel3}' || part === '{chat}') {
         return (
           <span key={`mention-ch3-${index}`} className="discord-mention-channel">
             #{channelName3}
           </span>
+        );
+      }
+      if (part === '{website}') {
+        if (!websiteUrl) {
+          return (
+            <span key={`web-${index}`} style={{ color: '#38bdf8', fontWeight: '500' }}>
+              [{websiteText}]
+            </span>
+          );
+        }
+        return (
+          <a
+            key={`web-${index}`}
+            href={websiteUrl}
+            target="_blank"
+            rel="noreferrer"
+            style={{ color: '#38bdf8', textDecoration: 'none', fontWeight: '500' }}
+            onClick={e => e.preventDefault()}
+          >
+            {websiteText} 🔗
+          </a>
         );
       }
 
@@ -2116,10 +2141,12 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
       settings?.welcome?.redirectChannelId3
     ].filter(Boolean);
 
-    if (redirectIds.length === 0) return null;
+    const hasWebsite = Boolean(settings?.welcome?.websiteUrl);
+
+    if (redirectIds.length === 0 && !hasWebsite) return null;
 
     return (
-      <div className="discord-buttons-row">
+      <div className="discord-buttons-row" style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '8px' }}>
         {redirectIds.map((id, index) => {
           const redirectCh = channels.find(c => c.id === id);
           const channelName = redirectCh ? redirectCh.name : 'channel';
@@ -2134,6 +2161,16 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
             </span>
           );
         })}
+        {hasWebsite && (
+          <span className="discord-button-link" style={{ backgroundColor: '#4e5058' }}>
+            <span>{settings?.welcome?.websiteText || 'Website'}</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+              <polyline points="15 3 21 3 21 9"></polyline>
+              <line x1="10" y1="14" x2="21" y2="3"></line>
+            </svg>
+          </span>
+        )}
       </div>
     );
   };
@@ -2376,6 +2413,33 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
       }
     }));
     showNotification('Layout reset to default positions, sizes & visibility!');
+  };
+
+  const handleApplyFieryPreset = () => {
+    setSettings(prev => ({
+      ...prev,
+      welcome: {
+        ...prev.welcome,
+        enabled: true,
+        layoutType: 'embed-only',
+        embedColor: '#ff0033',
+        embedAuthorName: 'Welcome To The Server !',
+        embedAuthorIcon: prev.welcome.embedAuthorIcon || '',
+        embedAuthorUrl: '',
+        embedTitle: '',
+        embedThumbnail: prev.welcome.embedThumbnail || '{user_avatar}',
+        bulletEmoji: '➤',
+        message: '➤ Welcome {user} To **{server}**\n\n➤ Stay Updated {channel2}\n\n➤ Read {channel} And Follow\n\n➤ Go And Enjoy {channel3}',
+        embedImage: prev.welcome.embedImage || 'https://i.gifer.com/7VE.gif',
+        gifSupport: true,
+        gifRatio: '16:9',
+        gifHeight: 250,
+        gifFitMode: 'cover',
+        websiteText: 'Visit Website',
+        websiteUrl: prev.welcome.websiteUrl || ''
+      }
+    }));
+    showNotification('Fiery Server Welcome Preset applied!');
   };
 
   const getSanitizedSettings = (rawSettings) => {
@@ -4450,14 +4514,37 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                             flexDirection: 'column',
                             gap: '16px'
                           }}>
-                            <div style={{ borderBottom: '1px solid rgba(255,255,255,0.08)', paddingBottom: '10px' }}>
-                              <h4 style={{ fontSize: '1.05rem', fontWeight: '700', color: '#ffffff', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                <Sparkles size={18} style={{ color: 'var(--primary)' }} />
-                                Welcome Embed Customizer
-                              </h4>
-                              <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', margin: '2px 0 0 0' }}>
-                                Customize color, thumbnail, author, title, description markdown, fields, main image banner, and footer icon.
-                              </p>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.08)', paddingBottom: '10px' }}>
+                              <div>
+                                <h4 style={{ fontSize: '1.05rem', fontWeight: '700', color: '#ffffff', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                  <Sparkles size={18} style={{ color: 'var(--primary)' }} />
+                                  Welcome Embed Customizer & Preset
+                                </h4>
+                                <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', margin: '2px 0 0 0' }}>
+                                  Customize GIF size, ratio, channel mentions, website link, bullet arrows, color, and banner images.
+                                </p>
+                              </div>
+
+                              <button
+                                type="button"
+                                onClick={handleApplyFieryPreset}
+                                className="btn-primary"
+                                style={{
+                                  padding: '6px 14px',
+                                  fontSize: '0.8rem',
+                                  fontWeight: '600',
+                                  borderRadius: '8px',
+                                  background: 'linear-gradient(135deg, #ff0033 0%, #e67e22 100%)',
+                                  border: 'none',
+                                  cursor: 'pointer',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '6px',
+                                  boxShadow: '0 4px 12px rgba(255, 0, 51, 0.3)'
+                                }}
+                              >
+                                <Sparkles size={14} /> Apply Fiery Preset (Like Image)
+                              </button>
                             </div>
 
                             {/* Top Row: Color & Thumbnail */}
@@ -4466,7 +4553,7 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                               {/* Color Picker & Swatches */}
                               <div>
                                 <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-secondary)', marginBottom: '8px' }}>
-                                  Color
+                                  Embed Color Strip
                                 </label>
                                 <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '10px' }}>
                                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px', backgroundColor: '#0f1013', border: '1px solid var(--border-color)', borderRadius: '6px', padding: '4px 8px' }}>
@@ -4487,8 +4574,8 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
 
                                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', alignItems: 'center' }}>
                                     {[
-                                      '#000000', '#2ecc71', '#3498db', '#9b59b6', '#e91e63',
-                                      '#f1c40f', '#e67e22', '#e74c3c', '#95a5a6', '#34495e', '#ffffff'
+                                      '#ff0033', '#000000', '#2ecc71', '#3498db', '#9b59b6', '#e91e63',
+                                      '#f1c40f', '#e67e22', '#e74c3c', '#95a5a6', '#ffffff'
                                     ].map(colorHex => (
                                       <button
                                         key={colorHex}
@@ -4612,7 +4699,7 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                             {/* Author Section */}
                             <div>
                               <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-secondary)', marginBottom: '6px' }}>
-                                Author
+                                Author Header Text
                               </label>
                               <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                                 <label className="btn-secondary" style={{ padding: '8px 10px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '38px', borderRadius: '6px' }} title="Upload Author Icon">
@@ -4632,244 +4719,259 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                                   />
                                 </label>
 
-                                <button
-                                  type="button"
-                                  className="btn-secondary"
-                                  onClick={() => {
-                                    const url = prompt('Enter Author Link URL:', settings.welcome.embedAuthorUrl || '');
-                                    if (url !== null) handleInputChange('welcome.embedAuthorUrl', url);
-                                  }}
-                                  style={{ padding: '8px 10px', height: '38px', borderRadius: '6px', background: settings.welcome.embedAuthorUrl ? 'var(--primary-glow)' : undefined }}
-                                  title="Set Author Link URL"
-                                >
-                                  <LinkIcon size={16} />
-                                </button>
-
                                 <input
                                   type="text"
                                   value={settings.welcome.embedAuthorName || ''}
                                   onChange={(e) => handleInputChange('welcome.embedAuthorName', e.target.value)}
                                   className="glass-input"
-                                  placeholder="HERE IS OUR WEBSITE"
+                                  placeholder="Welcome To The Server !"
                                   style={{ flex: 1 }}
                                 />
                               </div>
-                              {(settings.welcome.embedAuthorIcon || settings.welcome.embedAuthorUrl) && (
-                                <div style={{ display: 'flex', gap: '12px', fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '4px' }}>
-                                  {settings.welcome.embedAuthorIcon && <span>Icon: {settings.welcome.embedAuthorIcon}</span>}
-                                  {settings.welcome.embedAuthorUrl && <span>URL: {settings.welcome.embedAuthorUrl}</span>}
-                                </div>
-                              )}
                             </div>
 
-                            {/* Title Section */}
-                            <div>
-                              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-secondary)', marginBottom: '6px' }}>
-                                Title
-                              </label>
-                              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                                <button
-                                  type="button"
-                                  className="btn-secondary"
-                                  onClick={() => {
-                                    const url = prompt('Enter Title Link URL:', settings.welcome.embedTitleUrl || '');
-                                    if (url !== null) handleInputChange('welcome.embedTitleUrl', url);
-                                  }}
-                                  style={{ padding: '8px 10px', height: '38px', borderRadius: '6px', background: settings.welcome.embedTitleUrl ? 'var(--primary-glow)' : undefined }}
-                                  title="Set Title Link URL"
-                                >
-                                  <LinkIcon size={16} />
-                                </button>
-
-                                <input
-                                  type="text"
-                                  value={settings.welcome.embedTitle || ''}
-                                  onChange={(e) => handleInputChange('welcome.embedTitle', e.target.value)}
-                                  className="glass-input"
-                                  placeholder="Website"
-                                  style={{ flex: 1 }}
-                                />
+                            {/* Channel Mentions, Website URL & Bullet Selector Integration */}
+                            <div style={{
+                              padding: '12px',
+                              borderRadius: '10px',
+                              backgroundColor: 'rgba(0,0,0,0.2)',
+                              border: '1px solid rgba(255,255,255,0.05)',
+                              display: 'flex',
+                              flexDirection: 'column',
+                              gap: '12px'
+                            }}>
+                              <div style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--primary)', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '4px' }}>
+                                Channel Mentions & Website Link Integration
                               </div>
-                              {settings.welcome.embedTitleUrl && (
-                                <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', display: 'block', marginTop: '4px' }}>
-                                  Link URL: {settings.welcome.embedTitleUrl}
-                                </span>
-                              )}
+
+                              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '10px' }}>
+                                <div>
+                                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>
+                                    Rules Channel ({`{rules}`})
+                                  </label>
+                                  <select
+                                    value={settings.welcome.redirectChannelId || ''}
+                                    onChange={(e) => handleInputChange('welcome.redirectChannelId', e.target.value)}
+                                    className="glass-input"
+                                    style={{ fontSize: '0.8rem', width: '100%' }}
+                                  >
+                                    <option value="">None Selected</option>
+                                    {channels.map(ch => (
+                                      <option key={ch.id} value={ch.id}>#{ch.name}</option>
+                                    ))}
+                                  </select>
+                                </div>
+
+                                <div>
+                                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>
+                                    Announcements Channel ({`{announcements}`})
+                                  </label>
+                                  <select
+                                    value={settings.welcome.redirectChannelId2 || ''}
+                                    onChange={(e) => handleInputChange('welcome.redirectChannelId2', e.target.value)}
+                                    className="glass-input"
+                                    style={{ fontSize: '0.8rem', width: '100%' }}
+                                  >
+                                    <option value="">None Selected</option>
+                                    {channels.map(ch => (
+                                      <option key={ch.id} value={ch.id}>#{ch.name}</option>
+                                    ))}
+                                  </select>
+                                </div>
+
+                                <div>
+                                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>
+                                    General Chat Channel ({`{chat}`})
+                                  </label>
+                                  <select
+                                    value={settings.welcome.redirectChannelId3 || ''}
+                                    onChange={(e) => handleInputChange('welcome.redirectChannelId3', e.target.value)}
+                                    className="glass-input"
+                                    style={{ fontSize: '0.8rem', width: '100%' }}
+                                  >
+                                    <option value="">None Selected</option>
+                                    {channels.map(ch => (
+                                      <option key={ch.id} value={ch.id}>#{ch.name}</option>
+                                    ))}
+                                  </select>
+                                </div>
+                              </div>
+
+                              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 100px', gap: '10px', alignItems: 'center' }}>
+                                <div>
+                                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>
+                                    Website URL ({`{website}`})
+                                  </label>
+                                  <input
+                                    type="text"
+                                    value={settings.welcome.websiteUrl || ''}
+                                    onChange={(e) => handleInputChange('welcome.websiteUrl', e.target.value)}
+                                    className="glass-input"
+                                    placeholder="https://yourwebsite.com"
+                                    style={{ fontSize: '0.8rem' }}
+                                  />
+                                </div>
+
+                                <div>
+                                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>
+                                    Website Button Label
+                                  </label>
+                                  <input
+                                    type="text"
+                                    value={settings.welcome.websiteText || ''}
+                                    onChange={(e) => handleInputChange('welcome.websiteText', e.target.value)}
+                                    className="glass-input"
+                                    placeholder="Visit Website"
+                                    style={{ fontSize: '0.8rem' }}
+                                  />
+                                </div>
+
+                                <div>
+                                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>
+                                    Bullet Emoji ({`{bullet}`})
+                                  </label>
+                                  <select
+                                    value={settings.welcome.bulletEmoji || '➤'}
+                                    onChange={(e) => handleInputChange('welcome.bulletEmoji', e.target.value)}
+                                    className="glass-input"
+                                    style={{ fontSize: '0.8rem' }}
+                                  >
+                                    <option value="➤">➤ Arrow</option>
+                                    <option value="⚡">⚡ Lightning</option>
+                                    <option value="✦">✦ Star</option>
+                                    <option value="🔥">🔥 Fire</option>
+                                    <option value="📌">📌 Pin</option>
+                                    <option value="•">• Dot</option>
+                                  </select>
+                                </div>
+                              </div>
                             </div>
 
                             {/* Description Section */}
                             <div>
                               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
                                 <label style={{ fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-secondary)' }}>
-                                  Description
+                                  Message / Description Text
                                 </label>
                                 <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-                                  {(settings.welcome.message || '').length} / 4096
+                                  Available tags: {`{user}, {server}, {rules}, {announcements}, {chat}, {website}, {bullet}`}
                                 </span>
                               </div>
                               <textarea
                                 value={settings.welcome.message || ''}
                                 onChange={(e) => handleInputChange('welcome.message', e.target.value)}
                                 className="glass-input"
-                                rows="3"
-                                placeholder="**BUY ALL THINGS FROM HERE <#153338781401100410>**"
-                                style={{ width: '100%', minHeight: '80px', resize: 'vertical', fontFamily: 'inherit' }}
+                                rows="4"
+                                placeholder="➤ Welcome {user} To **{server}**&#10;&#10;➤ Stay Updated {announcements}&#10;&#10;➤ Read {rules} And Follow&#10;&#10;➤ Go And Enjoy {chat}"
+                                style={{ width: '100%', minHeight: '95px', resize: 'vertical', fontFamily: 'inherit' }}
                               />
                             </div>
 
-                            {/* Fields Section */}
-                            <div>
-                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                                <label style={{ fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-secondary)' }}>
-                                  Fields
+                            {/* GIF Banner Image & Sizing Controls Section */}
+                            <div style={{
+                              padding: '12px',
+                              borderRadius: '10px',
+                              backgroundColor: 'rgba(0,0,0,0.25)',
+                              border: '1px solid rgba(255,255,255,0.06)',
+                              display: 'flex',
+                              flexDirection: 'column',
+                              gap: '12px'
+                            }}>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <label style={{ fontSize: '0.85rem', fontWeight: '700', color: '#ffffff', margin: 0 }}>
+                                  GIF Banner Image & Sizing Controls
                                 </label>
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    const currentFields = settings.welcome.embedFields || [];
-                                    handleInputChange('welcome.embedFields', [...currentFields, { name: '', value: '', inline: false }]);
-                                  }}
-                                  className="btn-secondary"
-                                  style={{ padding: '4px 10px', fontSize: '0.75rem', borderRadius: '6px', display: 'flex', alignItems: 'center', gap: '4px' }}
-                                >
-                                  <Plus size={14} /> Add Field
-                                </button>
+                                <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                                  <input
+                                    type="checkbox"
+                                    checked={settings.welcome.gifSupport || false}
+                                    onChange={() => handleToggle('welcome.gifSupport')}
+                                  />
+                                  Enable GIF Mode
+                                </label>
                               </div>
 
-                              {Array.isArray(settings.welcome.embedFields) && settings.welcome.embedFields.length > 0 && (
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                                  {settings.welcome.embedFields.map((field, idx) => (
-                                    <div key={idx} style={{ padding: '10px', borderRadius: '8px', backgroundColor: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.05)', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                      <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                                        <input
-                                          type="text"
-                                          value={field.name || ''}
-                                          onChange={(e) => {
-                                            const newFields = [...(settings.welcome.embedFields || [])];
-                                            newFields[idx].name = e.target.value;
-                                            handleInputChange('welcome.embedFields', newFields);
-                                          }}
-                                          className="glass-input"
-                                          placeholder="Field Name"
-                                          style={{ flex: 1, fontSize: '0.85rem' }}
-                                        />
-                                        <label style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.75rem', cursor: 'pointer' }}>
-                                          <input
-                                            type="checkbox"
-                                            checked={Boolean(field.inline)}
-                                            onChange={(e) => {
-                                              const newFields = [...(settings.welcome.embedFields || [])];
-                                              newFields[idx].inline = e.target.checked;
-                                              handleInputChange('welcome.embedFields', newFields);
-                                            }}
-                                          />
-                                          Inline
-                                        </label>
-                                        <button
-                                          type="button"
-                                          onClick={() => {
-                                            const newFields = settings.welcome.embedFields.filter((_, i) => i !== idx);
-                                            handleInputChange('welcome.embedFields', newFields);
-                                          }}
-                                          style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', padding: '4px' }}
-                                        >
-                                          <Trash2 size={16} />
-                                        </button>
-                                      </div>
-                                      <textarea
-                                        value={field.value || ''}
-                                        onChange={(e) => {
-                                          const newFields = [...(settings.welcome.embedFields || [])];
-                                          newFields[idx].value = e.target.value;
-                                          handleInputChange('welcome.embedFields', newFields);
-                                        }}
-                                        className="glass-input"
-                                        rows="2"
-                                        placeholder="Field Value"
-                                        style={{ width: '100%', fontSize: '0.85rem', resize: 'vertical' }}
-                                      />
-                                    </div>
-                                  ))}
-                                </div>
-                              )}
-                            </div>
-
-                            {/* Image Section (Main Banner Image) */}
-                            <div>
-                              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-secondary)', marginBottom: '6px' }}>
-                                Image
-                              </label>
-                              <div style={{
-                                position: 'relative',
-                                width: '100%',
-                                minHeight: '90px',
-                                borderRadius: '8px',
-                                backgroundColor: '#111216',
-                                border: '1px solid rgba(255,255,255,0.1)',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                padding: '10px',
-                                overflow: 'hidden'
-                              }}>
-                                {settings.welcome.embedImage ? (
-                                  <div style={{ position: 'relative', width: '100%', textAlign: 'center' }}>
-                                    <img src={resolveUploadUrl(settings.welcome.embedImage)} alt="Embed Main Image" style={{ maxHeight: '160px', maxWidth: '100%', objectFit: 'contain', borderRadius: '4px' }} />
-                                    <button
-                                      type="button"
-                                      onClick={() => handleInputChange('welcome.embedImage', '')}
-                                      style={{
-                                        position: 'absolute',
-                                        top: '4px',
-                                        right: '4px',
-                                        width: '22px',
-                                        height: '22px',
-                                        borderRadius: '50%',
-                                        backgroundColor: 'rgba(0,0,0,0.85)',
-                                        color: '#ffffff',
-                                        border: 'none',
-                                        cursor: 'pointer',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center'
-                                      }}
-                                      title="Remove Main Image"
-                                    >
-                                      <X size={14} />
-                                    </button>
-                                  </div>
-                                ) : (
-                                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', padding: '12px 0' }}>
-                                    <ImageIcon size={28} style={{ color: 'var(--text-muted)' }} />
-                                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                                      <label className="btn-secondary" style={{ padding: '6px 14px', fontSize: '0.8rem', cursor: 'pointer' }}>
-                                        Upload Image
-                                        <input
-                                          type="file"
-                                          accept="image/*"
-                                          style={{ display: 'none' }}
-                                          onChange={async (e) => {
-                                            const file = e.target.files[0];
-                                            if (file) {
-                                              const res = await api.uploadBackground(guildId, file).catch(() => null);
-                                              if (res && res.url) handleInputChange('welcome.embedImage', res.url);
-                                            }
-                                            e.target.value = null;
-                                          }}
-                                        />
-                                      </label>
-                                      <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>or paste URL below</span>
-                                    </div>
+                              {/* GIF / Image URL */}
+                              <div>
+                                <div style={{ display: 'flex', gap: '8px' }}>
+                                  <input
+                                    type="text"
+                                    value={settings.welcome.embedImage || ''}
+                                    onChange={(e) => handleInputChange('welcome.embedImage', e.target.value)}
+                                    className="glass-input"
+                                    placeholder="https://example.com/welcome_banner.gif"
+                                    style={{ flex: 1, fontSize: '0.85rem' }}
+                                  />
+                                  <label className="btn-secondary" style={{ padding: '8px 14px', cursor: 'pointer', fontSize: '0.8rem', display: 'flex', alignItems: 'center' }}>
+                                    Upload GIF
                                     <input
-                                      type="text"
-                                      value={settings.welcome.embedImage || ''}
-                                      onChange={(e) => handleInputChange('welcome.embedImage', e.target.value)}
-                                      className="glass-input"
-                                      placeholder="https://example.com/banner.png"
-                                      style={{ width: '280px', fontSize: '0.8rem', textAlign: 'center' }}
+                                      type="file"
+                                      accept="image/*"
+                                      style={{ display: 'none' }}
+                                      onChange={async (e) => {
+                                        const file = e.target.files[0];
+                                        if (file) {
+                                          const res = await api.uploadBackground(guildId, file).catch(() => null);
+                                          if (res && res.url) handleInputChange('welcome.embedImage', res.url);
+                                        }
+                                        e.target.value = null;
+                                      }}
                                     />
+                                  </label>
+                                </div>
+                              </div>
+
+                              {/* GIF Ratio, Height & Fit Mode Sliders */}
+                              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px', alignItems: 'center' }}>
+                                <div>
+                                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>
+                                    Aspect Ratio
+                                  </label>
+                                  <select
+                                    value={settings.welcome.gifRatio || '16:9'}
+                                    onChange={(e) => handleInputChange('welcome.gifRatio', e.target.value)}
+                                    className="glass-input"
+                                    style={{ fontSize: '0.8rem' }}
+                                  >
+                                    <option value="16:9">16:9 (Standard Widescreen)</option>
+                                    <option value="21:9">21:9 (Ultrawide Banner)</option>
+                                    <option value="4:3">4:3 (Classic Box)</option>
+                                    <option value="1:1">1:1 (Square Box)</option>
+                                    <option value="auto">Auto (Native Height)</option>
+                                  </select>
+                                </div>
+
+                                <div>
+                                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>
+                                    <span>Max Height</span>
+                                    <span>{settings.welcome.gifHeight || 250}px</span>
                                   </div>
-                                )}
+                                  <input
+                                    type="range"
+                                    min="100"
+                                    max="400"
+                                    step="10"
+                                    value={settings.welcome.gifHeight || 250}
+                                    onChange={(e) => handleInputChange('welcome.gifHeight', parseInt(e.target.value))}
+                                    style={{ width: '100%', accentColor: 'var(--primary)' }}
+                                  />
+                                </div>
+
+                                <div>
+                                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>
+                                    Fit Mode
+                                  </label>
+                                  <select
+                                    value={settings.welcome.gifFitMode || 'cover'}
+                                    onChange={(e) => handleInputChange('welcome.gifFitMode', e.target.value)}
+                                    className="glass-input"
+                                    style={{ fontSize: '0.8rem' }}
+                                  >
+                                    <option value="cover">Cover (Fill Container)</option>
+                                    <option value="contain">Contain (Fit Whole GIF)</option>
+                                    <option value="fill">Stretch Fill</option>
+                                  </select>
+                                </div>
                               </div>
                             </div>
 
@@ -5717,19 +5819,21 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                                           {/* Title & Thumbnail Row */}
                                           <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px' }}>
                                             <div style={{ flex: 1 }}>
-                                              <div style={{ fontWeight: '700', color: '#38bdf8', fontSize: '1rem', marginBottom: '6px' }}>
-                                                {settings.welcome.embedTitleUrl ? (
-                                                  <a href={settings.welcome.embedTitleUrl} target="_blank" rel="noreferrer" style={{ color: '#38bdf8', textDecoration: 'none' }} onClick={e => e.preventDefault()}>
-                                                    {formatWelcomeText(settings.welcome.embedTitle || `Welcome to ${guildName || 'Server'}!`)}
-                                                  </a>
-                                                ) : (
-                                                  formatWelcomeText(settings.welcome.embedTitle || `Welcome to ${guildName || 'Server'}!`)
-                                                )}
-                                              </div>
+                                              {settings.welcome.embedTitle && (
+                                                <div style={{ fontWeight: '700', color: '#38bdf8', fontSize: '1rem', marginBottom: '6px' }}>
+                                                  {settings.welcome.embedTitleUrl ? (
+                                                    <a href={settings.welcome.embedTitleUrl} target="_blank" rel="noreferrer" style={{ color: '#38bdf8', textDecoration: 'none' }} onClick={e => e.preventDefault()}>
+                                                      {formatWelcomeText(settings.welcome.embedTitle)}
+                                                    </a>
+                                                  ) : (
+                                                    formatWelcomeText(settings.welcome.embedTitle)
+                                                  )}
+                                                </div>
+                                              )}
 
                                               {/* Description */}
                                               {settings.welcome.message && (
-                                                <div style={{ fontSize: '0.875rem', color: '#dbdee1', whiteSpace: 'pre-wrap', marginBottom: '8px', wordBreak: 'break-word' }}>
+                                                <div style={{ fontSize: '0.875rem', color: '#dbdee1', whiteSpace: 'pre-wrap', marginBottom: '8px', wordBreak: 'break-word', lineHeight: '1.5' }}>
                                                   {formatWelcomeText(settings.welcome.message)}
                                                 </div>
                                               )}
@@ -5757,15 +5861,42 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                                             </div>
                                           )}
 
-                                          {/* Main Image Banner */}
+                                          {/* Main Image Banner with Ratio, Max Height, and Fit Mode */}
                                           {settings.welcome.layoutType === 'embed-card' ? (
                                             <div style={{ marginTop: '10px', borderRadius: '4px', overflow: 'hidden' }}>
                                               {renderCanvasCard()}
                                             </div>
                                           ) : (
                                             (mainImageUrl || (settings.welcome.gifSupport && settings.welcome.background)) && (
-                                              <div style={{ marginTop: '10px', borderRadius: '4px', overflow: 'hidden' }}>
-                                                <img src={mainImageUrl || resolveUploadUrl(settings.welcome.background)} alt="embed main banner" style={{ maxWidth: '100%', maxHeight: '250px', borderRadius: '4px', objectFit: 'cover' }} />
+                                              <div style={{
+                                                marginTop: '10px',
+                                                borderRadius: '4px',
+                                                overflow: 'hidden',
+                                                width: '100%',
+                                                aspectRatio: (() => {
+                                                  const r = settings.welcome.gifRatio;
+                                                  if (r === '16:9') return '16/9';
+                                                  if (r === '21:9') return '21/9';
+                                                  if (r === '4:3') return '4/3';
+                                                  if (r === '1:1') return '1/1';
+                                                  return 'auto';
+                                                })(),
+                                                maxHeight: `${settings.welcome.gifHeight || 250}px`,
+                                                backgroundColor: '#0f1013',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center'
+                                              }}>
+                                                <img
+                                                  src={mainImageUrl || resolveUploadUrl(settings.welcome.background)}
+                                                  alt="embed main banner"
+                                                  style={{
+                                                    width: '100%',
+                                                    height: '100%',
+                                                    borderRadius: '4px',
+                                                    objectFit: settings.welcome.gifFitMode || 'cover'
+                                                  }}
+                                                />
                                               </div>
                                             )
                                           )}
