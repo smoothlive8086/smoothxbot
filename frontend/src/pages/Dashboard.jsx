@@ -684,6 +684,7 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
   const [clearingLogs, setClearingLogs] = useState(false);
   const [uploadFile, setUploadFile] = useState(null);
   const [showCropModal, setShowCropModal] = useState(false);
+  const [isSendingTestWelcome, setIsSendingTestWelcome] = useState(false);
 
   // Custom Mass-DM Broadcast State
   const [broadcastMessage, setBroadcastMessage] = useState('');
@@ -999,6 +1000,20 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
     } catch (err) {
       console.error(err);
       setErrorMsg(err.message || 'Failed to send test DM.');
+    }
+  };
+
+  const handleSendTestWelcome = async () => {
+    if (!selectedGuild) return;
+    setIsSendingTestWelcome(true);
+    try {
+      const res = await apiRequest(`/settings/${selectedGuild.id}/test-welcome`, { method: 'POST' });
+      showNotification(res.message || 'Test welcome message sent successfully!');
+    } catch (err) {
+      console.error(err);
+      setErrorMsg(err.message || 'Failed to send test welcome message. Make sure greeting channel is configured.');
+    } finally {
+      setIsSendingTestWelcome(false);
     }
   };
 
@@ -2053,44 +2068,62 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
     if (!rawText) return '';
 
     const redirectCh = channels.find(c => c.id === settings?.welcome?.redirectChannelId);
-    const channelName = redirectCh ? redirectCh.name : 'channel';
+    const channelName = redirectCh ? redirectCh.name : 'SERVER-RULES';
     const redirectCh2 = channels.find(c => c.id === settings?.welcome?.redirectChannelId2);
-    const channelName2 = redirectCh2 ? redirectCh2.name : 'channel';
+    const channelName2 = redirectCh2 ? redirectCh2.name : 'GENERAL-CHAT';
     const redirectCh3 = channels.find(c => c.id === settings?.welcome?.redirectChannelId3);
-    const channelName3 = redirectCh3 ? redirectCh3.name : 'channel';
+    const channelName3 = redirectCh3 ? redirectCh3.name : 'GENERAL VC';
+
+    const now = new Date();
+    const formatDateStr = (d) => {
+      const day = String(d.getDate()).padStart(2, '0');
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const year = d.getFullYear();
+      const hours = String(d.getHours()).padStart(2, '0');
+      const mins = String(d.getMinutes()).padStart(2, '0');
+      return `${day}/${month}/${year} – ${hours}:${mins}`;
+    };
 
     let text = rawText
-      .replace(/{username}/g, user?.username || 'Member')
-      .replace(/{server}/g, guildName || 'Server');
+      .replace(/{username}/g, user?.username || 'rayandfk')
+      .replace(/{user_name}/g, user?.username || 'rayandfk')
+      .replace(/{displayname}/g, user?.username || 'Rayandfk')
+      .replace(/{display_name}/g, user?.username || 'Rayandfk')
+      .replace(/{server}/g, guildName || 'Akshay Akz\'s Server')
+      .replace(/{membercount}/g, '24146')
+      .replace(/{position}/g, '24146')
+      .replace(/{user_position}/g, '24146')
+      .replace(/{joined_at}/g, formatDateStr(now))
+      .replace(/{created_at}/g, formatDateStr(new Date(now.getTime() - 300000)));
 
-    const parts = text.split(/({user}|{channel}|{channel2}|{channel3})/g);
+    const parts = text.split(/({user}|{channel}|{channel1}|{channel2}|{channel3})/g);
 
     return parts.map((part, index) => {
       if (part === '{user}') {
         return (
           <span key={`mention-user-${index}`} className="discord-mention">
-            @{user?.username || 'Member'}
+            @{user?.username || 'Rayan'}
           </span>
         );
       }
-      if (part === '{channel}') {
+      if (part === '{channel}' || part === '{channel1}') {
         return (
           <span key={`mention-ch-${index}`} className="discord-mention-channel">
-            #{channelName}
+            # 📜 · {channelName}
           </span>
         );
       }
       if (part === '{channel2}') {
         return (
           <span key={`mention-ch2-${index}`} className="discord-mention-channel">
-            #{channelName2}
+            # ❤️ · {channelName2}
           </span>
         );
       }
       if (part === '{channel3}') {
         return (
           <span key={`mention-ch3-${index}`} className="discord-mention-channel">
-            #{channelName3}
+            # 🔊🌟 · {channelName3}
           </span>
         );
       }
@@ -4145,6 +4178,71 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                       <div className="welcome-split-layout" style={{ borderTop: '1px solid var(--border-color)', paddingTop: '16px' }}>
                         <div className="welcome-settings-column">
 
+                          {/* Quick Presets & Test Action Bar */}
+                          <div style={{ marginBottom: '16px', padding: '14px 16px', borderRadius: '12px', background: 'linear-gradient(135deg, rgba(0, 176, 244, 0.1) 0%, rgba(37, 99, 235, 0.05) 100%)', border: '1px solid rgba(0, 176, 244, 0.25)' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                              <div>
+                                <span style={{ fontSize: '0.9rem', color: '#ffffff', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                  ✨ Welcome Embed Presets & Quick Test
+                                </span>
+                                <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'block', marginTop: '2px' }}>
+                                  One-click setup to make your welcome message look like Sapphire Bot or send a live test message.
+                                </span>
+                              </div>
+                            </div>
+                            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center' }}>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  handleInputChange('welcome.layoutType', 'embed-only');
+                                  handleInputChange('welcome.embedAuthorName', '{server}');
+                                  handleInputChange('welcome.embedTitle', 'WELCOME');
+                                  handleInputChange('welcome.embedThumbnail', '{user_avatar}');
+                                  handleInputChange('welcome.embedColor', '#00b0f4');
+                                  handleInputChange('welcome.message', `Hey {user}\n**Welcome to {server}**\n**Follow the rules and Enjoy in our Server**\n▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n\n💫 **Read Rules** {channel}\n💫 **Chat with us** {channel2}\n💫 **Connect with us** {channel3}\n\n▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n\n👥 **USER INFO**\n**User Name** : {username}\n\n**User Position**: {position}\n\n**Joined at** : {joined_at}\n\n**Created at**: {created_at}`);
+                                  showNotification('Applied Sapphire Welcome Style Preset!');
+                                }}
+                                style={{
+                                  padding: '8px 14px',
+                                  fontSize: '0.8rem',
+                                  borderRadius: '8px',
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: '6px',
+                                  background: 'linear-gradient(135deg, #00b0f4 0%, #0072ff 100%)',
+                                  color: '#ffffff',
+                                  border: 'none',
+                                  fontWeight: '600',
+                                  cursor: 'pointer',
+                                  boxShadow: '0 4px 12px rgba(0, 176, 244, 0.3)'
+                                }}
+                              >
+                                💎 Apply Sapphire Welcome Preset
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={handleSendTestWelcome}
+                                disabled={isSendingTestWelcome}
+                                style={{
+                                  padding: '8px 14px',
+                                  fontSize: '0.8rem',
+                                  borderRadius: '8px',
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: '6px',
+                                  background: 'rgba(255, 255, 255, 0.08)',
+                                  color: '#ffffff',
+                                  border: '1px solid rgba(255, 255, 255, 0.18)',
+                                  fontWeight: '600',
+                                  cursor: isSendingTestWelcome ? 'not-allowed' : 'pointer'
+                                }}
+                              >
+                                🚀 {isSendingTestWelcome ? 'Sending Test...' : 'Send Test Welcome Message'}
+                              </button>
+                            </div>
+                          </div>
+
                           {/* Welcome Message Layout Selection */}
                           <div>
                             <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 'bold' }}>Welcome Message Layout Type</label>
@@ -5763,7 +5861,7 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                                               {renderCanvasCard()}
                                             </div>
                                           ) : (
-                                            (mainImageUrl || (settings.welcome.gifSupport && settings.welcome.background)) && (
+                                            (mainImageUrl || (settings.welcome.background && !settings.welcome.background.startsWith('#'))) && (
                                               <div style={{ marginTop: '10px', borderRadius: '4px', overflow: 'hidden' }}>
                                                 <img src={mainImageUrl || resolveUploadUrl(settings.welcome.background)} alt="embed main banner" style={{ maxWidth: '100%', maxHeight: '250px', borderRadius: '4px', objectFit: 'cover' }} />
                                               </div>
