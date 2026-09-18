@@ -4297,14 +4297,18 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
 
                     {settings.welcome.enabled && (
                       <div>
-                        {/* Welcome Module Sub-Navigation Pills */}
+                        {/* Welcome Module Sub-Navigation Pills Toolbar */}
                         <div style={{
                           display: 'flex',
                           gap: '8px',
-                          overflowX: 'auto',
-                          paddingBottom: '10px',
-                          marginBottom: '20px',
-                          borderBottom: '1px solid rgba(255,255,255,0.08)'
+                          flexWrap: 'wrap',
+                          alignItems: 'center',
+                          padding: '6px 8px',
+                          borderRadius: '12px',
+                          backgroundColor: 'rgba(0,0,0,0.3)',
+                          border: '1px solid rgba(255,255,255,0.08)',
+                          marginBottom: '24px',
+                          boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.4)'
                         }}>
                           {[
                             { id: 'builder', icon: Sparkles, label: 'Embed & Canvas Builder' },
@@ -4320,16 +4324,17 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                               style={{
                                 display: 'flex',
                                 alignItems: 'center',
-                                gap: '6px',
-                                padding: '8px 14px',
+                                gap: '8px',
+                                padding: '8px 16px',
                                 borderRadius: '8px',
                                 fontSize: '0.85rem',
                                 fontWeight: '600',
                                 cursor: 'pointer',
-                                border: 'none',
-                                background: welcomeSubTab === tab.id ? 'var(--primary)' : 'rgba(255, 255, 255, 0.05)',
+                                border: welcomeSubTab === tab.id ? '1px solid rgba(255,255,255,0.2)' : '1px solid transparent',
+                                background: welcomeSubTab === tab.id ? 'var(--primary)' : 'rgba(255, 255, 255, 0.04)',
                                 color: welcomeSubTab === tab.id ? '#ffffff' : 'var(--text-secondary)',
-                                transition: 'all 0.15s ease',
+                                boxShadow: welcomeSubTab === tab.id ? '0 4px 12px rgba(37,99,235,0.35)' : 'none',
+                                transition: 'all 0.2s ease',
                                 whiteSpace: 'nowrap'
                               }}
                             >
