@@ -54,15 +54,15 @@ const Youtube = ({ size = 24, className = '', style = {} }) => (
 
 
 const EMOJI_CATEGORIES = [
-  { id: 'smileys', icon: '😀', label: 'Smileys & Emotion', list: ['😀','😃','😄','😁','😆','😅','🤣','😂','🙂','🙃','😉','😊','😇','🥰','😍','🤩','😘','😗','😚','😋','😛','😜','🤪','😝','🤑','🤗','🤭','🤫','🤔','🤐','🤨','😐','😑','😶','😏','😒','🙄','😬','🤥','😌','😔','😪','🤤','😴','😷','🤒','🤕','🤢','🤮','🤧','🥵','🥶','🥴','😵','🤯','🤠','🥳','😎','🤓','🧐','😕','😟','🙁','😮','😯','😲','😳','🥺','😦','😧','😮‍💨','🥱','😤','😡','😠','🤬','😈','👿','💀','☠️','💩','🤡','👹','👺','👻','👽','👾','🤖','🔥','✨','💥','💯','❤️','💖','🙏','👍','👎','👏','🙌','👑'] },
-  { id: 'people', icon: '👋', label: 'People & Body', list: ['👋','🤚','🖐️','✋','🖖','👌','🤌','🤏','✌️','🤞','🤟','🤘','🤙','👈','👉','👆','🖕','👇','☝️','👍','👎','✊','👊','🤛','🤜','👏','🙌','👐','🤲','🤝','🙏','✍️','💅','🤳','💪','👑','🧢','👒','🎓','🎩'] },
-  { id: 'animals', icon: '🐶', label: 'Animals & Nature', list: ['🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼','🐻‍❄️','🐨','🐯','🦁','🐮','🐷','🐽','🐸','🐵','🙈','🙉','🙊','🐒','🐔','🐧','🐦','🐤','🐣','🐥','🦆','🦅','🦉','🦇','🐺','🐗','🐴','🦄','🐝','🐛','🦋','🐌','🐞','🐜','🦟','🦗','🕷️','🦂','🐢','🐍','🦎','🐙','🦑','🦞','🦀','🐡','🐠','🐟','🐬','🐳','🐋','🦈','🐊','🐅','🐆'] },
-  { id: 'food', icon: '🍕', label: 'Food & Drink', list: ['🍏','🍎','🍐','🍊','🍋','🍌','🍉','🍇','🍓','🫐','🍈','🍒','🍑','🥭','🍍','🥥','🥝','🍅','🥑','🍆','🥔','🥕','🌽','🌶️','🫑','🥒','🥬','🥦','🧄','🧅','🍄','🥜','🍞','🥐','🥖','🫓','🥨','🥯','🥞','🧇','🧀','🍖','🍗','🥩','🥓','🍔','🍟','🍕','🌭','🥪','🌮','🌯','🥙','🧆','🥚','🍳','🥘','🍲','🥗','🍿','🍱','🍘','🍙','🍚','🍛','🍜','🍝','🍠','🍢','🍣','🍤','🥟','🍦','🍧','🍨','🍩','🍪','🎂','🍰','🧁','🥧','🍫','🍬','🍭','🍮','🥛','☕','🫖','🍵','🍶','🍾','🍷','🍸','🍹','🍺','🍻','🥂','🥃','🥤'] },
-  { id: 'activities', icon: '⚽', label: 'Activities & Sports', list: ['⚽','🏀','🏈','⚾','🥎','🎾','🏐','🏉','🥏','🎱','🪀','🏓','🏸','🏒','🏑','🥍','🏏','🏹','🎣','🤿','🥊','🥋','🎽','🛹','🛼','🛷','⛸️','🎿','🏂','🏋️','🤼','🤸','⛹️','🤺','🤾','🧘','🏄','🏊','🚣','🧗','🚵','🚴','🏆','🥇','🥈','🥉','🏅','🎖️','🎫','🎟️','🎪','🎭','🎨','🎬','🎤','🎧','🎼','🎵','🎶','🎙️','🎸','🎹','🎺','🎻','🥁','🎲','♟️','🎯',' bowling','🎮','🎰','🧩'] },
-  { id: 'travel', icon: '🚗', label: 'Travel & Places', list: ['🚗','🚕','🚙','🚌','🏎️','🚓','🚑','🚒','🚐','🛻','🚚','🚛','🚜','🛵','🚲','🛴','🚨','🚘','✈️','🛫','🛬','🛸','🚀','🛰️','🚁','🛶','⛵','🚤','🛳️','⚓','⛽','🚧','🚦','🗺️','🗿','🗽','<ctrl42>','🏰','🏯','🏟️','🎡','🎢','🏖️','🏝️','🏜️','🌋','⛰️','🏔️','🗻','🏕️','🏠','🏡','🏙️','🌅','🌄','🌇','🌆','🌃','🌌'] },
-  { id: 'objects', icon: '💡', label: 'Objects & Tools', list: ['⌚','📱','📲','💻','⌨️','🖥️','🖨️','🖱️','🕹️','💽','💾','💿','📀','📷','📸','📹','🎥','📽️','📻','🎙️','⏱️','⏲️','⏰','🕰️','⌛','⏳','📡','🔋','🔌','💡','🔦','🕯️','💸','💵','💴','💶','💷','🪙','💰','💳','💎','⚖️','🪜','🧰','🔧','🔨','⚒️','🛠️','⛏️','⚙️','💣','🔪','🗡️','⚔️','🛡️','🔮','📿','🔑','🗝️','🔒','🔓'] },
-  { id: 'symbols', icon: '🔣', label: 'Symbols & Icons', list: ['❤️','🧡','💛','💚','💙','💜','🖤','🤍','🤎','💔','❤️‍🔥','❣️','💕','💞','💓','💗','💖','💘','💝','💟','☮️','✝️','☪️','🕉️','☸️','✡️','<ctrl42>','☯️','☦️','⛎','♈','♉','♊','♋','♌','♍','♎','♏','♐','♑','♒','♓','⚛️','☢️','☣️','📴','📳','🈶','🈚','🆚','🅰️','🅱️','🆎','🅾️','🆘','❌','⭕','🛑','⛔','🚫','💯','💢','♨️','❗','❕','❓','❔','‼️','⁉️','⚠️','🔱','⚜️','🔰','🌐','💠','Ⓜ️','🌀','💤','🏧','🚾','♿','🅿️','🚻','🧹','💬','💭','🛑','✅','☑️','✔️','✖️','❌','➕','➖','➗','♾️'] },
-  { id: 'flags', icon: '🚩', label: 'Flags', list: ['🚩','🏳️','🏴','🏁','🚩','🏳️‍🌈','🏳️‍⚧️','🏴‍☠️','🇺🇸','🇬🇧','🇮🇳','🇨🇦','🇦🇺','🇩🇪','🇫🇷','🇯🇵','🇰🇷','🇨🇳','🇧🇷','🇲🇽','🇮🇹','🇪🇸','🇷🇺'] }
+  { id: 'smileys', icon: '😀', label: 'Smileys & Emotion', list: ['😀', '😃', '😄', '😁', '😆', '😅', '🤣', '😂', '🙂', '🙃', '😉', '😊', '😇', '🥰', '😍', '🤩', '😘', '😗', '😚', '😋', '😛', '😜', '🤪', '😝', '🤑', '🤗', '🤭', '🤫', '🤔', '🤐', '🤨', '😐', '😑', '😶', '😏', '😒', '🙄', '😬', '🤥', '😌', '😔', '😪', '🤤', '😴', '😷', '🤒', '🤕', '🤢', '🤮', '🤧', '🥵', '🥶', '🥴', '😵', '🤯', '🤠', '🥳', '😎', '🤓', '🧐', '😕', '😟', '🙁', '😮', '😯', '😲', '😳', '🥺', '😦', '😧', '😮‍💨', '🥱', '😤', '😡', '😠', '🤬', '😈', '👿', '💀', '☠️', '💩', '🤡', '👹', '👺', '👻', '👽', '👾', '🤖', '🔥', '✨', '💥', '💯', '❤️', '💖', '🙏', '👍', '👎', '👏', '🙌', '👑'] },
+  { id: 'people', icon: '👋', label: 'People & Body', list: ['👋', '🤚', '🖐️', '✋', '🖖', '👌', '🤌', '🤏', '✌️', '🤞', '🤟', '🤘', '🤙', '👈', '👉', '👆', '🖕', '👇', '☝️', '👍', '👎', '✊', '👊', '🤛', '🤜', '👏', '🙌', '👐', '🤲', '🤝', '🙏', '✍️', '💅', '🤳', '💪', '👑', '🧢', '👒', '🎓', '🎩'] },
+  { id: 'animals', icon: '🐶', label: 'Animals & Nature', list: ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐻‍❄️', '🐨', '🐯', '🦁', '🐮', '🐷', '🐽', '🐸', '🐵', '🙈', '🙉', '🙊', '🐒', '🐔', '🐧', '🐦', '🐤', '🐣', '🐥', '🦆', '🦅', '🦉', '🦇', '🐺', '🐗', '🐴', '🦄', '🐝', '🐛', '🦋', '🐌', '🐞', '🐜', '🦟', '🦗', '🕷️', '🦂', '🐢', '🐍', '🦎', '🐙', '🦑', '🦞', '🦀', '🐡', '🐠', '🐟', '🐬', '🐳', '🐋', '🦈', '🐊', '🐅', '🐆'] },
+  { id: 'food', icon: '🍕', label: 'Food & Drink', list: ['🍏', '🍎', '🍐', '🍊', '🍋', '🍌', '🍉', '🍇', '🍓', '🫐', '🍈', '🍒', '🍑', '🥭', '🍍', '🥥', '🥝', '🍅', '🥑', '🍆', '🥔', '🥕', '🌽', '🌶️', '🫑', '🥒', '🥬', '🥦', '🧄', '🧅', '🍄', '🥜', '🍞', '🥐', '🥖', '🫓', '🥨', '🥯', '🥞', '🧇', '🧀', '🍖', '🍗', '🥩', '🥓', '🍔', '🍟', '🍕', '🌭', '🥪', '🌮', '🌯', '🥙', '🧆', '🥚', '🍳', '🥘', '🍲', '🥗', '🍿', '🍱', '🍘', '🍙', '🍚', '🍛', '🍜', '🍝', '🍠', '🍢', '🍣', '🍤', '🥟', '🍦', '🍧', '🍨', '🍩', '🍪', '🎂', '🍰', '🧁', '🥧', '🍫', '🍬', '🍭', '🍮', '🥛', '☕', '🫖', '🍵', '🍶', '🍾', '🍷', '🍸', '🍹', '🍺', '🍻', '🥂', '🥃', '🥤'] },
+  { id: 'activities', icon: '⚽', label: 'Activities & Sports', list: ['⚽', '🏀', '🏈', '⚾', '🥎', '🎾', '🏐', '🏉', '🥏', '🎱', '🪀', '🏓', '🏸', '🏒', '🏑', '🥍', '🏏', '🏹', '🎣', '🤿', '🥊', '🥋', '🎽', '🛹', '🛼', '🛷', '⛸️', '🎿', '🏂', '🏋️', '🤼', '🤸', '⛹️', '🤺', '🤾', '🧘', '🏄', '🏊', '🚣', '🧗', '🚵', '🚴', '🏆', '🥇', '🥈', '🥉', '🏅', '🎖️', '🎫', '🎟️', '🎪', '🎭', '🎨', '🎬', '🎤', '🎧', '🎼', '🎵', '🎶', '🎙️', '🎸', '🎹', '🎺', '🎻', '🥁', '🎲', '♟️', '🎯', ' bowling', '🎮', '🎰', '🧩'] },
+  { id: 'travel', icon: '🚗', label: 'Travel & Places', list: ['🚗', '🚕', '🚙', '🚌', '🏎️', '🚓', '🚑', '🚒', '🚐', '🛻', '🚚', '🚛', '🚜', '🛵', '🚲', '🛴', '🚨', '🚘', '✈️', '🛫', '🛬', '🛸', '🚀', '🛰️', '🚁', '🛶', '⛵', '🚤', '🛳️', '⚓', '⛽', '🚧', '🚦', '🗺️', '🗿', '🗽', '<ctrl42>', '🏰', '🏯', '🏟️', '🎡', '🎢', '🏖️', '🏝️', '🏜️', '🌋', '⛰️', '🏔️', '🗻', '🏕️', '🏠', '🏡', '🏙️', '🌅', '🌄', '🌇', '🌆', '🌃', '🌌'] },
+  { id: 'objects', icon: '💡', label: 'Objects & Tools', list: ['⌚', '📱', '📲', '💻', '⌨️', '🖥️', '🖨️', '🖱️', '🕹️', '💽', '💾', '💿', '📀', '📷', '📸', '📹', '🎥', '📽️', '📻', '🎙️', '⏱️', '⏲️', '⏰', '🕰️', '⌛', '⏳', '📡', '🔋', '🔌', '💡', '🔦', '🕯️', '💸', '💵', '💴', '💶', '💷', '🪙', '💰', '💳', '💎', '⚖️', '🪜', '🧰', '🔧', '🔨', '⚒️', '🛠️', '⛏️', '⚙️', '💣', '🔪', '🗡️', '⚔️', '🛡️', '🔮', '📿', '🔑', '🗝️', '🔒', '🔓'] },
+  { id: 'symbols', icon: '🔣', label: 'Symbols & Icons', list: ['❤️', '🧡', '💛', '💚', '💙', '💜', '🖤', '🤍', '🤎', '💔', '❤️‍🔥', '❣️', '💕', '💞', '💓', '💗', '💖', '💘', '💝', '💟', '☮️', '✝️', '☪️', '🕉️', '☸️', '✡️', '<ctrl42>', '☯️', '☦️', '⛎', '♈', '♉', '♊', '♋', '♌', '♍', '♎', '♏', '♐', '♑', '♒', '♓', '⚛️', '☢️', '☣️', '📴', '📳', '🈶', '🈚', '🆚', '🅰️', '🅱️', '🆎', '🅾️', '🆘', '❌', '⭕', '🛑', '⛔', '🚫', '💯', '💢', '♨️', '❗', '❕', '❓', '❔', '‼️', '⁉️', '⚠️', '🔱', '⚜️', '🔰', '🌐', '💠', 'Ⓜ️', '🌀', '💤', '🏧', '🚾', '♿', '🅿️', '🚻', '🧹', '💬', '💭', '🛑', '✅', '☑️', '✔️', '✖️', '❌', '➕', '➖', '➗', '♾️'] },
+  { id: 'flags', icon: '🚩', label: 'Flags', list: ['🚩', '🏳️', '🏴', '🏁', '🚩', '🏳️‍🌈', '🏳️‍⚧️', '🏴‍☠️', '🇺🇸', '🇬🇧', '🇮🇳', '🇨🇦', '🇦🇺', '🇩🇪', '🇫🇷', '🇯🇵', '🇰🇷', '🇨🇳', '🇧🇷', '🇲🇽', '🇮🇹', '🇪🇸', '🇷🇺'] }
 ];
 
 function EmojiPickerModal({ isOpen, onClose, onSelectEmoji, guildEmojis = [] }) {
@@ -809,6 +809,9 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
   const [pollImageUrl, setPollImageUrl] = useState('');
   const [pollThumbnailUrl, setPollThumbnailUrl] = useState('');
   const [creatingPoll, setCreatingPoll] = useState(false);
+
+  // Welcome Module Sub-Tab State ('builder', 'channels', 'dm', 'leave', 'presets')
+  const [welcomeSubTab, setWelcomeSubTab] = useState('builder');
 
   // Auto Moderation / Word Filter State Hooks
   const [wordFilterInput, setWordFilterInput] = useState('');
@@ -2058,6 +2061,11 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
     const channelName2 = redirectCh2 ? redirectCh2.name : 'announcements';
     const redirectCh3 = channels.find(c => c.id === settings?.welcome?.redirectChannelId3);
     const channelName3 = redirectCh3 ? redirectCh3.name : 'chat';
+    const verifyCh = channels.find(c => c.id === settings?.welcome?.verifyChannelId);
+    const verifyName = verifyCh ? verifyCh.name : 'verify';
+    const ticketCh = channels.find(c => c.id === settings?.welcome?.ticketChannelId);
+    const ticketName = ticketCh ? ticketCh.name : 'ticket';
+
     const bullet = settings?.welcome?.bulletEmoji || '➤';
     const websiteUrl = settings?.welcome?.websiteUrl || '';
     const websiteText = settings?.welcome?.websiteText || 'Website';
@@ -2067,7 +2075,7 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
       .replace(/{server}/g, guildName || 'Server')
       .replace(/{bullet}/g, bullet);
 
-    const parts = text.split(/({user}|{channel}|{rules}|{channel2}|{announcements}|{channel3}|{chat}|{website})/g);
+    const parts = text.split(/({user}|{channel}|{rules}|{channel2}|{announcements}|{channel3}|{chat}|{verify}|{ticket}|{website})/g);
 
     return parts.map((part, index) => {
       if (part === '{user}') {
@@ -2095,6 +2103,20 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
         return (
           <span key={`mention-ch3-${index}`} className="discord-mention-channel">
             #{channelName3}
+          </span>
+        );
+      }
+      if (part === '{verify}') {
+        return (
+          <span key={`mention-verify-${index}`} className="discord-mention-channel">
+            #{verifyName}
+          </span>
+        );
+      }
+      if (part === '{ticket}') {
+        return (
+          <span key={`mention-ticket-${index}`} className="discord-mention-channel">
+            #{ticketName}
           </span>
         );
       }
@@ -2138,12 +2160,15 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
     const redirectIds = [
       settings?.welcome?.redirectChannelId,
       settings?.welcome?.redirectChannelId2,
-      settings?.welcome?.redirectChannelId3
+      settings?.welcome?.redirectChannelId3,
+      settings?.welcome?.verifyChannelId,
+      settings?.welcome?.ticketChannelId
     ].filter(Boolean);
 
     const hasWebsite = Boolean(settings?.welcome?.websiteUrl);
+    const socialLinks = Array.isArray(settings?.welcome?.socialLinks) ? settings.welcome.socialLinks.filter(l => l && l.url) : [];
 
-    if (redirectIds.length === 0 && !hasWebsite) return null;
+    if (redirectIds.length === 0 && !hasWebsite && socialLinks.length === 0) return null;
 
     return (
       <div className="discord-buttons-row" style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '8px' }}>
@@ -2171,6 +2196,16 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
             </svg>
           </span>
         )}
+        {socialLinks.map((link, idx) => (
+          <span key={`soc-${idx}`} className="discord-button-link" style={{ backgroundColor: '#4e5058' }}>
+            <span>{link.label || 'Link'}</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+              <polyline points="15 3 21 3 21 9"></polyline>
+              <line x1="10" y1="14" x2="21" y2="3"></line>
+            </svg>
+          </span>
+        ))}
       </div>
     );
   };
@@ -2415,31 +2450,86 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
     showNotification('Layout reset to default positions, sizes & visibility!');
   };
 
-  const handleApplyFieryPreset = () => {
-    setSettings(prev => ({
-      ...prev,
-      welcome: {
-        ...prev.welcome,
-        enabled: true,
-        layoutType: 'embed-only',
-        embedColor: '#ff0033',
-        embedAuthorName: 'Welcome To The Server !',
-        embedAuthorIcon: prev.welcome.embedAuthorIcon || '',
-        embedAuthorUrl: '',
-        embedTitle: '',
-        embedThumbnail: prev.welcome.embedThumbnail || '{user_avatar}',
-        bulletEmoji: '➤',
-        message: '➤ Welcome {user} To **{server}**\n\n➤ Stay Updated {channel2}\n\n➤ Read {channel} And Follow\n\n➤ Go And Enjoy {channel3}',
-        embedImage: prev.welcome.embedImage || 'https://i.gifer.com/7VE.gif',
-        gifSupport: true,
-        gifRatio: '16:9',
-        gifHeight: 250,
-        gifFitMode: 'cover',
-        websiteText: 'Visit Website',
-        websiteUrl: prev.welcome.websiteUrl || ''
+  const handleApplyPreset = (type) => {
+    setSettings(prev => {
+      let presetWelcome = { ...prev.welcome, enabled: true };
+
+      if (type === 'fiery') {
+        presetWelcome = {
+          ...presetWelcome,
+          layoutType: 'embed-only',
+          embedColor: '#ff0033',
+          embedAuthorName: 'Welcome To The Server !',
+          embedAuthorIcon: prev.welcome.embedAuthorIcon || '',
+          embedAuthorUrl: '',
+          embedTitle: '',
+          embedThumbnail: prev.welcome.embedThumbnail || '{user_avatar}',
+          bulletEmoji: '➤',
+          message: '➤ Welcome {user} To **{server}**\n\n➤ Stay Updated {announcements}\n\n➤ Read {rules} And Follow\n\n➤ Go And Enjoy {chat}',
+          embedImage: prev.welcome.embedImage || 'https://i.gifer.com/7VE.gif',
+          gifSupport: true,
+          gifRatio: '16:9',
+          gifHeight: 250,
+          gifFitMode: 'cover',
+          websiteText: 'Visit Website',
+          websiteUrl: prev.welcome.websiteUrl || ''
+        };
+        showNotification('Fiery Cyberpunk Preset applied!');
+      } else if (type === 'minimal') {
+        presetWelcome = {
+          ...presetWelcome,
+          layoutType: 'embed-only',
+          embedColor: '#2b2d31',
+          embedAuthorName: '',
+          embedTitle: 'Welcome to {server}',
+          embedThumbnail: '{server_icon}',
+          bulletEmoji: '•',
+          message: '• Welcome {user}! We are glad to have you here.\n• Be sure to check {rules} and say hello in {chat}.',
+          embedImage: '',
+          gifSupport: false,
+          websiteText: 'Website',
+          websiteUrl: prev.welcome.websiteUrl || ''
+        };
+        showNotification('Minimalist Dark Preset applied!');
+      } else if (type === 'neon') {
+        presetWelcome = {
+          ...presetWelcome,
+          layoutType: 'embed-only',
+          embedColor: '#00ff66',
+          embedAuthorName: '⚡ NEW MEMBER JOINED',
+          embedTitle: '{username} HAS ARRIVED!',
+          embedThumbnail: '{user_avatar}',
+          bulletEmoji: '⚡',
+          message: '⚡ Welcome {user} to **{server}**!\n\n⚡ Check {announcements} for official updates\n⚡ Verify your roles in {verify}\n⚡ Enjoy chatting in {chat}!',
+          embedImage: prev.welcome.embedImage || 'https://i.gifer.com/4V0b.gif',
+          gifSupport: true,
+          gifRatio: '21:9',
+          gifHeight: 220,
+          gifFitMode: 'cover',
+          websiteText: 'Visit Website',
+          websiteUrl: prev.welcome.websiteUrl || ''
+        };
+        showNotification('Neon Glow Preset applied!');
+      } else if (type === 'community') {
+        presetWelcome = {
+          ...presetWelcome,
+          layoutType: 'embed-only',
+          embedColor: '#38bdf8',
+          embedAuthorName: '🎉 COMMUNITY WELCOME HUB',
+          embedTitle: 'Welcome to {server}!',
+          embedThumbnail: '{user_avatar}',
+          bulletEmoji: '📌',
+          message: '📌 Welcome {user}!\n\n📌 1. Read Server Rules: {rules}\n📌 2. Get Roles & Verify: {verify}\n📌 3. Open Support Ticket: {ticket}\n📌 4. Official Website: {website}',
+          embedImage: '',
+          gifSupport: false,
+          websiteText: 'Visit Main Website',
+          websiteUrl: prev.welcome.websiteUrl || ''
+        };
+        showNotification('Community Hub Preset applied!');
       }
-    }));
-    showNotification('Fiery Server Welcome Preset applied!');
+
+      return { ...prev, welcome: presetWelcome };
+    });
   };
 
   const getSanitizedSettings = (rawSettings) => {
@@ -4192,8 +4282,8 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                   <div className="glass-panel" style={{ padding: '24px', marginBottom: '24px', backgroundColor: 'rgba(255,255,255,0.01)', overflow: 'visible' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                       <div>
-                        <h3 style={{ fontSize: '1.2rem', fontWeight: '700' }}>Welcome Messages & Cards</h3>
-                        <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Send an automated canvas image card or message when members join.</p>
+                        <h3 style={{ fontSize: '1.2rem', fontWeight: '700', margin: 0 }}>Welcome & Member Flow Control Center</h3>
+                        <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', margin: '4px 0 0 0' }}>Configure automated canvas cards, rich embed greetings, DMs, channel links, and departure notifications.</p>
                       </div>
                       <label className="switch">
                         <input
@@ -4206,456 +4296,343 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                     </div>
 
                     {settings.welcome.enabled && (
-                      <div className="welcome-split-layout" style={{ borderTop: '1px solid var(--border-color)', paddingTop: '16px' }}>
-                        <div className="welcome-settings-column">
+                      <div>
+                        {/* Welcome Module Sub-Navigation Pills */}
+                        <div style={{
+                          display: 'flex',
+                          gap: '8px',
+                          overflowX: 'auto',
+                          paddingBottom: '10px',
+                          marginBottom: '20px',
+                          borderBottom: '1px solid rgba(255,255,255,0.08)'
+                        }}>
+                          {[
+                            { id: 'builder', icon: Sparkles, label: 'Embed & Canvas Builder' },
+                            { id: 'channels', icon: Hash, label: 'Channels & Social Links' },
+                            { id: 'dm', icon: Mail, label: 'DM Welcome Message' },
+                            { id: 'leave', icon: LogOut, label: 'Goodbye Messages' },
+                            { id: 'presets', icon: Zap, label: 'Presets Gallery' }
+                          ].map(tab => (
+                            <button
+                              key={tab.id}
+                              type="button"
+                              onClick={() => setWelcomeSubTab(tab.id)}
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '6px',
+                                padding: '8px 14px',
+                                borderRadius: '8px',
+                                fontSize: '0.85rem',
+                                fontWeight: '600',
+                                cursor: 'pointer',
+                                border: 'none',
+                                background: welcomeSubTab === tab.id ? 'var(--primary)' : 'rgba(255, 255, 255, 0.05)',
+                                color: welcomeSubTab === tab.id ? '#ffffff' : 'var(--text-secondary)',
+                                transition: 'all 0.15s ease',
+                                whiteSpace: 'nowrap'
+                              }}
+                            >
+                              <tab.icon size={15} />
+                              {tab.label}
+                            </button>
+                          ))}
+                        </div>
 
-                          {/* Welcome Message Layout Selection */}
-                          <div>
-                            <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 'bold' }}>Welcome Message Layout Type</label>
-                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '12px' }}>
-                              {[
-                                { id: 'classic', title: 'Classic Card', desc: 'Message text + image card attachment' },
-                                { id: 'embed-card', title: 'Embed with Card', desc: 'Rich embed with card image loaded inside' },
-                                { id: 'embed-only', title: 'Embed Only', desc: 'Rich embed only (no card image)' },
-                                { id: 'text-only', title: 'Text Message Only', desc: 'Plain text message only' }
-                              ].map(layoutOption => (
-                                <div
-                                  key={layoutOption.id}
-                                  onClick={() => handleInputChange('welcome.layoutType', layoutOption.id)}
-                                  style={{
-                                    padding: '12px 14px',
-                                    borderRadius: '10px',
-                                    border: `2px solid ${settings.welcome.layoutType === layoutOption.id ? 'var(--primary)' : 'rgba(255,255,255,0.05)'}`,
-                                    backgroundColor: settings.welcome.layoutType === layoutOption.id ? 'var(--primary-glow)' : 'rgba(255,255,255,0.02)',
-                                    cursor: 'pointer',
-                                    transition: 'all 0.2s ease',
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    gap: '4px'
-                                  }}
-                                >
-                                  <span style={{ fontSize: '0.85rem', fontWeight: '700', color: settings.welcome.layoutType === layoutOption.id ? '#ffffff' : 'var(--text-secondary)' }}>
-                                    {layoutOption.title}
-                                  </span>
-                                  <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', lineHeight: '1rem' }}>
-                                    {layoutOption.desc}
-                                  </span>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
+                        <div className="welcome-split-layout">
+                          <div className="welcome-settings-column">
 
-                          {/* Channel and Font Family Row */}
-                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginBottom: '16px' }}>
-                            <div>
-                              <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Greeting Channel</label>
-                              <select
-                                value={settings.welcome.channelId}
-                                onChange={(e) => handleInputChange('welcome.channelId', e.target.value)}
-                                className="glass-input"
-                              >
-                                <option value="">-- Select Channel --</option>
-                                {channels.map(ch => (
-                                  <option key={ch.id} value={ch.id}>#{ch.name}</option>
-                                ))}
-                              </select>
-                            </div>
-
-                            <div>
-                              <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Font Family</label>
-                              <select
-                                value={settings.welcome.fontFamily || 'Ethnocentric'}
-                                onChange={(e) => handleInputChange('welcome.fontFamily', e.target.value)}
-                                className="glass-input"
-                              >
-                                <option value="Ethnocentric">Ethnocentric (Futuristic) (Default)</option>
-                                <option value="Oxanium">Oxanium (Cyberpunk)</option>
-                                <option value="Sans">Sans-Serif</option>
-                                <option value="Poppins">Poppins</option>
-                                <option value="Montserrat">Montserrat</option>
-                                <option value="Bebas Neue">Bebas Neue</option>
-                                <option value="Orbitron">Orbitron</option>
-                                <option value="Oswald">Oswald</option>
-                                <option value="Inter">Inter</option>
-                                <option value="Roboto">Roboto</option>
-                                <option value="Permanent Marker">Permanent Marker (Brush)</option>
-                              </select>
-                            </div>
-                          </div>
-
-                          {/* Redirect Channels Row */}
-                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '16px', marginBottom: '16px' }}>
-                            <div>
-                              <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Redirect Channel Link 1</label>
-                              <select
-                                value={settings.welcome.redirectChannelId || ''}
-                                onChange={(e) => handleInputChange('welcome.redirectChannelId', e.target.value)}
-                                className="glass-input"
-                              >
-                                <option value="">-- No redirect channel --</option>
-                                {channels.map(ch => (
-                                  <option key={ch.id} value={ch.id}>#{ch.name}</option>
-                                ))}
-                              </select>
-                            </div>
-
-                            <div>
-                              <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Redirect Channel Link 2</label>
-                              <select
-                                value={settings.welcome.redirectChannelId2 || ''}
-                                onChange={(e) => handleInputChange('welcome.redirectChannelId2', e.target.value)}
-                                className="glass-input"
-                              >
-                                <option value="">-- No redirect channel --</option>
-                                {channels.map(ch => (
-                                  <option key={ch.id} value={ch.id}>#{ch.name}</option>
-                                ))}
-                              </select>
-                            </div>
-
-                            <div>
-                              <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Redirect Channel Link 3</label>
-                              <select
-                                value={settings.welcome.redirectChannelId3 || ''}
-                                onChange={(e) => handleInputChange('welcome.redirectChannelId3', e.target.value)}
-                                className="glass-input"
-                              >
-                                <option value="">-- No redirect channel --</option>
-                                {channels.map(ch => (
-                                  <option key={ch.id} value={ch.id}>#{ch.name}</option>
-                                ))}
-                              </select>
-                            </div>
-                          </div>
-
-                          {/* Welcomes Card Colors Row */}
-                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
-                            <div>
-                              <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Title Color (Hex)</label>
-                              <div style={{ display: 'flex', gap: '8px' }}>
-                                <input
-                                  type="color"
-                                  value={settings.welcome.textColor?.startsWith('#') ? settings.welcome.textColor : `#${settings.welcome.textColor || 'ffffff'}`}
-                                  onChange={(e) => handleInputChange('welcome.textColor', e.target.value)}
-                                  style={{ width: '40px', height: '40px', padding: '0', border: '1px solid var(--border-color)', borderRadius: '6px', background: 'none', cursor: 'pointer' }}
-                                />
-                                <input
-                                  type="text"
-                                  value={settings.welcome.textColor || '#ffffff'}
-                                  onChange={(e) => handleInputChange('welcome.textColor', e.target.value)}
-                                  className="glass-input"
-                                  placeholder="#ffffff"
-                                />
-                              </div>
-                            </div>
-
-                            <div>
-                              <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Username Color (Hex)</label>
-                              <div style={{ display: 'flex', gap: '8px' }}>
-                                <input
-                                  type="color"
-                                  value={settings.welcome.usernameColor?.startsWith('#') ? settings.welcome.usernameColor : `#${settings.welcome.usernameColor || '2563eb'}`}
-                                  onChange={(e) => handleInputChange('welcome.usernameColor', e.target.value)}
-                                  style={{ width: '40px', height: '40px', padding: '0', border: '1px solid var(--border-color)', borderRadius: '6px', background: 'none', cursor: 'pointer' }}
-                                />
-                                <input
-                                  type="text"
-                                  value={settings.welcome.usernameColor || '#2563eb'}
-                                  onChange={(e) => handleInputChange('welcome.usernameColor', e.target.value)}
-                                  className="glass-input"
-                                  placeholder="#2563eb"
-                                />
-                              </div>
-                            </div>
-
-                            <div>
-                              <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Subtext Color (Hex)</label>
-                              <div style={{ display: 'flex', gap: '8px' }}>
-                                <input
-                                  type="color"
-                                  value={settings.welcome.subtextColor?.startsWith('#') ? settings.welcome.subtextColor : `#${settings.welcome.subtextColor || 'ffffff'}`}
-                                  onChange={(e) => handleInputChange('welcome.subtextColor', e.target.value)}
-                                  style={{ width: '40px', height: '40px', padding: '0', border: '1px solid var(--border-color)', borderRadius: '6px', background: 'none', cursor: 'pointer' }}
-                                />
-                                <input
-                                  type="text"
-                                  value={settings.welcome.subtextColor || 'rgba(255, 255, 255, 0.7)'}
-                                  onChange={(e) => handleInputChange('welcome.subtextColor', e.target.value)}
-                                  className="glass-input"
-                                  placeholder="rgba(255, 255, 255, 0.7)"
-                                />
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Font Weight and Text Alignment */}
-                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
-                            <div>
-                              <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Font Weight</label>
-                              <select
-                                value={settings.welcome.fontWeight || 'bold'}
-                                onChange={(e) => handleInputChange('welcome.fontWeight', e.target.value)}
-                                className="glass-input"
-                              >
-                                <option value="normal">Normal</option>
-                                <option value="medium">Medium (500)</option>
-                                <option value="600">Semi-Bold (600)</option>
-                                <option value="bold">Bold (700)</option>
-                                <option value="900">Extra-Bold (900)</option>
-                              </select>
-                            </div>
-
-                            <div>
-                              <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Text Alignment</label>
-                              <select
-                                value={settings.welcome.textAlignment || 'center'}
-                                onChange={(e) => handleInputChange('welcome.textAlignment', e.target.value)}
-                                className="glass-input"
-                              >
-                                <option value="left">Left</option>
-                                <option value="center">Center</option>
-                                <option value="right">Right</option>
-                              </select>
-                            </div>
-                          </div>
-
-                          {/* Welcome Message Text */}
-                          <div>
-                            <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Welcome Message Template (Supports {`{user}`}, {`{username}`}, {`{server}`}, {`{channel}`}, {`{channel2}`}, {`{channel3}`})</label>
-                            <textarea
-                              value={settings.welcome.message}
-                              onChange={(e) => handleInputChange('welcome.message', e.target.value)}
-                              className="glass-input"
-                              placeholder="Welcome {user} to the server!"
-                              rows="3"
-                              style={{ minHeight: '80px', resize: 'vertical', fontFamily: 'inherit' }}
-                            />
-                            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginTop: '4px' }}>
-                              If any Redirect Channels are selected, buttons linking to them will also be attached automatically (up to 3 links).
-                            </span>
-                          </div>
-
-                          {/* Welcome Card Custom Text Templates */}
-                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
-                            <div>
-                              <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Card Title Text Template</label>
-                              <input
-                                type="text"
-                                value={settings.welcome.titleText !== undefined ? settings.welcome.titleText : 'WELCOME'}
-                                onChange={(e) => handleInputChange('welcome.titleText', e.target.value)}
-                                className="glass-input"
-                                placeholder="e.g. WELCOME"
-                              />
-                            </div>
-
-                            <div>
-                              <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Card Subtext Template (Supports {`{server}`})</label>
-                              <input
-                                type="text"
-                                value={settings.welcome.subtextText !== undefined ? settings.welcome.subtextText : 'TO {server}'}
-                                onChange={(e) => handleInputChange('welcome.subtextText', e.target.value)}
-                                className="glass-input"
-                                placeholder="e.g. TO {server}"
-                              />
-                            </div>
-                          </div>
-
-                          {/* Background Upload and controls */}
-                          <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '16px', alignItems: 'center' }}>
-                            <div>
-                              <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Background Image/GIF URL or Solid Color Hex</label>
-                              <div style={{ display: 'flex', gap: '8px' }}>
-                                <input
-                                  type="text"
-                                  value={settings.welcome.background}
-                                  onChange={(e) => handleInputChange('welcome.background', e.target.value)}
-                                  className="glass-input"
-                                  placeholder="https://example.com/background.png or #0F0C20"
-                                />
-                                <label className="btn-secondary" style={{ padding: '10px 16px', cursor: 'pointer', fontSize: '0.85rem', flexShrink: 0, display: 'inline-flex', alignItems: 'center' }}>
-                                  Upload File
-                                  <input
-                                    type="file"
-                                    accept="image/*"
-                                    style={{ display: 'none' }}
-                                    onChange={(e) => {
-                                      const file = e.target.files[0];
-                                      if (!file) return;
-                                      setUploadFile(file);
-                                      setShowCropModal(true);
-                                      e.target.value = null; // Clear so same file works again
-                                    }}
-                                  />
-                                </label>
-                              </div>
-                            </div>
-
-                            <div style={{ marginTop: '24px' }}>
-                              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.9rem' }}>
-                                <input
-                                  type="checkbox"
-                                  checked={settings.welcome.gifSupport}
-                                  onChange={() => handleToggle('welcome.gifSupport')}
-                                />
-                                Enable GIF URL Embed
-                              </label>
-                            </div>
-                          </div>
-
-                          {/* Welcome Embed Customizer Section (Matching Example Image 1) */}
-                          <div className="glass-panel" style={{
-                            padding: '20px',
-                            borderRadius: '12px',
-                            backgroundColor: 'rgba(24, 25, 30, 0.95)',
-                            border: '1px solid rgba(255, 255, 255, 0.08)',
-                            marginTop: '16px',
-                            marginBottom: '16px',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            gap: '16px'
-                          }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.08)', paddingBottom: '10px' }}>
-                              <div>
-                                <h4 style={{ fontSize: '1.05rem', fontWeight: '700', color: '#ffffff', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                  <Sparkles size={18} style={{ color: 'var(--primary)' }} />
-                                  Welcome Embed Customizer & Preset
-                                </h4>
-                                <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', margin: '2px 0 0 0' }}>
-                                  Customize GIF size, ratio, channel mentions, website link, bullet arrows, color, and banner images.
-                                </p>
-                              </div>
-
-                              <button
-                                type="button"
-                                onClick={handleApplyFieryPreset}
-                                className="btn-primary"
-                                style={{
-                                  padding: '6px 14px',
-                                  fontSize: '0.8rem',
-                                  fontWeight: '600',
-                                  borderRadius: '8px',
-                                  background: 'linear-gradient(135deg, #ff0033 0%, #e67e22 100%)',
-                                  border: 'none',
-                                  cursor: 'pointer',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  gap: '6px',
-                                  boxShadow: '0 4px 12px rgba(255, 0, 51, 0.3)'
-                                }}
-                              >
-                                <Sparkles size={14} /> Apply Fiery Preset (Like Image)
-                              </button>
-                            </div>
-
-                            {/* Top Row: Color & Thumbnail */}
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 120px', gap: '16px', alignItems: 'flex-start' }}>
-                              
-                              {/* Color Picker & Swatches */}
-                              <div>
-                                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-secondary)', marginBottom: '8px' }}>
-                                  Embed Color Strip
-                                </label>
-                                <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '10px' }}>
-                                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', backgroundColor: '#0f1013', border: '1px solid var(--border-color)', borderRadius: '6px', padding: '4px 8px' }}>
-                                    <input
-                                      type="color"
-                                      value={settings.welcome.embedColor?.startsWith('#') ? settings.welcome.embedColor : `#${settings.welcome.embedColor || '2563eb'}`}
-                                      onChange={(e) => handleInputChange('welcome.embedColor', e.target.value)}
-                                      style={{ width: '28px', height: '28px', padding: '0', border: 'none', borderRadius: '4px', cursor: 'pointer', background: 'none' }}
-                                    />
-                                    <input
-                                      type="text"
-                                      value={settings.welcome.embedColor || '#2563eb'}
-                                      onChange={(e) => handleInputChange('welcome.embedColor', e.target.value)}
-                                      style={{ width: '75px', background: 'none', border: 'none', color: '#ffffff', fontSize: '0.85rem', fontFamily: 'monospace', outline: 'none' }}
-                                      placeholder="#2563eb"
-                                    />
-                                  </div>
-
-                                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', alignItems: 'center' }}>
+                            {/* SUB-TAB 1: EMBED & CANVAS BUILDER */}
+                            {welcomeSubTab === 'builder' && (
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                                {/* Layout Type Selection */}
+                                <div>
+                                  <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 'bold' }}>Welcome Message Layout Type</label>
+                                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '12px' }}>
                                     {[
-                                      '#ff0033', '#000000', '#2ecc71', '#3498db', '#9b59b6', '#e91e63',
-                                      '#f1c40f', '#e67e22', '#e74c3c', '#95a5a6', '#ffffff'
-                                    ].map(colorHex => (
-                                      <button
-                                        key={colorHex}
-                                        type="button"
-                                        onClick={() => handleInputChange('welcome.embedColor', colorHex)}
+                                      { id: 'classic', title: 'Classic Card', desc: 'Message text + image card attachment' },
+                                      { id: 'embed-card', title: 'Embed with Card', desc: 'Rich embed with card image loaded inside' },
+                                      { id: 'embed-only', title: 'Embed Only', desc: 'Rich embed only (no card image)' },
+                                      { id: 'text-only', title: 'Text Message Only', desc: 'Plain text message only' }
+                                    ].map(layoutOption => (
+                                      <div
+                                        key={layoutOption.id}
+                                        onClick={() => handleInputChange('welcome.layoutType', layoutOption.id)}
                                         style={{
-                                          width: '20px',
-                                          height: '20px',
-                                          borderRadius: '50%',
-                                          backgroundColor: colorHex,
-                                          border: settings.welcome.embedColor === colorHex ? '2px solid #ffffff' : '1px solid rgba(255,255,255,0.2)',
+                                          padding: '12px 14px',
+                                          borderRadius: '10px',
+                                          border: `2px solid ${settings.welcome.layoutType === layoutOption.id ? 'var(--primary)' : 'rgba(255,255,255,0.05)'}`,
+                                          backgroundColor: settings.welcome.layoutType === layoutOption.id ? 'var(--primary-glow)' : 'rgba(255,255,255,0.02)',
                                           cursor: 'pointer',
-                                          scale: settings.welcome.embedColor === colorHex ? '1.2' : '1',
-                                          transition: 'all 0.15s ease'
+                                          transition: 'all 0.2s ease',
+                                          display: 'flex',
+                                          flexDirection: 'column',
+                                          gap: '4px'
                                         }}
-                                        title={colorHex}
-                                      />
+                                      >
+                                        <span style={{ fontSize: '0.85rem', fontWeight: '700', color: settings.welcome.layoutType === layoutOption.id ? '#ffffff' : 'var(--text-secondary)' }}>
+                                          {layoutOption.title}
+                                        </span>
+                                        <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', lineHeight: '1rem' }}>
+                                          {layoutOption.desc}
+                                        </span>
+                                      </div>
                                     ))}
                                   </div>
                                 </div>
-                              </div>
 
-                              {/* Thumbnail Section */}
-                              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-                                <span style={{ fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-secondary)', marginBottom: '6px', display: 'block', width: '100%', textAlign: 'right' }}>
-                                  Thumbnail
-                                </span>
-                                <div style={{
-                                  position: 'relative',
-                                  width: '85px',
-                                  height: '85px',
-                                  borderRadius: '8px',
-                                  backgroundColor: '#111216',
-                                  border: '1px solid rgba(255,255,255,0.1)',
+                                {/* Greeting Channel Selector */}
+                                <div>
+                                  <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px', fontWeight: 'bold' }}>Welcome Target Channel</label>
+                                  <select
+                                    value={settings.welcome.channelId}
+                                    onChange={(e) => handleInputChange('welcome.channelId', e.target.value)}
+                                    className="glass-input"
+                                  >
+                                    <option value="">-- Select Channel --</option>
+                                    {channels.map(ch => (
+                                      <option key={ch.id} value={ch.id}>#{ch.name}</option>
+                                    ))}
+                                  </select>
+                                </div>
+
+                                {/* Welcome Embed Customizer Card */}
+                                <div className="glass-panel" style={{
+                                  padding: '20px',
+                                  borderRadius: '12px',
+                                  backgroundColor: 'rgba(24, 25, 30, 0.95)',
+                                  border: '1px solid rgba(255, 255, 255, 0.08)',
                                   display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  overflow: 'hidden'
+                                  flexDirection: 'column',
+                                  gap: '16px'
                                 }}>
-                                  {(() => {
-                                    const t = settings.welcome.embedThumbnail;
-                                    let thumbSrc = null;
-                                    if (t === '{server_icon}') thumbSrc = guildIcon || 'https://cdn.discordapp.com/embed/avatars/0.png';
-                                    else if (t === 'none') thumbSrc = null;
-                                    else if (t && t !== '{user_avatar}') thumbSrc = resolveUploadUrl(t);
-                                    else thumbSrc = user.avatar ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png` : 'https://cdn.discordapp.com/embed/avatars/0.png';
+                                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.08)', paddingBottom: '10px' }}>
+                                    <div>
+                                      <h4 style={{ fontSize: '1.05rem', fontWeight: '700', color: '#ffffff', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                        <Sparkles size={18} style={{ color: 'var(--primary)' }} />
+                                        Welcome Embed Customizer
+                                      </h4>
+                                      <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', margin: '2px 0 0 0' }}>
+                                        Configure embed colors, thumbnail, header, description text, and banner GIF sizing.
+                                      </p>
+                                    </div>
+                                  </div>
 
-                                    if (thumbSrc) {
-                                      return (
-                                        <>
-                                          <img src={thumbSrc} alt="Thumbnail preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                          <button
-                                            type="button"
-                                            onClick={() => handleInputChange('welcome.embedThumbnail', 'none')}
-                                            style={{
-                                              position: 'absolute',
-                                              top: '4px',
-                                              right: '4px',
-                                              width: '18px',
-                                              height: '18px',
-                                              borderRadius: '50%',
-                                              backgroundColor: 'rgba(0,0,0,0.85)',
-                                              color: '#ffffff',
-                                              border: 'none',
-                                              cursor: 'pointer',
-                                              display: 'flex',
-                                              alignItems: 'center',
-                                              justifyContent: 'center'
-                                            }}
-                                            title="Remove Thumbnail"
-                                          >
-                                            <X size={12} />
-                                          </button>
-                                        </>
-                                      );
-                                    }
-                                    return (
-                                      <label style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', gap: '4px' }}>
-                                        <ImageIcon size={22} style={{ color: 'var(--text-muted)' }} />
-                                        <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>Upload</span>
+                                  {/* Color & Thumbnail Row */}
+                                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 120px', gap: '16px', alignItems: 'flex-start' }}>
+                                    <div>
+                                      <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-secondary)', marginBottom: '8px' }}>
+                                        Embed Left Color Strip
+                                      </label>
+                                      <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '10px' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', backgroundColor: '#0f1013', border: '1px solid var(--border-color)', borderRadius: '6px', padding: '4px 8px' }}>
+                                          <input
+                                            type="color"
+                                            value={settings.welcome.embedColor?.startsWith('#') ? settings.welcome.embedColor : `#${settings.welcome.embedColor || '2563eb'}`}
+                                            onChange={(e) => handleInputChange('welcome.embedColor', e.target.value)}
+                                            style={{ width: '28px', height: '28px', padding: '0', border: 'none', borderRadius: '4px', cursor: 'pointer', background: 'none' }}
+                                          />
+                                          <input
+                                            type="text"
+                                            value={settings.welcome.embedColor || '#2563eb'}
+                                            onChange={(e) => handleInputChange('welcome.embedColor', e.target.value)}
+                                            style={{ width: '75px', background: 'none', border: 'none', color: '#ffffff', fontSize: '0.85rem', fontFamily: 'monospace', outline: 'none' }}
+                                            placeholder="#2563eb"
+                                          />
+                                        </div>
+
+                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', alignItems: 'center' }}>
+                                          {[
+                                            '#ff0033', '#000000', '#2ecc71', '#3498db', '#9b59b6', '#e91e63',
+                                            '#f1c40f', '#e67e22', '#e74c3c', '#95a5a6', '#ffffff'
+                                          ].map(colorHex => (
+                                            <button
+                                              key={colorHex}
+                                              type="button"
+                                              onClick={() => handleInputChange('welcome.embedColor', colorHex)}
+                                              style={{
+                                                width: '20px',
+                                                height: '20px',
+                                                borderRadius: '50%',
+                                                backgroundColor: colorHex,
+                                                border: settings.welcome.embedColor === colorHex ? '2px solid #ffffff' : '1px solid rgba(255,255,255,0.2)',
+                                                cursor: 'pointer',
+                                                scale: settings.welcome.embedColor === colorHex ? '1.2' : '1',
+                                                transition: 'all 0.15s ease'
+                                              }}
+                                              title={colorHex}
+                                            />
+                                          ))}
+                                        </div>
+                                      </div>
+                                    </div>
+
+                                    {/* Thumbnail Section */}
+                                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                                      <span style={{ fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-secondary)', marginBottom: '6px', display: 'block', width: '100%', textAlign: 'right' }}>
+                                        Thumbnail
+                                      </span>
+                                      <div style={{
+                                        position: 'relative',
+                                        width: '85px',
+                                        height: '85px',
+                                        borderRadius: '8px',
+                                        backgroundColor: '#111216',
+                                        border: '1px solid rgba(255,255,255,0.1)',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        overflow: 'hidden'
+                                      }}>
+                                        {(() => {
+                                          const t = settings.welcome.embedThumbnail;
+                                          let thumbSrc = null;
+                                          if (t === '{server_icon}') thumbSrc = guildIcon || 'https://cdn.discordapp.com/embed/avatars/0.png';
+                                          else if (t === 'none') thumbSrc = null;
+                                          else if (t && t !== '{user_avatar}') thumbSrc = resolveUploadUrl(t);
+                                          else thumbSrc = user.avatar ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png` : 'https://cdn.discordapp.com/embed/avatars/0.png';
+
+                                          if (thumbSrc) {
+                                            return (
+                                              <>
+                                                <img src={thumbSrc} alt="Thumbnail preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                <button
+                                                  type="button"
+                                                  onClick={() => handleInputChange('welcome.embedThumbnail', 'none')}
+                                                  style={{
+                                                    position: 'absolute',
+                                                    top: '4px',
+                                                    right: '4px',
+                                                    width: '18px',
+                                                    height: '18px',
+                                                    borderRadius: '50%',
+                                                    backgroundColor: 'rgba(0,0,0,0.85)',
+                                                    color: '#ffffff',
+                                                    border: 'none',
+                                                    cursor: 'pointer',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center'
+                                                  }}
+                                                  title="Remove Thumbnail"
+                                                >
+                                                  <X size={12} />
+                                                </button>
+                                              </>
+                                            );
+                                          }
+                                          return (
+                                            <label style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', gap: '4px' }}>
+                                              <ImageIcon size={22} style={{ color: 'var(--text-muted)' }} />
+                                              <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>Upload</span>
+                                              <input
+                                                type="file"
+                                                accept="image/*"
+                                                style={{ display: 'none' }}
+                                                onChange={async (e) => {
+                                                  const file = e.target.files[0];
+                                                  if (file) {
+                                                    const res = await api.uploadBackground(guildId, file).catch(() => null);
+                                                    if (res && res.url) handleInputChange('welcome.embedThumbnail', res.url);
+                                                  }
+                                                  e.target.value = null;
+                                                }}
+                                              />
+                                            </label>
+                                          );
+                                        })()}
+                                      </div>
+
+                                      <div style={{ display: 'flex', gap: '4px', marginTop: '6px' }}>
+                                        <button
+                                          type="button"
+                                          onClick={() => handleInputChange('welcome.embedThumbnail', '{user_avatar}')}
+                                          className="btn-secondary"
+                                          style={{ padding: '2px 6px', fontSize: '0.62rem', borderRadius: '4px', background: settings.welcome.embedThumbnail === '{user_avatar}' || !settings.welcome.embedThumbnail ? 'var(--primary)' : undefined }}
+                                        >
+                                          User Avatar
+                                        </button>
+                                        <button
+                                          type="button"
+                                          onClick={() => handleInputChange('welcome.embedThumbnail', '{server_icon}')}
+                                          className="btn-secondary"
+                                          style={{ padding: '2px 6px', fontSize: '0.62rem', borderRadius: '4px', background: settings.welcome.embedThumbnail === '{server_icon}' ? 'var(--primary)' : undefined }}
+                                        >
+                                          Server Icon
+                                        </button>
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  {/* Author Header */}
+                                  <div>
+                                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-secondary)', marginBottom: '6px' }}>
+                                      Author Header Text
+                                    </label>
+                                    <input
+                                      type="text"
+                                      value={settings.welcome.embedAuthorName || ''}
+                                      onChange={(e) => handleInputChange('welcome.embedAuthorName', e.target.value)}
+                                      className="glass-input"
+                                      placeholder="Welcome To The Server !"
+                                    />
+                                  </div>
+
+                                  {/* Message Text Area */}
+                                  <div>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                                      <label style={{ fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-secondary)' }}>
+                                        Message / Description Text
+                                      </label>
+                                      <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                                        Tags: {`{user}, {server}, {rules}, {announcements}, {chat}, {verify}, {ticket}, {website}, {bullet}`}
+                                      </span>
+                                    </div>
+                                    <textarea
+                                      value={settings.welcome.message || ''}
+                                      onChange={(e) => handleInputChange('welcome.message', e.target.value)}
+                                      className="glass-input"
+                                      rows="4"
+                                      placeholder="➤ Welcome {user} To **{server}**&#10;&#10;➤ Stay Updated {announcements}&#10;&#10;➤ Read {rules} And Follow&#10;&#10;➤ Go And Enjoy {chat}"
+                                      style={{ width: '100%', minHeight: '95px', resize: 'vertical', fontFamily: 'inherit' }}
+                                    />
+                                  </div>
+
+                                  {/* GIF Banner Image & Sizing Controls */}
+                                  <div style={{
+                                    padding: '14px',
+                                    borderRadius: '10px',
+                                    backgroundColor: 'rgba(0,0,0,0.25)',
+                                    border: '1px solid rgba(255,255,255,0.06)',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    gap: '12px'
+                                  }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                      <label style={{ fontSize: '0.85rem', fontWeight: '700', color: '#ffffff', margin: 0 }}>
+                                        GIF Banner Image & Sizing Controls
+                                      </label>
+                                      <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                                        <input
+                                          type="checkbox"
+                                          checked={settings.welcome.gifSupport || false}
+                                          onChange={() => handleToggle('welcome.gifSupport')}
+                                        />
+                                        Enable GIF Mode
+                                      </label>
+                                    </div>
+
+                                    <div style={{ display: 'flex', gap: '8px' }}>
+                                      <input
+                                        type="text"
+                                        value={settings.welcome.embedImage || ''}
+                                        onChange={(e) => handleInputChange('welcome.embedImage', e.target.value)}
+                                        className="glass-input"
+                                        placeholder="https://example.com/welcome_banner.gif"
+                                        style={{ flex: 1, fontSize: '0.85rem' }}
+                                      />
+                                      <label className="btn-secondary" style={{ padding: '8px 14px', cursor: 'pointer', fontSize: '0.8rem', display: 'flex', alignItems: 'center' }}>
+                                        Upload GIF
                                         <input
                                           type="file"
                                           accept="image/*"
@@ -4664,883 +4641,48 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                                             const file = e.target.files[0];
                                             if (file) {
                                               const res = await api.uploadBackground(guildId, file).catch(() => null);
-                                              if (res && res.url) handleInputChange('welcome.embedThumbnail', res.url);
+                                              if (res && res.url) handleInputChange('welcome.embedImage', res.url);
                                             }
                                             e.target.value = null;
                                           }}
                                         />
                                       </label>
-                                    );
-                                  })()}
-                                </div>
-
-                                <div style={{ display: 'flex', gap: '4px', marginTop: '6px' }}>
-                                  <button
-                                    type="button"
-                                    onClick={() => handleInputChange('welcome.embedThumbnail', '{user_avatar}')}
-                                    className="btn-secondary"
-                                    style={{ padding: '2px 6px', fontSize: '0.62rem', borderRadius: '4px', background: settings.welcome.embedThumbnail === '{user_avatar}' || !settings.welcome.embedThumbnail ? 'var(--primary)' : undefined }}
-                                  >
-                                    User Avatar
-                                  </button>
-                                  <button
-                                    type="button"
-                                    onClick={() => handleInputChange('welcome.embedThumbnail', '{server_icon}')}
-                                    className="btn-secondary"
-                                    style={{ padding: '2px 6px', fontSize: '0.62rem', borderRadius: '4px', background: settings.welcome.embedThumbnail === '{server_icon}' ? 'var(--primary)' : undefined }}
-                                  >
-                                    Server Icon
-                                  </button>
-                                </div>
-                              </div>
-
-                            </div>
-
-                            {/* Author Section */}
-                            <div>
-                              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-secondary)', marginBottom: '6px' }}>
-                                Author Header Text
-                              </label>
-                              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                                <label className="btn-secondary" style={{ padding: '8px 10px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '38px', borderRadius: '6px' }} title="Upload Author Icon">
-                                  <ImageIcon size={16} />
-                                  <input
-                                    type="file"
-                                    accept="image/*"
-                                    style={{ display: 'none' }}
-                                    onChange={async (e) => {
-                                      const file = e.target.files[0];
-                                      if (file) {
-                                        const res = await api.uploadBackground(guildId, file).catch(() => null);
-                                        if (res && res.url) handleInputChange('welcome.embedAuthorIcon', res.url);
-                                      }
-                                      e.target.value = null;
-                                    }}
-                                  />
-                                </label>
-
-                                <input
-                                  type="text"
-                                  value={settings.welcome.embedAuthorName || ''}
-                                  onChange={(e) => handleInputChange('welcome.embedAuthorName', e.target.value)}
-                                  className="glass-input"
-                                  placeholder="Welcome To The Server !"
-                                  style={{ flex: 1 }}
-                                />
-                              </div>
-                            </div>
-
-                            {/* Channel Mentions, Website URL & Bullet Selector Integration */}
-                            <div style={{
-                              padding: '12px',
-                              borderRadius: '10px',
-                              backgroundColor: 'rgba(0,0,0,0.2)',
-                              border: '1px solid rgba(255,255,255,0.05)',
-                              display: 'flex',
-                              flexDirection: 'column',
-                              gap: '12px'
-                            }}>
-                              <div style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--primary)', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '4px' }}>
-                                Channel Mentions & Website Link Integration
-                              </div>
-
-                              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '10px' }}>
-                                <div>
-                                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>
-                                    Rules Channel ({`{rules}`})
-                                  </label>
-                                  <select
-                                    value={settings.welcome.redirectChannelId || ''}
-                                    onChange={(e) => handleInputChange('welcome.redirectChannelId', e.target.value)}
-                                    className="glass-input"
-                                    style={{ fontSize: '0.8rem', width: '100%' }}
-                                  >
-                                    <option value="">None Selected</option>
-                                    {channels.map(ch => (
-                                      <option key={ch.id} value={ch.id}>#{ch.name}</option>
-                                    ))}
-                                  </select>
-                                </div>
-
-                                <div>
-                                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>
-                                    Announcements Channel ({`{announcements}`})
-                                  </label>
-                                  <select
-                                    value={settings.welcome.redirectChannelId2 || ''}
-                                    onChange={(e) => handleInputChange('welcome.redirectChannelId2', e.target.value)}
-                                    className="glass-input"
-                                    style={{ fontSize: '0.8rem', width: '100%' }}
-                                  >
-                                    <option value="">None Selected</option>
-                                    {channels.map(ch => (
-                                      <option key={ch.id} value={ch.id}>#{ch.name}</option>
-                                    ))}
-                                  </select>
-                                </div>
-
-                                <div>
-                                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>
-                                    General Chat Channel ({`{chat}`})
-                                  </label>
-                                  <select
-                                    value={settings.welcome.redirectChannelId3 || ''}
-                                    onChange={(e) => handleInputChange('welcome.redirectChannelId3', e.target.value)}
-                                    className="glass-input"
-                                    style={{ fontSize: '0.8rem', width: '100%' }}
-                                  >
-                                    <option value="">None Selected</option>
-                                    {channels.map(ch => (
-                                      <option key={ch.id} value={ch.id}>#{ch.name}</option>
-                                    ))}
-                                  </select>
-                                </div>
-                              </div>
-
-                              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 100px', gap: '10px', alignItems: 'center' }}>
-                                <div>
-                                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>
-                                    Website URL ({`{website}`})
-                                  </label>
-                                  <input
-                                    type="text"
-                                    value={settings.welcome.websiteUrl || ''}
-                                    onChange={(e) => handleInputChange('welcome.websiteUrl', e.target.value)}
-                                    className="glass-input"
-                                    placeholder="https://yourwebsite.com"
-                                    style={{ fontSize: '0.8rem' }}
-                                  />
-                                </div>
-
-                                <div>
-                                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>
-                                    Website Button Label
-                                  </label>
-                                  <input
-                                    type="text"
-                                    value={settings.welcome.websiteText || ''}
-                                    onChange={(e) => handleInputChange('welcome.websiteText', e.target.value)}
-                                    className="glass-input"
-                                    placeholder="Visit Website"
-                                    style={{ fontSize: '0.8rem' }}
-                                  />
-                                </div>
-
-                                <div>
-                                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>
-                                    Bullet Emoji ({`{bullet}`})
-                                  </label>
-                                  <select
-                                    value={settings.welcome.bulletEmoji || '➤'}
-                                    onChange={(e) => handleInputChange('welcome.bulletEmoji', e.target.value)}
-                                    className="glass-input"
-                                    style={{ fontSize: '0.8rem' }}
-                                  >
-                                    <option value="➤">➤ Arrow</option>
-                                    <option value="⚡">⚡ Lightning</option>
-                                    <option value="✦">✦ Star</option>
-                                    <option value="🔥">🔥 Fire</option>
-                                    <option value="📌">📌 Pin</option>
-                                    <option value="•">• Dot</option>
-                                  </select>
-                                </div>
-                              </div>
-                            </div>
-
-                            {/* Description Section */}
-                            <div>
-                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                                <label style={{ fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-secondary)' }}>
-                                  Message / Description Text
-                                </label>
-                                <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-                                  Available tags: {`{user}, {server}, {rules}, {announcements}, {chat}, {website}, {bullet}`}
-                                </span>
-                              </div>
-                              <textarea
-                                value={settings.welcome.message || ''}
-                                onChange={(e) => handleInputChange('welcome.message', e.target.value)}
-                                className="glass-input"
-                                rows="4"
-                                placeholder="➤ Welcome {user} To **{server}**&#10;&#10;➤ Stay Updated {announcements}&#10;&#10;➤ Read {rules} And Follow&#10;&#10;➤ Go And Enjoy {chat}"
-                                style={{ width: '100%', minHeight: '95px', resize: 'vertical', fontFamily: 'inherit' }}
-                              />
-                            </div>
-
-                            {/* GIF Banner Image & Sizing Controls Section */}
-                            <div style={{
-                              padding: '12px',
-                              borderRadius: '10px',
-                              backgroundColor: 'rgba(0,0,0,0.25)',
-                              border: '1px solid rgba(255,255,255,0.06)',
-                              display: 'flex',
-                              flexDirection: 'column',
-                              gap: '12px'
-                            }}>
-                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <label style={{ fontSize: '0.85rem', fontWeight: '700', color: '#ffffff', margin: 0 }}>
-                                  GIF Banner Image & Sizing Controls
-                                </label>
-                                <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-                                  <input
-                                    type="checkbox"
-                                    checked={settings.welcome.gifSupport || false}
-                                    onChange={() => handleToggle('welcome.gifSupport')}
-                                  />
-                                  Enable GIF Mode
-                                </label>
-                              </div>
-
-                              {/* GIF / Image URL */}
-                              <div>
-                                <div style={{ display: 'flex', gap: '8px' }}>
-                                  <input
-                                    type="text"
-                                    value={settings.welcome.embedImage || ''}
-                                    onChange={(e) => handleInputChange('welcome.embedImage', e.target.value)}
-                                    className="glass-input"
-                                    placeholder="https://example.com/welcome_banner.gif"
-                                    style={{ flex: 1, fontSize: '0.85rem' }}
-                                  />
-                                  <label className="btn-secondary" style={{ padding: '8px 14px', cursor: 'pointer', fontSize: '0.8rem', display: 'flex', alignItems: 'center' }}>
-                                    Upload GIF
-                                    <input
-                                      type="file"
-                                      accept="image/*"
-                                      style={{ display: 'none' }}
-                                      onChange={async (e) => {
-                                        const file = e.target.files[0];
-                                        if (file) {
-                                          const res = await api.uploadBackground(guildId, file).catch(() => null);
-                                          if (res && res.url) handleInputChange('welcome.embedImage', res.url);
-                                        }
-                                        e.target.value = null;
-                                      }}
-                                    />
-                                  </label>
-                                </div>
-                              </div>
-
-                              {/* GIF Ratio, Height & Fit Mode Sliders */}
-                              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px', alignItems: 'center' }}>
-                                <div>
-                                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>
-                                    Aspect Ratio
-                                  </label>
-                                  <select
-                                    value={settings.welcome.gifRatio || '16:9'}
-                                    onChange={(e) => handleInputChange('welcome.gifRatio', e.target.value)}
-                                    className="glass-input"
-                                    style={{ fontSize: '0.8rem' }}
-                                  >
-                                    <option value="16:9">16:9 (Standard Widescreen)</option>
-                                    <option value="21:9">21:9 (Ultrawide Banner)</option>
-                                    <option value="4:3">4:3 (Classic Box)</option>
-                                    <option value="1:1">1:1 (Square Box)</option>
-                                    <option value="auto">Auto (Native Height)</option>
-                                  </select>
-                                </div>
-
-                                <div>
-                                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>
-                                    <span>Max Height</span>
-                                    <span>{settings.welcome.gifHeight || 250}px</span>
-                                  </div>
-                                  <input
-                                    type="range"
-                                    min="100"
-                                    max="400"
-                                    step="10"
-                                    value={settings.welcome.gifHeight || 250}
-                                    onChange={(e) => handleInputChange('welcome.gifHeight', parseInt(e.target.value))}
-                                    style={{ width: '100%', accentColor: 'var(--primary)' }}
-                                  />
-                                </div>
-
-                                <div>
-                                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>
-                                    Fit Mode
-                                  </label>
-                                  <select
-                                    value={settings.welcome.gifFitMode || 'cover'}
-                                    onChange={(e) => handleInputChange('welcome.gifFitMode', e.target.value)}
-                                    className="glass-input"
-                                    style={{ fontSize: '0.8rem' }}
-                                  >
-                                    <option value="cover">Cover (Fill Container)</option>
-                                    <option value="contain">Contain (Fit Whole GIF)</option>
-                                    <option value="fill">Stretch Fill</option>
-                                  </select>
-                                </div>
-                              </div>
-                            </div>
-
-                            {/* Footer Section */}
-                            <div>
-                              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-secondary)', marginBottom: '6px' }}>
-                                Footer
-                              </label>
-                              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                                <label className="btn-secondary" style={{ padding: '8px 10px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '38px', borderRadius: '6px' }} title="Upload Footer Icon">
-                                  <ImageIcon size={16} />
-                                  <input
-                                    type="file"
-                                    accept="image/*"
-                                    style={{ display: 'none' }}
-                                    onChange={async (e) => {
-                                      const file = e.target.files[0];
-                                      if (file) {
-                                        const res = await api.uploadBackground(guildId, file).catch(() => null);
-                                        if (res && res.url) handleInputChange('welcome.embedFooterIcon', res.url);
-                                      }
-                                      e.target.value = null;
-                                    }}
-                                  />
-                                </label>
-
-                                <input
-                                  type="text"
-                                  value={settings.welcome.embedFooterText || ''}
-                                  onChange={(e) => handleInputChange('welcome.embedFooterText', e.target.value)}
-                                  className="glass-input"
-                                  placeholder="@everyone Welcome to my Server"
-                                  style={{ flex: 1 }}
-                                />
-
-                                <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', cursor: 'pointer', whiteSpace: 'nowrap', color: 'var(--text-secondary)' }}>
-                                  <input
-                                    type="checkbox"
-                                    checked={settings.welcome.embedTimestamp !== false}
-                                    onChange={(e) => handleInputChange('welcome.embedTimestamp', e.target.checked)}
-                                  />
-                                  • Add timestamp
-                                </label>
-                              </div>
-                              {settings.welcome.embedFooterIcon && (
-                                <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', display: 'block', marginTop: '4px' }}>
-                                  Footer Icon URL: {settings.welcome.embedFooterIcon}
-                                </span>
-                              )}
-                            </div>
-
-                          </div>
-
-                          {/* Control Customizers and Live Preview Grid */}
-                          <div className="welcome-preview-grid">
-
-                            {/* Element Sliders */}
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-color)', paddingBottom: '4px' }}>
-                                <h4 style={{ fontSize: '1rem', fontWeight: '700', color: 'var(--primary)', margin: 0 }}>Welcome Card Elements Sizing</h4>
-                                <button
-                                  type="button"
-                                  onClick={handleResetLayout}
-                                  className="btn-secondary"
-                                  style={{ padding: '4px 10px', fontSize: '0.75rem', borderRadius: '6px', cursor: 'pointer' }}
-                                >
-                                  Reset Layout
-                                </button>
-                              </div>
-
-                              {/* Add/Remove Action Buttons */}
-                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', margin: '4px 0 12px 0', padding: '10px', borderRadius: '8px', backgroundColor: 'rgba(255, 255, 255, 0.02)', border: '1px solid var(--border-color)' }}>
-                                <div style={{ width: '100%', fontSize: '0.75rem', fontWeight: '600', color: 'var(--text-secondary)', marginBottom: '4px' }}>Toggle Card Elements:</div>
-
-                                {/* Profile Toggle Button */}
-                                {settings.welcome.avatarEnabled !== false ? (
-                                  <button
-                                    type="button"
-                                    onClick={() => handleInputChange('welcome.avatarEnabled', false)}
-                                    className="btn-danger"
-                                    style={{ padding: '4px 10px', fontSize: '0.72rem', borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', height: '28px', border: 'none' }}
-                                  >
-                                    <Trash2 size={12} /> Remove Profile
-                                  </button>
-                                ) : (
-                                  <button
-                                    type="button"
-                                    onClick={() => handleInputChange('welcome.avatarEnabled', true)}
-                                    className="btn-primary"
-                                    style={{ padding: '4px 10px', fontSize: '0.72rem', borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', height: '28px', border: 'none' }}
-                                  >
-                                    <Plus size={12} /> Add Profile
-                                  </button>
-                                )}
-
-                                {/* Title Toggle Button */}
-                                {settings.welcome.titleEnabled !== false ? (
-                                  <button
-                                    type="button"
-                                    onClick={() => handleInputChange('welcome.titleEnabled', false)}
-                                    className="btn-danger"
-                                    style={{ padding: '4px 10px', fontSize: '0.72rem', borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', height: '28px', border: 'none' }}
-                                  >
-                                    <Trash2 size={12} /> Remove Title
-                                  </button>
-                                ) : (
-                                  <button
-                                    type="button"
-                                    onClick={() => handleInputChange('welcome.titleEnabled', true)}
-                                    className="btn-primary"
-                                    style={{ padding: '4px 10px', fontSize: '0.72rem', borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', height: '28px', border: 'none' }}
-                                  >
-                                    <Plus size={12} /> Add Title
-                                  </button>
-                                )}
-
-                                {/* Username Toggle Button */}
-                                {settings.welcome.usernameEnabled !== false ? (
-                                  <button
-                                    type="button"
-                                    onClick={() => handleInputChange('welcome.usernameEnabled', false)}
-                                    className="btn-danger"
-                                    style={{ padding: '4px 10px', fontSize: '0.72rem', borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', height: '28px', border: 'none' }}
-                                  >
-                                    <Trash2 size={12} /> Remove Username
-                                  </button>
-                                ) : (
-                                  <button
-                                    type="button"
-                                    onClick={() => handleInputChange('welcome.usernameEnabled', true)}
-                                    className="btn-primary"
-                                    style={{ padding: '4px 10px', fontSize: '0.72rem', borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', height: '28px', border: 'none' }}
-                                  >
-                                    <Plus size={12} /> Add Username
-                                  </button>
-                                )}
-
-                                {/* Subtext Toggle Button */}
-                                {settings.welcome.subtextEnabled !== false ? (
-                                  <button
-                                    type="button"
-                                    onClick={() => handleInputChange('welcome.subtextEnabled', false)}
-                                    className="btn-danger"
-                                    style={{ padding: '4px 10px', fontSize: '0.72rem', borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', height: '28px', border: 'none' }}
-                                  >
-                                    <Trash2 size={12} /> Remove Subtext
-                                  </button>
-                                ) : (
-                                  <button
-                                    type="button"
-                                    onClick={() => handleInputChange('welcome.subtextEnabled', true)}
-                                    className="btn-primary"
-                                    style={{ padding: '4px 10px', fontSize: '0.72rem', borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', height: '28px', border: 'none' }}
-                                  >
-                                    <Plus size={12} /> Add Subtext
-                                  </button>
-                                )}
-                              </div>
-
-                              {/* Profile Picture Control Group */}
-                              <div style={{
-                                padding: '12px',
-                                borderRadius: '10px',
-                                backgroundColor: 'rgba(255, 255, 255, 0.02)',
-                                border: '1px solid rgba(255, 255, 255, 0.05)',
-                                marginBottom: '4px'
-                              }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                                  <span style={{ fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-primary)' }}>Profile Picture (Pfp)</span>
-                                  <label className="switch">
-                                    <input
-                                      type="checkbox"
-                                      checked={settings.welcome.avatarEnabled !== false}
-                                      onChange={() => handleInputChange('welcome.avatarEnabled', !(settings.welcome.avatarEnabled !== false))}
-                                    />
-                                    <span className="slider"></span>
-                                  </label>
-                                </div>
-
-                                {settings.welcome.avatarEnabled !== false ? (
-                                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '6px' }}>
-                                    {/* Avatar Size */}
-                                    <div>
-                                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                                        <span>Pfp Size</span>
-                                        <span>{settings.welcome.avatarSize || 140}px</span>
-                                      </div>
-                                      <input
-                                        type="range" min="50" max="250" step="5"
-                                        value={settings.welcome.avatarSize || 140}
-                                        onChange={(e) => handleInputChange('welcome.avatarSize', parseInt(e.target.value))}
-                                        style={{ width: '100%', accentColor: 'var(--primary)' }}
-                                      />
                                     </div>
 
-                                    {/* Avatar Rotation */}
-                                    <div>
-                                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                                        <span>Pfp Rotation</span>
-                                        <span>{settings.welcome.avatarRotation || 0}°</span>
-                                      </div>
-                                      <input
-                                        type="range" min="0" max="360" step="5"
-                                        value={settings.welcome.avatarRotation || 0}
-                                        onChange={(e) => handleInputChange('welcome.avatarRotation', parseInt(e.target.value))}
-                                        style={{ width: '100%', accentColor: 'var(--primary)' }}
-                                      />
-                                    </div>
-
-                                    {/* Border Size & Color */}
-                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 60px', gap: '10px' }}>
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px', alignItems: 'center' }}>
                                       <div>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                                          <span>Border Thickness</span>
-                                          <span>{settings.welcome.avatarBorderThickness !== undefined ? settings.welcome.avatarBorderThickness : 6}px</span>
+                                        <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>
+                                          Aspect Ratio
+                                        </label>
+                                        <select
+                                          value={settings.welcome.gifRatio || '16:9'}
+                                          onChange={(e) => handleInputChange('welcome.gifRatio', e.target.value)}
+                                          className="glass-input"
+                                          style={{ fontSize: '0.8rem' }}
+                                        >
+                                          <option value="16:9">16:9 (Standard Widescreen)</option>
+                                          <option value="21:9">21:9 (Ultrawide Banner)</option>
+                                          <option value="4:3">4:3 (Classic Box)</option>
+                                          <option value="1:1">1:1 (Square Box)</option>
+                                          <option value="auto">Auto (Native Height)</option>
+                                        </select>
+                                      </div>
+
+                                      <div>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>
+                                          <span>Max Height</span>
+                                          <span>{settings.welcome.gifHeight || 250}px</span>
                                         </div>
                                         <input
-                                          type="range" min="0" max="20" step="1"
-                                          value={settings.welcome.avatarBorderThickness !== undefined ? settings.welcome.avatarBorderThickness : 6}
-                                          onChange={(e) => handleInputChange('welcome.avatarBorderThickness', parseInt(e.target.value))}
+                                          type="range"
+                                          min="100"
+                                          max="400"
+                                          step="10"
+                                          value={settings.welcome.gifHeight || 250}
+                                          onChange={(e) => handleInputChange('welcome.gifHeight', parseInt(e.target.value))}
                                           style={{ width: '100%', accentColor: 'var(--primary)' }}
                                         />
                                       </div>
-                                      <div>
-                                        <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', textAlign: 'center', marginBottom: '2px' }}>Border Color</label>
-                                        <input
-                                          type="color"
-                                          value={settings.welcome.avatarBorderColor || '#ffffff'}
-                                          onChange={(e) => handleInputChange('welcome.avatarBorderColor', e.target.value)}
-                                          style={{ width: '100%', height: '24px', padding: '0', border: '1px solid var(--border-color)', borderRadius: '4px', cursor: 'pointer', background: 'none' }}
-                                        />
-                                      </div>
-                                    </div>
-                                  </div>
-                                ) : (
-                                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontStyle: 'italic', padding: '4px 0' }}>
-                                    Profile Picture is disabled and hidden from the welcome card.
-                                  </div>
-                                )}
-                              </div>
-
-                              {/* Title Text Control Group */}
-                              <div style={{
-                                padding: '12px',
-                                borderRadius: '10px',
-                                backgroundColor: 'rgba(255, 255, 255, 0.02)',
-                                border: '1px solid rgba(255, 255, 255, 0.05)',
-                                marginBottom: '4px'
-                              }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                                  <span style={{ fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-primary)' }}>Title Text ("WELCOME")</span>
-                                  <label className="switch">
-                                    <input
-                                      type="checkbox"
-                                      checked={settings.welcome.titleEnabled !== false}
-                                      onChange={() => handleInputChange('welcome.titleEnabled', !(settings.welcome.titleEnabled !== false))}
-                                    />
-                                    <span className="slider"></span>
-                                  </label>
-                                </div>
-
-                                {settings.welcome.titleEnabled !== false ? (
-                                  <div style={{ marginTop: '6px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                                    <div>
-                                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                                        <span>Title Text Size</span>
-                                        <span>{settings.welcome.titleSize || 54}px</span>
-                                      </div>
-                                      <input
-                                        type="range" min="12" max="100" step="1"
-                                        value={settings.welcome.titleSize || 54}
-                                        onChange={(e) => handleInputChange('welcome.titleSize', parseInt(e.target.value))}
-                                        style={{ width: '100%', accentColor: 'var(--primary)' }}
-                                      />
-                                    </div>
-
-                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '10px', alignItems: 'center' }}>
-                                      <div>
-                                        <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>Font Family</label>
-                                        <select
-                                          value={settings.welcome.titleFontFamily || ''}
-                                          onChange={(e) => handleInputChange('welcome.titleFontFamily', e.target.value)}
-                                          className="glass-input"
-                                          style={{ padding: '6px 10px', fontSize: '0.8rem' }}
-                                        >
-                                          <option value="">Use Global Font</option>
-                                          <option value="Sans">Sans-Serif (Default)</option>
-                                          <option value="Poppins">Poppins</option>
-                                          <option value="Montserrat">Montserrat</option>
-                                          <option value="Bebas Neue">Bebas Neue</option>
-                                          <option value="Orbitron">Orbitron</option>
-                                          <option value="Oswald">Oswald</option>
-                                          <option value="Inter">Inter</option>
-                                          <option value="Roboto">Roboto</option>
-                                          <option value="Ethnocentric">Ethnocentric (Futuristic)</option>
-                                          <option value="Oxanium">Oxanium (Cyberpunk)</option>
-                                          <option value="Permanent Marker">Permanent Marker (Brush)</option>
-                                        </select>
-                                      </div>
-                                      <div>
-                                        <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '4px', textAlign: 'center' }}>Italic</label>
-                                        <label className="switch" style={{ scale: '0.85' }}>
-                                          <input
-                                            type="checkbox"
-                                            checked={settings.welcome.titleFontStyle === 'italic'}
-                                            onChange={(e) => handleInputChange('welcome.titleFontStyle', e.target.checked ? 'italic' : 'normal')}
-                                          />
-                                          <span className="slider"></span>
-                                        </label>
-                                      </div>
-                                    </div>
-
-                                    <div style={{ borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '8px', marginTop: '4px' }}>
-                                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                        <span style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--text-secondary)' }}>Neon Glow Effect</span>
-                                        <label className="switch" style={{ scale: '0.8' }}>
-                                          <input
-                                            type="checkbox"
-                                            checked={settings.welcome.titleGlowEnabled || false}
-                                            onChange={(e) => handleInputChange('welcome.titleGlowEnabled', e.target.checked)}
-                                          />
-                                          <span className="slider"></span>
-                                        </label>
-                                      </div>
-                                      {settings.welcome.titleGlowEnabled && (
-                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 60px', gap: '10px', alignItems: 'center', marginTop: '6px' }}>
-                                          <div>
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', color: 'var(--text-muted)' }}>
-                                              <span>Glow Radius</span>
-                                              <span>{settings.welcome.titleGlowBlur || 10}px</span>
-                                            </div>
-                                            <input
-                                              type="range" min="1" max="40" step="1"
-                                              value={settings.welcome.titleGlowBlur || 10}
-                                              onChange={(e) => handleInputChange('welcome.titleGlowBlur', parseInt(e.target.value))}
-                                              style={{ width: '100%', accentColor: 'var(--primary)' }}
-                                            />
-                                          </div>
-                                          <div>
-                                            <label style={{ display: 'block', fontSize: '0.65rem', color: 'var(--text-muted)', textAlign: 'center', marginBottom: '2px' }}>Color</label>
-                                            <input
-                                              type="color"
-                                              value={settings.welcome.titleGlowColor || '#00ff66'}
-                                              onChange={(e) => handleInputChange('welcome.titleGlowColor', e.target.value)}
-                                              style={{ width: '100%', height: '20px', padding: '0', border: '1px solid var(--border-color)', borderRadius: '4px', cursor: 'pointer', background: 'none' }}
-                                            />
-                                          </div>
-                                        </div>
-                                      )}
-                                    </div>
-                                  </div>
-                                ) : (
-                                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontStyle: 'italic', padding: '4px 0' }}>
-                                    Title Text is disabled and hidden from the welcome card.
-                                  </div>
-                                )}
-                              </div>
-
-                              {/* Username Text Control Group */}
-                              <div style={{
-                                padding: '12px',
-                                borderRadius: '10px',
-                                backgroundColor: 'rgba(255, 255, 255, 0.02)',
-                                border: '1px solid rgba(255, 255, 255, 0.05)',
-                                marginBottom: '4px'
-                              }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                                  <span style={{ fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-primary)' }}>Username Text</span>
-                                  <label className="switch">
-                                    <input
-                                      type="checkbox"
-                                      checked={settings.welcome.usernameEnabled !== false}
-                                      onChange={() => handleInputChange('welcome.usernameEnabled', !(settings.welcome.usernameEnabled !== false))}
-                                    />
-                                    <span className="slider"></span>
-                                  </label>
-                                </div>
-
-                                {settings.welcome.usernameEnabled !== false ? (
-                                  <div style={{ marginTop: '6px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                                    <div>
-                                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                                        <span>Username Text Size</span>
-                                        <span>{settings.welcome.usernameSize || 38}px</span>
-                                      </div>
-                                      <input
-                                        type="range" min="12" max="100" step="1"
-                                        value={settings.welcome.usernameSize || 38}
-                                        onChange={(e) => handleInputChange('welcome.usernameSize', parseInt(e.target.value))}
-                                        style={{ width: '100%', accentColor: 'var(--primary)' }}
-                                      />
-                                    </div>
-
-                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '10px', alignItems: 'center' }}>
-                                      <div>
-                                        <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>Font Family</label>
-                                        <select
-                                          value={settings.welcome.usernameFontFamily || ''}
-                                          onChange={(e) => handleInputChange('welcome.usernameFontFamily', e.target.value)}
-                                          className="glass-input"
-                                          style={{ padding: '6px 10px', fontSize: '0.8rem' }}
-                                        >
-                                          <option value="">Use Global Font</option>
-                                          <option value="Sans">Sans-Serif (Default)</option>
-                                          <option value="Poppins">Poppins</option>
-                                          <option value="Montserrat">Montserrat</option>
-                                          <option value="Bebas Neue">Bebas Neue</option>
-                                          <option value="Orbitron">Orbitron</option>
-                                          <option value="Oswald">Oswald</option>
-                                          <option value="Inter">Inter</option>
-                                          <option value="Roboto">Roboto</option>
-                                          <option value="Ethnocentric">Ethnocentric (Futuristic)</option>
-                                          <option value="Oxanium">Oxanium (Cyberpunk)</option>
-                                          <option value="Permanent Marker">Permanent Marker (Brush)</option>
-                                        </select>
-                                      </div>
-                                      <div>
-                                        <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '4px', textAlign: 'center' }}>Italic</label>
-                                        <label className="switch" style={{ scale: '0.85' }}>
-                                          <input
-                                            type="checkbox"
-                                            checked={settings.welcome.usernameFontStyle === 'italic'}
-                                            onChange={(e) => handleInputChange('welcome.usernameFontStyle', e.target.checked ? 'italic' : 'normal')}
-                                          />
-                                          <span className="slider"></span>
-                                        </label>
-                                      </div>
-                                    </div>
-
-                                    <div style={{ borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '8px', marginTop: '4px' }}>
-                                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                        <span style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--text-secondary)' }}>Neon Glow Effect</span>
-                                        <label className="switch" style={{ scale: '0.8' }}>
-                                          <input
-                                            type="checkbox"
-                                            checked={settings.welcome.usernameGlowEnabled || false}
-                                            onChange={(e) => handleInputChange('welcome.usernameGlowEnabled', e.target.checked)}
-                                          />
-                                          <span className="slider"></span>
-                                        </label>
-                                      </div>
-                                      {settings.welcome.usernameGlowEnabled && (
-                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 60px', gap: '10px', alignItems: 'center', marginTop: '6px' }}>
-                                          <div>
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', color: 'var(--text-muted)' }}>
-                                              <span>Glow Radius</span>
-                                              <span>{settings.welcome.usernameGlowBlur || 10}px</span>
-                                            </div>
-                                            <input
-                                              type="range" min="1" max="40" step="1"
-                                              value={settings.welcome.usernameGlowBlur || 10}
-                                              onChange={(e) => handleInputChange('welcome.usernameGlowBlur', parseInt(e.target.value))}
-                                              style={{ width: '100%', accentColor: 'var(--primary)' }}
-                                            />
-                                          </div>
-                                          <div>
-                                            <label style={{ display: 'block', fontSize: '0.65rem', color: 'var(--text-muted)', textAlign: 'center', marginBottom: '2px' }}>Color</label>
-                                            <input
-                                              type="color"
-                                              value={settings.welcome.usernameGlowColor || '#2563eb'}
-                                              onChange={(e) => handleInputChange('welcome.usernameGlowColor', e.target.value)}
-                                              style={{ width: '100%', height: '20px', padding: '0', border: '1px solid var(--border-color)', borderRadius: '4px', cursor: 'pointer', background: 'none' }}
-                                            />
-                                          </div>
-                                        </div>
-                                      )}
-                                    </div>
-                                  </div>
-                                ) : (
-                                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontStyle: 'italic', padding: '4px 0' }}>
-                                    Username Text is disabled and hidden from the welcome card.
-                                  </div>
-                                )}
-                              </div>
-
-                              {/* Subtext Text Control Group */}
-                              <div style={{
-                                padding: '12px',
-                                borderRadius: '10px',
-                                backgroundColor: 'rgba(255, 255, 255, 0.02)',
-                                border: '1px solid rgba(255, 255, 255, 0.05)',
-                                marginBottom: '4px'
-                              }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                                  <span style={{ fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-primary)' }}>Subtext Text</span>
-                                  <label className="switch">
-                                    <input
-                                      type="checkbox"
-                                      checked={settings.welcome.subtextEnabled !== false}
-                                      onChange={() => handleInputChange('welcome.subtextEnabled', !(settings.welcome.subtextEnabled !== false))}
-                                    />
-                                    <span className="slider"></span>
-                                  </label>
-                                </div>
-
-                                {settings.welcome.subtextEnabled !== false ? (
-                                  <div style={{ marginTop: '6px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                                    <div>
-                                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                                        <span>Subtext Text Size</span>
-                                        <span>{settings.welcome.subtextSize || 22}px</span>
-                                      </div>
-                                      <input
-                                        type="range" min="10" max="60" step="1"
-                                        value={settings.welcome.subtextSize || 22}
-                                        onChange={(e) => handleInputChange('welcome.subtextSize', parseInt(e.target.value))}
-                                        style={{ width: '100%', accentColor: 'var(--primary)' }}
-                                      />
-                                    </div>
-
-                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '10px', alignItems: 'center' }}>
-                                      <div>
-                                        <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>Font Family</label>
-                                        <select
-                                          value={settings.welcome.subtextFontFamily || ''}
-                                          onChange={(e) => handleInputChange('welcome.subtextFontFamily', e.target.value)}
-                                          className="glass-input"
-                                          style={{ padding: '6px 10px', fontSize: '0.8rem' }}
-                                        >
-                                          <option value="">Use Global Font</option>
-                                          <option value="Sans">Sans-Serif (Default)</option>
-                                          <option value="Poppins">Poppins</option>
-                                          <option value="Montserrat">Montserrat</option>
-                                          <option value="Bebas Neue">Bebas Neue</option>
-                                          <option value="Orbitron">Orbitron</option>
-                                          <option value="Oswald">Oswald</option>
-                                          <option value="Inter">Inter</option>
-                                          <option value="Roboto">Roboto</option>
-                                          <option value="Ethnocentric">Ethnocentric (Futuristic)</option>
-                                          <option value="Oxanium">Oxanium (Cyberpunk)</option>
-                                          <option value="Permanent Marker">Permanent Marker (Brush)</option>
-                                        </select>
-                                      </div>
-                                      <div>
-                                        <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '4px', textAlign: 'center' }}>Italic</label>
-                                        <label className="switch" style={{ scale: '0.85' }}>
-                                          <input
-                                            type="checkbox"
-                                            checked={settings.welcome.subtextFontStyle === 'italic'}
-                                            onChange={(e) => handleInputChange('welcome.subtextFontStyle', e.target.checked ? 'italic' : 'normal')}
-                                          />
-                                          <span className="slider"></span>
-                                        </label>
-                                      </div>
-                                    </div>
-
-                                    <div style={{ borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '8px', marginTop: '4px' }}>
-                                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                        <span style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--text-secondary)' }}>Neon Glow Effect</span>
-                                        <label className="switch" style={{ scale: '0.8' }}>
-                                          <input
-                                            type="checkbox"
-                                            checked={settings.welcome.subtextGlowEnabled || false}
-                                            onChange={(e) => handleInputChange('welcome.subtextGlowEnabled', e.target.checked)}
-                                          />
-                                          <span className="slider"></span>
-                                        </label>
-                                      </div>
-                                      {settings.welcome.subtextGlowEnabled && (
-                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 60px', gap: '10px', alignItems: 'center', marginTop: '6px' }}>
-                                          <div>
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', color: 'var(--text-muted)' }}>
-                                              <span>Glow Radius</span>
-                                              <span>{settings.welcome.subtextGlowBlur || 10}px</span>
-                                            </div>
-                                            <input
-                                              type="range" min="1" max="40" step="1"
-                                              value={settings.welcome.subtextGlowBlur || 10}
-                                              onChange={(e) => handleInputChange('welcome.subtextGlowBlur', parseInt(e.target.value))}
                                               style={{ width: '100%', accentColor: 'var(--primary)' }}
                                             />
                                           </div>
@@ -5797,7 +4939,7 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                                         </div>
 
                                         <div className="discord-embed" style={{ borderLeftColor: settings.welcome.embedColor || settings.welcome.textColor || '#2563eb', padding: '12px 16px', borderRadius: '4px', backgroundColor: '#2b2d31' }}>
-                                          
+
                                           {/* Author Section */}
                                           {settings.welcome.embedAuthorName && (
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
@@ -6172,14 +5314,14 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                 const currentOptions = (Array.isArray(settings.tickets?.options) && settings.tickets.options.length > 0)
                   ? settings.tickets.options
                   : [{
-                      label: settings.tickets?.buttonText || 'Create Ticket',
-                      emoji: '🎫',
-                      style: 'primary',
-                      categoryId: settings.tickets?.categoryId || '',
-                      supportRoleId: settings.tickets?.supportRoleId || '',
-                      title: settings.tickets?.title || 'Support Ticket',
-                      ticketMessage: settings.tickets?.ticketMessage || 'Welcome {user}! Please describe your issue. Support staff will assist you shortly.'
-                    }];
+                    label: settings.tickets?.buttonText || 'Create Ticket',
+                    emoji: '🎫',
+                    style: 'primary',
+                    categoryId: settings.tickets?.categoryId || '',
+                    supportRoleId: settings.tickets?.supportRoleId || '',
+                    title: settings.tickets?.title || 'Support Ticket',
+                    ticketMessage: settings.tickets?.ticketMessage || 'Welcome {user}! Please describe your issue. Support staff will assist you shortly.'
+                  }];
 
                 const updateTicketOptions = (newOptions) => {
                   const updatedTickets = {
@@ -8795,10 +7937,10 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                 const currentChannels = (Array.isArray(settings.tempVoice?.channels) && settings.tempVoice.channels.length > 0)
                   ? settings.tempVoice.channels
                   : [{
-                      channelId: settings.tempVoice?.channelId || '',
-                      categoryId: settings.tempVoice?.categoryId || '',
-                      nameTemplate: settings.tempVoice?.nameTemplate || "🔊 {username}'s Room"
-                    }];
+                    channelId: settings.tempVoice?.channelId || '',
+                    categoryId: settings.tempVoice?.categoryId || '',
+                    nameTemplate: settings.tempVoice?.nameTemplate || "🔊 {username}'s Room"
+                  }];
 
                 const updateTempVoiceChannels = (newChannels) => {
                   const updatedTempVoice = {
