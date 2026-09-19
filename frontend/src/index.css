@@ -858,43 +858,27 @@ input:checked + .slider:before {
 /* Split Layout for Welcome System */
 .welcome-split-layout {
   display: flex;
-  gap: 32px;
-  align-items: start;
+  gap: 28px;
+  align-items: flex-start;
+  width: 100%;
 }
 
 .welcome-settings-column {
-  flex: 1;
+  flex: 1.4;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 20px;
-  min-width: 0; /* Prevents flex items from overflowing */
-  max-height: calc(100vh - 300px);
-  overflow-y: auto;
-  padding-right: 16px;
-}
-
-/* Custom scrollbar for settings column to match the app theme */
-.welcome-settings-column::-webkit-scrollbar {
-  width: 6px;
-}
-.welcome-settings-column::-webkit-scrollbar-track {
-  background: transparent;
-}
-.welcome-settings-column::-webkit-scrollbar-thumb {
-  background: rgba(99, 102, 241, 0.2);
-  border-radius: 8px;
-}
-.welcome-settings-column::-webkit-scrollbar-thumb:hover {
-  background: rgba(99, 102, 241, 0.4);
 }
 
 .welcome-preview-column {
-  flex: 1.3;
+  flex: 1;
+  min-width: 360px;
+  max-width: 520px;
   position: -webkit-sticky;
   position: sticky;
   top: 24px;
   z-index: 10;
-  min-width: 0;
 }
 
 @media (max-width: 1250px) {
@@ -904,14 +888,13 @@ input:checked + .slider:before {
   }
   
   .welcome-settings-column {
-    max-height: none;
-    overflow-y: visible;
-    padding-right: 0;
+    width: 100%;
   }
   
   .welcome-preview-column {
     position: static;
     width: 100%;
+    max-width: 100%;
   }
 }
 
