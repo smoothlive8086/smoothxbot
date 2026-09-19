@@ -1525,6 +1525,81 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
             whitelistedUsers: []
           };
         }
+
+        if (!sData.welcome) {
+          sData.welcome = {
+            enabled: false,
+            channelId: '',
+            cardTitle: 'WELCOME',
+            cardSubtext: 'TO {server}',
+            bgUrl: '',
+            enableGifUrlEmbed: true,
+            pingUser: false,
+            messageContent: '',
+            embed: {
+              enabled: false,
+              title: '',
+              description: '',
+              color: '#5865F2',
+              thumbnailUrl: '',
+              imageUrl: '',
+              authorName: '',
+              authorIconUrl: '',
+              footerText: '',
+              footerIconUrl: '',
+              websiteUrl: '',
+              fields: []
+            },
+            dm: {
+              enabled: false,
+              messageContent: '',
+              embedEnabled: false,
+              title: '',
+              description: '',
+              color: '#5865F2',
+              imageUrl: ''
+            },
+            customButtons: [],
+            canvas: {
+              theme: 'dark',
+              avatarStyle: 'circle',
+              showAvatar: true,
+              showUsername: true,
+              showMemberCount: true,
+              showTitle: true,
+              showSubtext: true,
+              showBorder: true,
+              textColor: '#ffffff',
+              subtextColor: '#a0aec0',
+              accentColor: '#5865f2',
+              titleFontSize: 42,
+              subtextFontSize: 24,
+              avatarSize: 120,
+              avatarX: 100,
+              avatarY: 125,
+              titleX: 250,
+              titleY: 110,
+              subtextX: 250,
+              subtextY: 155
+            }
+          };
+        } else {
+          if (!sData.welcome.embed) {
+            sData.welcome.embed = { enabled: false, title: '', description: '', color: '#5865F2', thumbnailUrl: '', imageUrl: '', fields: [] };
+          }
+          if (!sData.welcome.dm) {
+            sData.welcome.dm = { enabled: false, messageContent: '', embedEnabled: false, title: '', description: '', color: '#5865F2', imageUrl: '' };
+          }
+          if (!sData.welcome.customButtons) {
+            sData.welcome.customButtons = [];
+          }
+          if (!sData.welcome.canvas) {
+            sData.welcome.canvas = {
+              theme: 'dark', avatarStyle: 'circle', showAvatar: true, showUsername: true, showMemberCount: true, showTitle: true, showSubtext: true, showBorder: true,
+              textColor: '#ffffff', subtextColor: '#a0aec0', accentColor: '#5865f2', titleFontSize: 42, subtextFontSize: 24, avatarSize: 120, avatarX: 100, avatarY: 125, titleX: 250, titleY: 110, subtextX: 250, subtextY: 155
+            };
+          }
+        }
       }
 
       setSettings(sData);
@@ -2059,9 +2134,24 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
     const redirectCh3 = channels.find(c => c.id === settings?.welcome?.redirectChannelId3);
     const channelName3 = redirectCh3 ? redirectCh3.name : 'channel';
 
+    const now = new Date();
+    const formatDateStr = (d) => {
+      const pad = (n) => String(n).padStart(2, '0');
+      return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} – ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    };
+
     let text = rawText
       .replace(/{username}/g, user?.username || 'Member')
-      .replace(/{server}/g, guildName || 'Server');
+      .replace(/{displayName}/gi, user?.displayName || user?.username || 'Member')
+      .replace(/{user_name}/gi, user?.username || 'Member')
+      .replace(/{server}/g, guildName || 'Server')
+      .replace(/{memberCount}/gi, String(memberCount || 118))
+      .replace(/{userPosition}/gi, String(memberCount || 24149))
+      .replace(/{count}/gi, String(memberCount || 118))
+      .replace(/{joinedAt}/gi, formatDateStr(now))
+      .replace(/{userJoinedAt}/gi, formatDateStr(now))
+      .replace(/{createdAt}/gi, formatDateStr(new Date(Date.now() - 4 * 24 * 60 * 60 * 1000)))
+      .replace(/{userCreatedAt}/gi, formatDateStr(new Date(Date.now() - 4 * 24 * 60 * 60 * 1000)));
 
     const parts = text.split(/({user}|{channel}|{channel2}|{channel3})/g);
 
@@ -2116,10 +2206,35 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
       settings?.welcome?.redirectChannelId3
     ].filter(Boolean);
 
-    if (redirectIds.length === 0) return null;
+    const hasWebsite = Boolean(settings?.welcome?.websiteUrl && settings.welcome.websiteUrl.trim());
+    const customBtns = (settings?.welcome?.customButtons || []).filter(b => b && b.label && b.url);
+
+    if (redirectIds.length === 0 && !hasWebsite && customBtns.length === 0) return null;
 
     return (
-      <div className="discord-buttons-row">
+      <div className="discord-buttons-row" style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '8px' }}>
+        {hasWebsite && (
+          <span className="discord-button-link" style={{ backgroundColor: 'rgba(88, 101, 242, 0.25)', border: '1px solid rgba(88, 101, 242, 0.4)' }}>
+            <span>{settings.welcome.websiteLabel || '🌐 Official Website'}</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+              <polyline points="15 3 21 3 21 9"></polyline>
+              <line x1="10" y1="14" x2="21" y2="3"></line>
+            </svg>
+          </span>
+        )}
+
+        {customBtns.map((cb, idx) => (
+          <span key={`cb-${idx}`} className="discord-button-link" style={{ backgroundColor: 'rgba(88, 101, 242, 0.25)', border: '1px solid rgba(88, 101, 242, 0.4)' }}>
+            <span>{cb.emoji ? `${cb.emoji} ` : ''}{cb.label}</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+              <polyline points="15 3 21 3 21 9"></polyline>
+              <line x1="10" y1="14" x2="21" y2="3"></line>
+            </svg>
+          </span>
+        ))}
+
         {redirectIds.map((id, index) => {
           const redirectCh = channels.find(c => c.id === id);
           const channelName = redirectCh ? redirectCh.name : 'channel';
@@ -4145,306 +4260,500 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                       <div className="welcome-split-layout" style={{ borderTop: '1px solid var(--border-color)', paddingTop: '16px' }}>
                         <div className="welcome-settings-column">
 
-                          {/* Welcome Message Layout Selection */}
-                          <div>
-                            <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 'bold' }}>Welcome Message Layout Type</label>
-                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '12px' }}>
-                              {[
-                                { id: 'classic', title: 'Classic Card', desc: 'Message text + image card attachment' },
-                                { id: 'embed-card', title: 'Embed with Card', desc: 'Rich embed with card image loaded inside' },
-                                { id: 'embed-only', title: 'Embed Only', desc: 'Rich embed only (no card image)' },
-                                { id: 'text-only', title: 'Text Message Only', desc: 'Plain text message only' }
-                              ].map(layoutOption => (
-                                <div
-                                  key={layoutOption.id}
-                                  onClick={() => handleInputChange('welcome.layoutType', layoutOption.id)}
-                                  style={{
-                                    padding: '12px 14px',
-                                    borderRadius: '10px',
-                                    border: `2px solid ${settings.welcome.layoutType === layoutOption.id ? 'var(--primary)' : 'rgba(255,255,255,0.05)'}`,
-                                    backgroundColor: settings.welcome.layoutType === layoutOption.id ? 'var(--primary-glow)' : 'rgba(255,255,255,0.02)',
-                                    cursor: 'pointer',
-                                    transition: 'all 0.2s ease',
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    gap: '4px'
-                                  }}
-                                >
-                                  <span style={{ fontSize: '0.85rem', fontWeight: '700', color: settings.welcome.layoutType === layoutOption.id ? '#ffffff' : 'var(--text-secondary)' }}>
-                                    {layoutOption.title}
-                                  </span>
-                                  <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', lineHeight: '1rem' }}>
-                                    {layoutOption.desc}
-                                  </span>
-                                </div>
-                              ))}
+                          {/* Quick Preset Templates Bar */}
+                          <div className="glass-panel" style={{
+                            padding: '14px 18px',
+                            borderRadius: '12px',
+                            backgroundColor: 'rgba(139, 92, 246, 0.05)',
+                            border: '1px solid rgba(139, 92, 246, 0.2)',
+                            marginBottom: '16px'
+                          }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                              <span style={{ fontSize: '0.9rem', fontWeight: '800', color: '#ffffff', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <Sparkles size={16} style={{ color: '#a78bfa' }} />
+                                1-Click Welcome Design Presets
+                              </span>
+                              <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Select a template to auto-populate layout</span>
+                            </div>
+
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: '10px' }}>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  handleInputChange('welcome.layoutType', 'embed-only');
+                                  handleInputChange('welcome.embedTitle', 'WELCOME TO OUR SERVER ✨✨');
+                                  handleInputChange('welcome.embedColor', '#ff9ebb');
+                                  handleInputChange('welcome.embedThumbnail', '{user_avatar}');
+                                  handleInputChange('welcome.message', '– – – – – – – – – – –\n\nCheck out more channels\n\n,\,\circ\cdot^\curvearrowright\ \ 📖 Read Rules {channel}\n,\,\circ\cdot^\curvearrowright\ \ 📢 Check {channel2}\n,\,\circ\cdot^\curvearrowright\ \ 💬 Continue Chatting {channel3}\n\n– – – – – – – – – – –\n\nHave a Good Time in Server !');
+                                  handleInputChange('welcome.embedFooterText', 'Members: {memberCount}');
+                                  handleInputChange('welcome.embedTimestamp', true);
+                                  handleInputChange('welcome.pingUser', true);
+                                  showNotification('Applied Example Embed Preset (Image 1)!');
+                                }}
+                                className="btn-secondary"
+                                style={{ padding: '8px 12px', fontSize: '0.78rem', fontWeight: '700', borderRadius: '8px', border: '1px solid rgba(255, 158, 187, 0.3)', backgroundColor: 'rgba(255, 158, 187, 0.1)', color: '#ffb3c6', cursor: 'pointer', textAlign: 'left' }}
+                              >
+                                ✨ Example Server Embed (Image 1)
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  handleInputChange('welcome.layoutType', 'embed-only');
+                                  handleInputChange('welcome.embedAuthorName', '{server}');
+                                  handleInputChange('welcome.embedAuthorIcon', '{server_icon}');
+                                  handleInputChange('welcome.embedTitle', 'WELCOME');
+                                  handleInputChange('welcome.embedColor', '#0088ff');
+                                  handleInputChange('welcome.embedThumbnail', '{user_avatar}');
+                                  handleInputChange('welcome.message', 'Hey {user}\n**Welcome to {server}**\nFollow the rules and Enjoy in our Server\n━━━━━━━━━━━━━━━━━━━━━━\n\n💫 **Read Rules** {channel}\n💫 **Chat with us** {channel2}\n💫 **Connect with us** {channel3}\n\n━━━━━━━━━━━━━━━━━━━━━━\n\n👥 **USER INFO**\n**User Name** : {username}\n**User Position**: {userPosition}\n**Joined at** : {joinedAt}\n**Created at**: {createdAt}');
+                                  handleInputChange('welcome.embedTimestamp', true);
+                                  handleInputChange('welcome.pingUser', true);
+                                  showNotification('Applied User Info Detailed Welcome Preset (Image 2)!');
+                                }}
+                                className="btn-secondary"
+                                style={{ padding: '8px 12px', fontSize: '0.78rem', fontWeight: '700', borderRadius: '8px', border: '1px solid rgba(0, 136, 255, 0.3)', backgroundColor: 'rgba(0, 136, 255, 0.1)', color: '#38bdf8', cursor: 'pointer', textAlign: 'left' }}
+                              >
+                                🔥 Detailed User Info (Image 2)
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  handleInputChange('welcome.layoutType', 'embed-card');
+                                  handleInputChange('welcome.embedTitle', 'WELCOME AGENT ⚡');
+                                  handleInputChange('welcome.embedColor', '#00ff66');
+                                  handleInputChange('welcome.titleText', 'WELCOME');
+                                  handleInputChange('welcome.subtextText', 'TO {server}');
+                                  handleInputChange('welcome.embedThumbnail', '{user_avatar}');
+                                  handleInputChange('welcome.embedFooterText', 'Member #{memberCount} • {server}');
+                                  handleInputChange('welcome.embedTimestamp', true);
+                                  showNotification('Applied Cyberpunk Neon Card Preset!');
+                                }}
+                                className="btn-secondary"
+                                style={{ padding: '8px 12px', fontSize: '0.78rem', fontWeight: '700', borderRadius: '8px', border: '1px solid rgba(0, 255, 102, 0.3)', backgroundColor: 'rgba(0, 255, 102, 0.08)', color: '#6ee7b7', cursor: 'pointer', textAlign: 'left' }}
+                              >
+                                🚀 Cyberpunk Neon Card
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  handleInputChange('welcome.dmEnabled', true);
+                                  handleInputChange('welcome.dmEmbedEnabled', true);
+                                  handleInputChange('welcome.dmMessage', 'Hey {user}! Welcome to **{server}** 🎉\n\nWe are super happy to have you here! Please check out {channel} for rules.');
+                                  showNotification('Applied DM Welcome Preset!');
+                                }}
+                                className="btn-secondary"
+                                style={{ padding: '8px 12px', fontSize: '0.78rem', fontWeight: '700', borderRadius: '8px', border: '1px solid rgba(59, 130, 246, 0.3)', backgroundColor: 'rgba(59, 130, 246, 0.1)', color: '#93c5fd', cursor: 'pointer', textAlign: 'left' }}
+                              >
+                                ✉️ DM Welcome Flow
+                              </button>
                             </div>
                           </div>
 
-                          {/* Channel and Font Family Row */}
-                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginBottom: '16px' }}>
-                            <div>
-                              <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Greeting Channel</label>
-                              <select
-                                value={settings.welcome.channelId}
-                                onChange={(e) => handleInputChange('welcome.channelId', e.target.value)}
-                                className="glass-input"
-                              >
-                                <option value="">-- Select Channel --</option>
-                                {channels.map(ch => (
-                                  <option key={ch.id} value={ch.id}>#{ch.name}</option>
-                                ))}
-                              </select>
-                            </div>
-
-                            <div>
-                              <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Font Family</label>
-                              <select
-                                value={settings.welcome.fontFamily || 'Ethnocentric'}
-                                onChange={(e) => handleInputChange('welcome.fontFamily', e.target.value)}
-                                className="glass-input"
-                              >
-                                <option value="Ethnocentric">Ethnocentric (Futuristic) (Default)</option>
-                                <option value="Oxanium">Oxanium (Cyberpunk)</option>
-                                <option value="Sans">Sans-Serif</option>
-                                <option value="Poppins">Poppins</option>
-                                <option value="Montserrat">Montserrat</option>
-                                <option value="Bebas Neue">Bebas Neue</option>
-                                <option value="Orbitron">Orbitron</option>
-                                <option value="Oswald">Oswald</option>
-                                <option value="Inter">Inter</option>
-                                <option value="Roboto">Roboto</option>
-                                <option value="Permanent Marker">Permanent Marker (Brush)</option>
-                              </select>
-                            </div>
-                          </div>
-
-                          {/* Redirect Channels Row */}
-                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '16px', marginBottom: '16px' }}>
-                            <div>
-                              <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Redirect Channel Link 1</label>
-                              <select
-                                value={settings.welcome.redirectChannelId || ''}
-                                onChange={(e) => handleInputChange('welcome.redirectChannelId', e.target.value)}
-                                className="glass-input"
-                              >
-                                <option value="">-- No redirect channel --</option>
-                                {channels.map(ch => (
-                                  <option key={ch.id} value={ch.id}>#{ch.name}</option>
-                                ))}
-                              </select>
-                            </div>
-
-                            <div>
-                              <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Redirect Channel Link 2</label>
-                              <select
-                                value={settings.welcome.redirectChannelId2 || ''}
-                                onChange={(e) => handleInputChange('welcome.redirectChannelId2', e.target.value)}
-                                className="glass-input"
-                              >
-                                <option value="">-- No redirect channel --</option>
-                                {channels.map(ch => (
-                                  <option key={ch.id} value={ch.id}>#{ch.name}</option>
-                                ))}
-                              </select>
-                            </div>
-
-                            <div>
-                              <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Redirect Channel Link 3</label>
-                              <select
-                                value={settings.welcome.redirectChannelId3 || ''}
-                                onChange={(e) => handleInputChange('welcome.redirectChannelId3', e.target.value)}
-                                className="glass-input"
-                              >
-                                <option value="">-- No redirect channel --</option>
-                                {channels.map(ch => (
-                                  <option key={ch.id} value={ch.id}>#{ch.name}</option>
-                                ))}
-                              </select>
-                            </div>
-                          </div>
-
-                          {/* Welcomes Card Colors Row */}
-                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
-                            <div>
-                              <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Title Color (Hex)</label>
-                              <div style={{ display: 'flex', gap: '8px' }}>
-                                <input
-                                  type="color"
-                                  value={settings.welcome.textColor?.startsWith('#') ? settings.welcome.textColor : `#${settings.welcome.textColor || 'ffffff'}`}
-                                  onChange={(e) => handleInputChange('welcome.textColor', e.target.value)}
-                                  style={{ width: '40px', height: '40px', padding: '0', border: '1px solid var(--border-color)', borderRadius: '6px', background: 'none', cursor: 'pointer' }}
-                                />
-                                <input
-                                  type="text"
-                                  value={settings.welcome.textColor || '#ffffff'}
-                                  onChange={(e) => handleInputChange('welcome.textColor', e.target.value)}
-                                  className="glass-input"
-                                  placeholder="#ffffff"
-                                />
-                              </div>
-                            </div>
-
-                            <div>
-                              <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Username Color (Hex)</label>
-                              <div style={{ display: 'flex', gap: '8px' }}>
-                                <input
-                                  type="color"
-                                  value={settings.welcome.usernameColor?.startsWith('#') ? settings.welcome.usernameColor : `#${settings.welcome.usernameColor || '2563eb'}`}
-                                  onChange={(e) => handleInputChange('welcome.usernameColor', e.target.value)}
-                                  style={{ width: '40px', height: '40px', padding: '0', border: '1px solid var(--border-color)', borderRadius: '6px', background: 'none', cursor: 'pointer' }}
-                                />
-                                <input
-                                  type="text"
-                                  value={settings.welcome.usernameColor || '#2563eb'}
-                                  onChange={(e) => handleInputChange('welcome.usernameColor', e.target.value)}
-                                  className="glass-input"
-                                  placeholder="#2563eb"
-                                />
-                              </div>
-                            </div>
-
-                            <div>
-                              <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Subtext Color (Hex)</label>
-                              <div style={{ display: 'flex', gap: '8px' }}>
-                                <input
-                                  type="color"
-                                  value={settings.welcome.subtextColor?.startsWith('#') ? settings.welcome.subtextColor : `#${settings.welcome.subtextColor || 'ffffff'}`}
-                                  onChange={(e) => handleInputChange('welcome.subtextColor', e.target.value)}
-                                  style={{ width: '40px', height: '40px', padding: '0', border: '1px solid var(--border-color)', borderRadius: '6px', background: 'none', cursor: 'pointer' }}
-                                />
-                                <input
-                                  type="text"
-                                  value={settings.welcome.subtextColor || 'rgba(255, 255, 255, 0.7)'}
-                                  onChange={(e) => handleInputChange('welcome.subtextColor', e.target.value)}
-                                  className="glass-input"
-                                  placeholder="rgba(255, 255, 255, 0.7)"
-                                />
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Font Weight and Text Alignment */}
-                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
-                            <div>
-                              <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Font Weight</label>
-                              <select
-                                value={settings.welcome.fontWeight || 'bold'}
-                                onChange={(e) => handleInputChange('welcome.fontWeight', e.target.value)}
-                                className="glass-input"
-                              >
-                                <option value="normal">Normal</option>
-                                <option value="medium">Medium (500)</option>
-                                <option value="600">Semi-Bold (600)</option>
-                                <option value="bold">Bold (700)</option>
-                                <option value="900">Extra-Bold (900)</option>
-                              </select>
-                            </div>
-
-                            <div>
-                              <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Text Alignment</label>
-                              <select
-                                value={settings.welcome.textAlignment || 'center'}
-                                onChange={(e) => handleInputChange('welcome.textAlignment', e.target.value)}
-                                className="glass-input"
-                              >
-                                <option value="left">Left</option>
-                                <option value="center">Center</option>
-                                <option value="right">Right</option>
-                              </select>
-                            </div>
-                          </div>
-
-                          {/* Welcome Message Text */}
-                          <div>
-                            <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Welcome Message Template (Supports {`{user}`}, {`{username}`}, {`{server}`}, {`{channel}`}, {`{channel2}`}, {`{channel3}`})</label>
-                            <textarea
-                              value={settings.welcome.message}
-                              onChange={(e) => handleInputChange('welcome.message', e.target.value)}
-                              className="glass-input"
-                              placeholder="Welcome {user} to the server!"
-                              rows="3"
-                              style={{ minHeight: '80px', resize: 'vertical', fontFamily: 'inherit' }}
-                            />
-                            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginTop: '4px' }}>
-                              If any Redirect Channels are selected, buttons linking to them will also be attached automatically (up to 3 links).
+                          {/* Dynamic Placeholders Toolbar */}
+                          <div style={{
+                            display: 'flex',
+                            flexWrap: 'wrap',
+                            alignItems: 'center',
+                            gap: '6px',
+                            backgroundColor: 'rgba(0,0,0,0.25)',
+                            padding: '10px 14px',
+                            borderRadius: '8px',
+                            border: '1px solid rgba(255,255,255,0.06)',
+                            marginBottom: '16px'
+                          }}>
+                            <span style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-secondary)', marginRight: '6px' }}>
+                              ⚡ Dynamic Variables (Click to copy):
                             </span>
+                            {[
+                              '{user}', '{username}', '{displayName}', '{server}', '{memberCount}', '{userPosition}', '{joinedAt}', '{createdAt}', '{channel}', '{channel2}', '{channel3}'
+                            ].map(tag => (
+                              <button
+                                key={tag}
+                                type="button"
+                                onClick={() => {
+                                  navigator.clipboard.writeText(tag);
+                                  showNotification(`Copied variable ${tag}!`);
+                                }}
+                                title={`Click to copy ${tag}`}
+                                style={{
+                                  backgroundColor: 'rgba(88, 101, 242, 0.15)',
+                                  border: '1px solid rgba(88, 101, 242, 0.3)',
+                                  color: '#a5b4fc',
+                                  padding: '3px 8px',
+                                  borderRadius: '4px',
+                                  fontSize: '0.72rem',
+                                  fontFamily: 'monospace',
+                                  cursor: 'pointer'
+                                }}
+                              >
+                                {tag}
+                              </button>
+                            ))}
                           </div>
 
-                          {/* Welcome Card Custom Text Templates */}
-                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
+                          {/* Section 1: Main Welcome Settings */}
+                          <div className="glass-panel" style={{
+                            padding: '18px',
+                            borderRadius: '12px',
+                            backgroundColor: 'rgba(15, 23, 42, 0.6)',
+                            border: '1px solid rgba(255, 255, 255, 0.08)',
+                            marginBottom: '16px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '14px'
+                          }}>
+                            <h4 style={{ fontSize: '0.95rem', fontWeight: '700', color: '#ffffff', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              <MessageSquare size={16} style={{ color: 'var(--primary)' }} />
+                              General Greeting & Channels
+                            </h4>
+
+                            {/* Welcome Message Layout Selection */}
                             <div>
-                              <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Card Title Text Template</label>
-                              <input
-                                type="text"
-                                value={settings.welcome.titleText !== undefined ? settings.welcome.titleText : 'WELCOME'}
-                                onChange={(e) => handleInputChange('welcome.titleText', e.target.value)}
+                              <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 'bold' }}>Welcome Message Layout Type</label>
+                              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '10px' }}>
+                                {[
+                                  { id: 'classic', title: 'Classic Card', desc: 'Text + Canvas Banner Card' },
+                                  { id: 'embed-card', title: 'Embed with Card', desc: 'Rich embed + Canvas Banner inside' },
+                                  { id: 'embed-only', title: 'Embed Only', desc: 'Rich embed only (no card image)' },
+                                  { id: 'text-only', title: 'Text Message Only', desc: 'Plain text message only' }
+                                ].map(layoutOption => (
+                                  <div
+                                    key={layoutOption.id}
+                                    onClick={() => handleInputChange('welcome.layoutType', layoutOption.id)}
+                                    style={{
+                                      padding: '10px 12px',
+                                      borderRadius: '10px',
+                                      border: `2px solid ${settings.welcome.layoutType === layoutOption.id ? 'var(--primary)' : 'rgba(255,255,255,0.05)'}`,
+                                      backgroundColor: settings.welcome.layoutType === layoutOption.id ? 'var(--primary-glow)' : 'rgba(255,255,255,0.02)',
+                                      cursor: 'pointer',
+                                      transition: 'all 0.2s ease',
+                                      display: 'flex',
+                                      flexDirection: 'column',
+                                      gap: '4px'
+                                    }}
+                                  >
+                                    <span style={{ fontSize: '0.82rem', fontWeight: '700', color: settings.welcome.layoutType === layoutOption.id ? '#ffffff' : 'var(--text-secondary)' }}>
+                                      {layoutOption.title}
+                                    </span>
+                                    <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)', lineHeight: '0.95rem' }}>
+                                      {layoutOption.desc}
+                                    </span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+
+                            {/* Channel and Font Family Row */}
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '14px' }}>
+                              <div>
+                                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>Greeting Channel</label>
+                                <select
+                                  value={settings.welcome.channelId}
+                                  onChange={(e) => handleInputChange('welcome.channelId', e.target.value)}
+                                  className="glass-input"
+                                >
+                                  <option value="">-- Select Channel --</option>
+                                  {channels.map(ch => (
+                                    <option key={ch.id} value={ch.id}>#{ch.name}</option>
+                                  ))}
+                                </select>
+                              </div>
+
+                              <div>
+                                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>Font Family</label>
+                                <select
+                                  value={settings.welcome.fontFamily || 'Ethnocentric'}
+                                  onChange={(e) => handleInputChange('welcome.fontFamily', e.target.value)}
+                                  className="glass-input"
+                                >
+                                  <option value="Ethnocentric">Ethnocentric (Futuristic) (Default)</option>
+                                  <option value="Oxanium">Oxanium (Cyberpunk)</option>
+                                  <option value="Sans">Sans-Serif</option>
+                                  <option value="Poppins">Poppins</option>
+                                  <option value="Montserrat">Montserrat</option>
+                                  <option value="Bebas Neue">Bebas Neue</option>
+                                  <option value="Orbitron">Orbitron</option>
+                                  <option value="Oswald">Oswald</option>
+                                  <option value="Inter">Inter</option>
+                                  <option value="Roboto">Roboto</option>
+                                  <option value="Permanent Marker">Permanent Marker (Brush)</option>
+                                </select>
+                              </div>
+                            </div>
+
+                            {/* Welcome Message Text */}
+                            <div>
+                              <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>Welcome Message Template</label>
+                              <textarea
+                                value={settings.welcome.message}
+                                onChange={(e) => handleInputChange('welcome.message', e.target.value)}
                                 className="glass-input"
-                                placeholder="e.g. WELCOME"
+                                placeholder="Welcome {user} to the server!"
+                                rows="3"
+                                style={{ minHeight: '80px', resize: 'vertical', fontFamily: 'inherit' }}
                               />
                             </div>
 
+                            {/* Redirect Channels Row */}
                             <div>
-                              <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Card Subtext Template (Supports {`{server}`})</label>
-                              <input
-                                type="text"
-                                value={settings.welcome.subtextText !== undefined ? settings.welcome.subtextText : 'TO {server}'}
-                                onChange={(e) => handleInputChange('welcome.subtextText', e.target.value)}
-                                className="glass-input"
-                                placeholder="e.g. TO {server}"
-                              />
+                              <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Redirect Channel Buttons (Up to 3 Attached Buttons)</label>
+                              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: '10px' }}>
+                                <div>
+                                  <select
+                                    value={settings.welcome.redirectChannelId || ''}
+                                    onChange={(e) => handleInputChange('welcome.redirectChannelId', e.target.value)}
+                                    className="glass-input"
+                                    style={{ fontSize: '0.8rem' }}
+                                  >
+                                    <option value="">-- No redirect 1 --</option>
+                                    {channels.map(ch => (
+                                      <option key={ch.id} value={ch.id}>#{ch.name}</option>
+                                    ))}
+                                  </select>
+                                </div>
+
+                                <div>
+                                  <select
+                                    value={settings.welcome.redirectChannelId2 || ''}
+                                    onChange={(e) => handleInputChange('welcome.redirectChannelId2', e.target.value)}
+                                    className="glass-input"
+                                    style={{ fontSize: '0.8rem' }}
+                                  >
+                                    <option value="">-- No redirect 2 --</option>
+                                    {channels.map(ch => (
+                                      <option key={ch.id} value={ch.id}>#{ch.name}</option>
+                                    ))}
+                                  </select>
+                                </div>
+
+                                <div>
+                                  <select
+                                    value={settings.welcome.redirectChannelId3 || ''}
+                                    onChange={(e) => handleInputChange('welcome.redirectChannelId3', e.target.value)}
+                                    className="glass-input"
+                                    style={{ fontSize: '0.8rem' }}
+                                  >
+                                    <option value="">-- No redirect 3 --</option>
+                                    {channels.map(ch => (
+                                      <option key={ch.id} value={ch.id}>#{ch.name}</option>
+                                    ))}
+                                  </select>
+                                </div>
+                              </div>
                             </div>
                           </div>
 
-                          {/* Background Upload and controls */}
-                          <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '16px', alignItems: 'center' }}>
-                            <div>
-                              <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Background Image/GIF URL or Solid Color Hex</label>
-                              <div style={{ display: 'flex', gap: '8px' }}>
+                          {/* Website Link & Custom URL Buttons Option */}
+                          <div className="glass-panel" style={{
+                            padding: '16px',
+                            borderRadius: '12px',
+                            backgroundColor: 'rgba(15, 23, 42, 0.6)',
+                            border: '1px solid rgba(255, 255, 255, 0.08)',
+                            marginBottom: '16px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '12px'
+                          }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                              <h4 style={{ fontSize: '0.95rem', fontWeight: '700', color: '#ffffff', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <LinkIcon size={16} style={{ color: 'var(--primary)' }} />
+                                Website Link & Custom Action Buttons
+                              </h4>
+                              <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Attached to welcome message</span>
+                            </div>
+
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
+                              <div>
+                                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>
+                                  Bot Website URL Link
+                                </label>
                                 <input
                                   type="text"
-                                  value={settings.welcome.background}
-                                  onChange={(e) => handleInputChange('welcome.background', e.target.value)}
+                                  value={settings.welcome.websiteUrl || ''}
+                                  onChange={(e) => handleInputChange('welcome.websiteUrl', e.target.value)}
                                   className="glass-input"
-                                  placeholder="https://example.com/background.png or #0F0C20"
+                                  placeholder="https://yourwebsite.com"
                                 />
-                                <label className="btn-secondary" style={{ padding: '10px 16px', cursor: 'pointer', fontSize: '0.85rem', flexShrink: 0, display: 'inline-flex', alignItems: 'center' }}>
-                                  Upload File
+                              </div>
+
+                              <div>
+                                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>
+                                  Website Button Label
+                                </label>
+                                <input
+                                  type="text"
+                                  value={settings.welcome.websiteLabel || '🌐 Official Website'}
+                                  onChange={(e) => handleInputChange('welcome.websiteLabel', e.target.value)}
+                                  className="glass-input"
+                                  placeholder="🌐 Official Website"
+                                />
+                              </div>
+                            </div>
+
+                            {/* Custom Link Buttons List */}
+                            <div style={{ marginTop: '4px', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '10px' }}>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                                <span style={{ fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-secondary)' }}>
+                                  Custom URL Buttons ({settings.welcome.customButtons?.length || 0})
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const current = settings.welcome.customButtons || [];
+                                    handleInputChange('welcome.customButtons', [...current, { label: '', url: '', emoji: '' }]);
+                                  }}
+                                  className="btn-secondary"
+                                  style={{ padding: '4px 10px', fontSize: '0.75rem', borderRadius: '6px', display: 'flex', alignItems: 'center', gap: '4px' }}
+                                >
+                                  <Plus size={14} /> Add Button
+                                </button>
+                              </div>
+
+                              {Array.isArray(settings.welcome.customButtons) && settings.welcome.customButtons.length > 0 && (
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                  {settings.welcome.customButtons.map((cb, idx) => (
+                                    <div key={idx} style={{ display: 'grid', gridTemplateColumns: '70px 1fr 1fr auto', gap: '8px', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.2)', padding: '8px 10px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                                      <input
+                                        type="text"
+                                        value={cb.emoji || ''}
+                                        onChange={(e) => {
+                                          const newBtns = [...(settings.welcome.customButtons || [])];
+                                          newBtns[idx].emoji = e.target.value;
+                                          handleInputChange('welcome.customButtons', newBtns);
+                                        }}
+                                        className="glass-input"
+                                        placeholder="Emoji"
+                                        style={{ fontSize: '0.8rem' }}
+                                      />
+                                      <input
+                                        type="text"
+                                        value={cb.label || ''}
+                                        onChange={(e) => {
+                                          const newBtns = [...(settings.welcome.customButtons || [])];
+                                          newBtns[idx].label = e.target.value;
+                                          handleInputChange('welcome.customButtons', newBtns);
+                                        }}
+                                        className="glass-input"
+                                        placeholder="Button Label"
+                                        style={{ fontSize: '0.8rem' }}
+                                      />
+                                      <input
+                                        type="text"
+                                        value={cb.url || ''}
+                                        onChange={(e) => {
+                                          const newBtns = [...(settings.welcome.customButtons || [])];
+                                          newBtns[idx].url = e.target.value;
+                                          handleInputChange('welcome.customButtons', newBtns);
+                                        }}
+                                        className="glass-input"
+                                        placeholder="https://link.com"
+                                        style={{ fontSize: '0.8rem' }}
+                                      />
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          const newBtns = (settings.welcome.customButtons || []).filter((_, i) => i !== idx);
+                                          handleInputChange('welcome.customButtons', newBtns);
+                                        }}
+                                        style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', padding: '4px' }}
+                                      >
+                                        <Trash2 size={16} />
+                                      </button>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* DM & Ping Controls Panel */}
+                          <div className="glass-panel" style={{
+                            padding: '16px',
+                            borderRadius: '12px',
+                            backgroundColor: 'rgba(15, 23, 42, 0.6)',
+                            border: '1px solid rgba(255, 255, 255, 0.08)',
+                            marginBottom: '16px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '12px'
+                          }}>
+                            <h4 style={{ fontSize: '0.95rem', fontWeight: '700', color: '#ffffff', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              <Send size={16} style={{ color: 'var(--primary)' }} />
+                              DM Greeting & Ping Controls
+                            </h4>
+
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', gap: '12px' }}>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.2)', padding: '10px 12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                                <div>
+                                  <span style={{ fontSize: '0.82rem', fontWeight: '600', display: 'block' }}>Send Direct Message (DM)</span>
+                                  <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Send greeting to user DMs</span>
+                                </div>
+                                <label className="switch">
                                   <input
-                                    type="file"
-                                    accept="image/*"
-                                    style={{ display: 'none' }}
-                                    onChange={(e) => {
-                                      const file = e.target.files[0];
-                                      if (!file) return;
-                                      setUploadFile(file);
-                                      setShowCropModal(true);
-                                      e.target.value = null; // Clear so same file works again
-                                    }}
+                                    type="checkbox"
+                                    checked={settings.welcome.dmEnabled || false}
+                                    onChange={() => handleToggle('welcome.dmEnabled')}
                                   />
+                                  <span className="slider"></span>
+                                </label>
+                              </div>
+
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.2)', padding: '10px 12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                                <div>
+                                  <span style={{ fontSize: '0.82rem', fontWeight: '600', display: 'block' }}>Include DM Rich Embed</span>
+                                  <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Attach embed inside DM</span>
+                                </div>
+                                <label className="switch">
+                                  <input
+                                    type="checkbox"
+                                    checked={settings.welcome.dmEmbedEnabled || false}
+                                    onChange={() => handleToggle('welcome.dmEmbedEnabled')}
+                                  />
+                                  <span className="slider"></span>
+                                </label>
+                              </div>
+
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.2)', padding: '10px 12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                                <div>
+                                  <span style={{ fontSize: '0.82rem', fontWeight: '600', display: 'block' }}>Ping Member in Channel</span>
+                                  <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Mention user in chat</span>
+                                </div>
+                                <label className="switch">
+                                  <input
+                                    type="checkbox"
+                                    checked={settings.welcome.pingUser !== false}
+                                    onChange={() => handleToggle('welcome.pingUser')}
+                                  />
+                                  <span className="slider"></span>
                                 </label>
                               </div>
                             </div>
 
-                            <div style={{ marginTop: '24px' }}>
-                              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.9rem' }}>
-                                <input
-                                  type="checkbox"
-                                  checked={settings.welcome.gifSupport}
-                                  onChange={() => handleToggle('welcome.gifSupport')}
+                            {settings.welcome.dmEnabled && (
+                              <div>
+                                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-secondary)', marginBottom: '4px' }}>
+                                  Direct Message (DM) Greeting Template
+                                </label>
+                                <textarea
+                                  value={settings.welcome.dmMessage || ''}
+                                  onChange={(e) => handleInputChange('welcome.dmMessage', e.target.value)}
+                                  className="glass-input"
+                                  rows="2"
+                                  placeholder="Welcome {user} to {server}! Enjoy your stay."
+                                  style={{ width: '100%', fontSize: '0.85rem', resize: 'vertical' }}
                                 />
-                                Enable GIF URL Embed
-                              </label>
-                            </div>
+                              </div>
+                            )}
                           </div>
 
-                          {/* Welcome Embed Customizer Section (Matching Example Image 1) */}
+                          {/* Welcome Embed Customizer Section (Matching Example Images) */}
                           <div className="glass-panel" style={{
                             padding: '20px',
                             borderRadius: '12px',
                             backgroundColor: 'rgba(24, 25, 30, 0.95)',
                             border: '1px solid rgba(255, 255, 255, 0.08)',
-                            marginTop: '16px',
                             marginBottom: '16px',
                             display: 'flex',
                             flexDirection: 'column',
@@ -4650,7 +4959,7 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                                   value={settings.welcome.embedAuthorName || ''}
                                   onChange={(e) => handleInputChange('welcome.embedAuthorName', e.target.value)}
                                   className="glass-input"
-                                  placeholder="HERE IS OUR WEBSITE"
+                                  placeholder="Author Name (Supports {server})"
                                   style={{ flex: 1 }}
                                 />
                               </div>
@@ -4686,7 +4995,7 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                                   value={settings.welcome.embedTitle || ''}
                                   onChange={(e) => handleInputChange('welcome.embedTitle', e.target.value)}
                                   className="glass-input"
-                                  placeholder="Website"
+                                  placeholder="Embed Title"
                                   style={{ flex: 1 }}
                                 />
                               </div>
@@ -4701,7 +5010,7 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                             <div>
                               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
                                 <label style={{ fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-secondary)' }}>
-                                  Description
+                                  Description Markdown
                                 </label>
                                 <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
                                   {(settings.welcome.message || '').length} / 4096
@@ -4712,7 +5021,7 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                                 onChange={(e) => handleInputChange('welcome.message', e.target.value)}
                                 className="glass-input"
                                 rows="3"
-                                placeholder="**BUY ALL THINGS FROM HERE <#153338781401100410>**"
+                                placeholder="Embed body content..."
                                 style={{ width: '100%', minHeight: '80px', resize: 'vertical', fontFamily: 'inherit' }}
                               />
                             </div>
@@ -4797,12 +5106,12 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                             {/* Image Section (Main Banner Image) */}
                             <div>
                               <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-secondary)', marginBottom: '6px' }}>
-                                Image
+                                Main Banner Image
                               </label>
                               <div style={{
                                 position: 'relative',
                                 width: '100%',
-                                minHeight: '90px',
+                                minHeight: '80px',
                                 borderRadius: '8px',
                                 backgroundColor: '#111216',
                                 border: '1px solid rgba(255,255,255,0.1)',
@@ -4839,10 +5148,10 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                                     </button>
                                   </div>
                                 ) : (
-                                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', padding: '12px 0' }}>
-                                    <ImageIcon size={28} style={{ color: 'var(--text-muted)' }} />
+                                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', padding: '10px 0' }}>
+                                    <ImageIcon size={24} style={{ color: 'var(--text-muted)' }} />
                                     <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                                      <label className="btn-secondary" style={{ padding: '6px 14px', fontSize: '0.8rem', cursor: 'pointer' }}>
+                                      <label className="btn-secondary" style={{ padding: '4px 12px', fontSize: '0.78rem', cursor: 'pointer' }}>
                                         Upload Image
                                         <input
                                           type="file"
@@ -4858,7 +5167,7 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                                           }}
                                         />
                                       </label>
-                                      <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>or paste URL below</span>
+                                      <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>or paste URL:</span>
                                     </div>
                                     <input
                                       type="text"
@@ -4876,7 +5185,7 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                             {/* Footer Section */}
                             <div>
                               <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-secondary)', marginBottom: '6px' }}>
-                                Footer
+                                Footer & Timestamp
                               </label>
                               <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                                 <label className="btn-secondary" style={{ padding: '8px 10px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '38px', borderRadius: '6px' }} title="Upload Footer Icon">
@@ -4901,721 +5210,18 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                                   value={settings.welcome.embedFooterText || ''}
                                   onChange={(e) => handleInputChange('welcome.embedFooterText', e.target.value)}
                                   className="glass-input"
-                                  placeholder="@everyone Welcome to my Server"
+                                  placeholder="Footer text (Supports {memberCount})"
                                   style={{ flex: 1 }}
                                 />
 
-                                <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', cursor: 'pointer', whiteSpace: 'nowrap', color: 'var(--text-secondary)' }}>
+                                <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.78rem', cursor: 'pointer', whiteSpace: 'nowrap', color: 'var(--text-secondary)' }}>
                                   <input
                                     type="checkbox"
                                     checked={settings.welcome.embedTimestamp !== false}
                                     onChange={(e) => handleInputChange('welcome.embedTimestamp', e.target.checked)}
                                   />
-                                  • Add timestamp
+                                  Timestamp
                                 </label>
-                              </div>
-                              {settings.welcome.embedFooterIcon && (
-                                <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', display: 'block', marginTop: '4px' }}>
-                                  Footer Icon URL: {settings.welcome.embedFooterIcon}
-                                </span>
-                              )}
-                            </div>
-
-                          </div>
-
-                          {/* Control Customizers and Live Preview Grid */}
-                          <div className="welcome-preview-grid">
-
-                            {/* Element Sliders */}
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-color)', paddingBottom: '4px' }}>
-                                <h4 style={{ fontSize: '1rem', fontWeight: '700', color: 'var(--primary)', margin: 0 }}>Welcome Card Elements Sizing</h4>
-                                <button
-                                  type="button"
-                                  onClick={handleResetLayout}
-                                  className="btn-secondary"
-                                  style={{ padding: '4px 10px', fontSize: '0.75rem', borderRadius: '6px', cursor: 'pointer' }}
-                                >
-                                  Reset Layout
-                                </button>
-                              </div>
-
-                              {/* Add/Remove Action Buttons */}
-                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', margin: '4px 0 12px 0', padding: '10px', borderRadius: '8px', backgroundColor: 'rgba(255, 255, 255, 0.02)', border: '1px solid var(--border-color)' }}>
-                                <div style={{ width: '100%', fontSize: '0.75rem', fontWeight: '600', color: 'var(--text-secondary)', marginBottom: '4px' }}>Toggle Card Elements:</div>
-
-                                {/* Profile Toggle Button */}
-                                {settings.welcome.avatarEnabled !== false ? (
-                                  <button
-                                    type="button"
-                                    onClick={() => handleInputChange('welcome.avatarEnabled', false)}
-                                    className="btn-danger"
-                                    style={{ padding: '4px 10px', fontSize: '0.72rem', borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', height: '28px', border: 'none' }}
-                                  >
-                                    <Trash2 size={12} /> Remove Profile
-                                  </button>
-                                ) : (
-                                  <button
-                                    type="button"
-                                    onClick={() => handleInputChange('welcome.avatarEnabled', true)}
-                                    className="btn-primary"
-                                    style={{ padding: '4px 10px', fontSize: '0.72rem', borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', height: '28px', border: 'none' }}
-                                  >
-                                    <Plus size={12} /> Add Profile
-                                  </button>
-                                )}
-
-                                {/* Title Toggle Button */}
-                                {settings.welcome.titleEnabled !== false ? (
-                                  <button
-                                    type="button"
-                                    onClick={() => handleInputChange('welcome.titleEnabled', false)}
-                                    className="btn-danger"
-                                    style={{ padding: '4px 10px', fontSize: '0.72rem', borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', height: '28px', border: 'none' }}
-                                  >
-                                    <Trash2 size={12} /> Remove Title
-                                  </button>
-                                ) : (
-                                  <button
-                                    type="button"
-                                    onClick={() => handleInputChange('welcome.titleEnabled', true)}
-                                    className="btn-primary"
-                                    style={{ padding: '4px 10px', fontSize: '0.72rem', borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', height: '28px', border: 'none' }}
-                                  >
-                                    <Plus size={12} /> Add Title
-                                  </button>
-                                )}
-
-                                {/* Username Toggle Button */}
-                                {settings.welcome.usernameEnabled !== false ? (
-                                  <button
-                                    type="button"
-                                    onClick={() => handleInputChange('welcome.usernameEnabled', false)}
-                                    className="btn-danger"
-                                    style={{ padding: '4px 10px', fontSize: '0.72rem', borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', height: '28px', border: 'none' }}
-                                  >
-                                    <Trash2 size={12} /> Remove Username
-                                  </button>
-                                ) : (
-                                  <button
-                                    type="button"
-                                    onClick={() => handleInputChange('welcome.usernameEnabled', true)}
-                                    className="btn-primary"
-                                    style={{ padding: '4px 10px', fontSize: '0.72rem', borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', height: '28px', border: 'none' }}
-                                  >
-                                    <Plus size={12} /> Add Username
-                                  </button>
-                                )}
-
-                                {/* Subtext Toggle Button */}
-                                {settings.welcome.subtextEnabled !== false ? (
-                                  <button
-                                    type="button"
-                                    onClick={() => handleInputChange('welcome.subtextEnabled', false)}
-                                    className="btn-danger"
-                                    style={{ padding: '4px 10px', fontSize: '0.72rem', borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', height: '28px', border: 'none' }}
-                                  >
-                                    <Trash2 size={12} /> Remove Subtext
-                                  </button>
-                                ) : (
-                                  <button
-                                    type="button"
-                                    onClick={() => handleInputChange('welcome.subtextEnabled', true)}
-                                    className="btn-primary"
-                                    style={{ padding: '4px 10px', fontSize: '0.72rem', borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', height: '28px', border: 'none' }}
-                                  >
-                                    <Plus size={12} /> Add Subtext
-                                  </button>
-                                )}
-                              </div>
-
-                              {/* Profile Picture Control Group */}
-                              <div style={{
-                                padding: '12px',
-                                borderRadius: '10px',
-                                backgroundColor: 'rgba(255, 255, 255, 0.02)',
-                                border: '1px solid rgba(255, 255, 255, 0.05)',
-                                marginBottom: '4px'
-                              }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                                  <span style={{ fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-primary)' }}>Profile Picture (Pfp)</span>
-                                  <label className="switch">
-                                    <input
-                                      type="checkbox"
-                                      checked={settings.welcome.avatarEnabled !== false}
-                                      onChange={() => handleInputChange('welcome.avatarEnabled', !(settings.welcome.avatarEnabled !== false))}
-                                    />
-                                    <span className="slider"></span>
-                                  </label>
-                                </div>
-
-                                {settings.welcome.avatarEnabled !== false ? (
-                                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '6px' }}>
-                                    {/* Avatar Size */}
-                                    <div>
-                                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                                        <span>Pfp Size</span>
-                                        <span>{settings.welcome.avatarSize || 140}px</span>
-                                      </div>
-                                      <input
-                                        type="range" min="50" max="250" step="5"
-                                        value={settings.welcome.avatarSize || 140}
-                                        onChange={(e) => handleInputChange('welcome.avatarSize', parseInt(e.target.value))}
-                                        style={{ width: '100%', accentColor: 'var(--primary)' }}
-                                      />
-                                    </div>
-
-                                    {/* Avatar Rotation */}
-                                    <div>
-                                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                                        <span>Pfp Rotation</span>
-                                        <span>{settings.welcome.avatarRotation || 0}°</span>
-                                      </div>
-                                      <input
-                                        type="range" min="0" max="360" step="5"
-                                        value={settings.welcome.avatarRotation || 0}
-                                        onChange={(e) => handleInputChange('welcome.avatarRotation', parseInt(e.target.value))}
-                                        style={{ width: '100%', accentColor: 'var(--primary)' }}
-                                      />
-                                    </div>
-
-                                    {/* Border Size & Color */}
-                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 60px', gap: '10px' }}>
-                                      <div>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                                          <span>Border Thickness</span>
-                                          <span>{settings.welcome.avatarBorderThickness !== undefined ? settings.welcome.avatarBorderThickness : 6}px</span>
-                                        </div>
-                                        <input
-                                          type="range" min="0" max="20" step="1"
-                                          value={settings.welcome.avatarBorderThickness !== undefined ? settings.welcome.avatarBorderThickness : 6}
-                                          onChange={(e) => handleInputChange('welcome.avatarBorderThickness', parseInt(e.target.value))}
-                                          style={{ width: '100%', accentColor: 'var(--primary)' }}
-                                        />
-                                      </div>
-                                      <div>
-                                        <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', textAlign: 'center', marginBottom: '2px' }}>Border Color</label>
-                                        <input
-                                          type="color"
-                                          value={settings.welcome.avatarBorderColor || '#ffffff'}
-                                          onChange={(e) => handleInputChange('welcome.avatarBorderColor', e.target.value)}
-                                          style={{ width: '100%', height: '24px', padding: '0', border: '1px solid var(--border-color)', borderRadius: '4px', cursor: 'pointer', background: 'none' }}
-                                        />
-                                      </div>
-                                    </div>
-                                  </div>
-                                ) : (
-                                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontStyle: 'italic', padding: '4px 0' }}>
-                                    Profile Picture is disabled and hidden from the welcome card.
-                                  </div>
-                                )}
-                              </div>
-
-                              {/* Title Text Control Group */}
-                              <div style={{
-                                padding: '12px',
-                                borderRadius: '10px',
-                                backgroundColor: 'rgba(255, 255, 255, 0.02)',
-                                border: '1px solid rgba(255, 255, 255, 0.05)',
-                                marginBottom: '4px'
-                              }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                                  <span style={{ fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-primary)' }}>Title Text ("WELCOME")</span>
-                                  <label className="switch">
-                                    <input
-                                      type="checkbox"
-                                      checked={settings.welcome.titleEnabled !== false}
-                                      onChange={() => handleInputChange('welcome.titleEnabled', !(settings.welcome.titleEnabled !== false))}
-                                    />
-                                    <span className="slider"></span>
-                                  </label>
-                                </div>
-
-                                {settings.welcome.titleEnabled !== false ? (
-                                  <div style={{ marginTop: '6px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                                    <div>
-                                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                                        <span>Title Text Size</span>
-                                        <span>{settings.welcome.titleSize || 54}px</span>
-                                      </div>
-                                      <input
-                                        type="range" min="12" max="100" step="1"
-                                        value={settings.welcome.titleSize || 54}
-                                        onChange={(e) => handleInputChange('welcome.titleSize', parseInt(e.target.value))}
-                                        style={{ width: '100%', accentColor: 'var(--primary)' }}
-                                      />
-                                    </div>
-
-                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '10px', alignItems: 'center' }}>
-                                      <div>
-                                        <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>Font Family</label>
-                                        <select
-                                          value={settings.welcome.titleFontFamily || ''}
-                                          onChange={(e) => handleInputChange('welcome.titleFontFamily', e.target.value)}
-                                          className="glass-input"
-                                          style={{ padding: '6px 10px', fontSize: '0.8rem' }}
-                                        >
-                                          <option value="">Use Global Font</option>
-                                          <option value="Sans">Sans-Serif (Default)</option>
-                                          <option value="Poppins">Poppins</option>
-                                          <option value="Montserrat">Montserrat</option>
-                                          <option value="Bebas Neue">Bebas Neue</option>
-                                          <option value="Orbitron">Orbitron</option>
-                                          <option value="Oswald">Oswald</option>
-                                          <option value="Inter">Inter</option>
-                                          <option value="Roboto">Roboto</option>
-                                          <option value="Ethnocentric">Ethnocentric (Futuristic)</option>
-                                          <option value="Oxanium">Oxanium (Cyberpunk)</option>
-                                          <option value="Permanent Marker">Permanent Marker (Brush)</option>
-                                        </select>
-                                      </div>
-                                      <div>
-                                        <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '4px', textAlign: 'center' }}>Italic</label>
-                                        <label className="switch" style={{ scale: '0.85' }}>
-                                          <input
-                                            type="checkbox"
-                                            checked={settings.welcome.titleFontStyle === 'italic'}
-                                            onChange={(e) => handleInputChange('welcome.titleFontStyle', e.target.checked ? 'italic' : 'normal')}
-                                          />
-                                          <span className="slider"></span>
-                                        </label>
-                                      </div>
-                                    </div>
-
-                                    <div style={{ borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '8px', marginTop: '4px' }}>
-                                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                        <span style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--text-secondary)' }}>Neon Glow Effect</span>
-                                        <label className="switch" style={{ scale: '0.8' }}>
-                                          <input
-                                            type="checkbox"
-                                            checked={settings.welcome.titleGlowEnabled || false}
-                                            onChange={(e) => handleInputChange('welcome.titleGlowEnabled', e.target.checked)}
-                                          />
-                                          <span className="slider"></span>
-                                        </label>
-                                      </div>
-                                      {settings.welcome.titleGlowEnabled && (
-                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 60px', gap: '10px', alignItems: 'center', marginTop: '6px' }}>
-                                          <div>
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', color: 'var(--text-muted)' }}>
-                                              <span>Glow Radius</span>
-                                              <span>{settings.welcome.titleGlowBlur || 10}px</span>
-                                            </div>
-                                            <input
-                                              type="range" min="1" max="40" step="1"
-                                              value={settings.welcome.titleGlowBlur || 10}
-                                              onChange={(e) => handleInputChange('welcome.titleGlowBlur', parseInt(e.target.value))}
-                                              style={{ width: '100%', accentColor: 'var(--primary)' }}
-                                            />
-                                          </div>
-                                          <div>
-                                            <label style={{ display: 'block', fontSize: '0.65rem', color: 'var(--text-muted)', textAlign: 'center', marginBottom: '2px' }}>Color</label>
-                                            <input
-                                              type="color"
-                                              value={settings.welcome.titleGlowColor || '#00ff66'}
-                                              onChange={(e) => handleInputChange('welcome.titleGlowColor', e.target.value)}
-                                              style={{ width: '100%', height: '20px', padding: '0', border: '1px solid var(--border-color)', borderRadius: '4px', cursor: 'pointer', background: 'none' }}
-                                            />
-                                          </div>
-                                        </div>
-                                      )}
-                                    </div>
-                                  </div>
-                                ) : (
-                                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontStyle: 'italic', padding: '4px 0' }}>
-                                    Title Text is disabled and hidden from the welcome card.
-                                  </div>
-                                )}
-                              </div>
-
-                              {/* Username Text Control Group */}
-                              <div style={{
-                                padding: '12px',
-                                borderRadius: '10px',
-                                backgroundColor: 'rgba(255, 255, 255, 0.02)',
-                                border: '1px solid rgba(255, 255, 255, 0.05)',
-                                marginBottom: '4px'
-                              }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                                  <span style={{ fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-primary)' }}>Username Text</span>
-                                  <label className="switch">
-                                    <input
-                                      type="checkbox"
-                                      checked={settings.welcome.usernameEnabled !== false}
-                                      onChange={() => handleInputChange('welcome.usernameEnabled', !(settings.welcome.usernameEnabled !== false))}
-                                    />
-                                    <span className="slider"></span>
-                                  </label>
-                                </div>
-
-                                {settings.welcome.usernameEnabled !== false ? (
-                                  <div style={{ marginTop: '6px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                                    <div>
-                                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                                        <span>Username Text Size</span>
-                                        <span>{settings.welcome.usernameSize || 38}px</span>
-                                      </div>
-                                      <input
-                                        type="range" min="12" max="100" step="1"
-                                        value={settings.welcome.usernameSize || 38}
-                                        onChange={(e) => handleInputChange('welcome.usernameSize', parseInt(e.target.value))}
-                                        style={{ width: '100%', accentColor: 'var(--primary)' }}
-                                      />
-                                    </div>
-
-                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '10px', alignItems: 'center' }}>
-                                      <div>
-                                        <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>Font Family</label>
-                                        <select
-                                          value={settings.welcome.usernameFontFamily || ''}
-                                          onChange={(e) => handleInputChange('welcome.usernameFontFamily', e.target.value)}
-                                          className="glass-input"
-                                          style={{ padding: '6px 10px', fontSize: '0.8rem' }}
-                                        >
-                                          <option value="">Use Global Font</option>
-                                          <option value="Sans">Sans-Serif (Default)</option>
-                                          <option value="Poppins">Poppins</option>
-                                          <option value="Montserrat">Montserrat</option>
-                                          <option value="Bebas Neue">Bebas Neue</option>
-                                          <option value="Orbitron">Orbitron</option>
-                                          <option value="Oswald">Oswald</option>
-                                          <option value="Inter">Inter</option>
-                                          <option value="Roboto">Roboto</option>
-                                          <option value="Ethnocentric">Ethnocentric (Futuristic)</option>
-                                          <option value="Oxanium">Oxanium (Cyberpunk)</option>
-                                          <option value="Permanent Marker">Permanent Marker (Brush)</option>
-                                        </select>
-                                      </div>
-                                      <div>
-                                        <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '4px', textAlign: 'center' }}>Italic</label>
-                                        <label className="switch" style={{ scale: '0.85' }}>
-                                          <input
-                                            type="checkbox"
-                                            checked={settings.welcome.usernameFontStyle === 'italic'}
-                                            onChange={(e) => handleInputChange('welcome.usernameFontStyle', e.target.checked ? 'italic' : 'normal')}
-                                          />
-                                          <span className="slider"></span>
-                                        </label>
-                                      </div>
-                                    </div>
-
-                                    <div style={{ borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '8px', marginTop: '4px' }}>
-                                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                        <span style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--text-secondary)' }}>Neon Glow Effect</span>
-                                        <label className="switch" style={{ scale: '0.8' }}>
-                                          <input
-                                            type="checkbox"
-                                            checked={settings.welcome.usernameGlowEnabled || false}
-                                            onChange={(e) => handleInputChange('welcome.usernameGlowEnabled', e.target.checked)}
-                                          />
-                                          <span className="slider"></span>
-                                        </label>
-                                      </div>
-                                      {settings.welcome.usernameGlowEnabled && (
-                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 60px', gap: '10px', alignItems: 'center', marginTop: '6px' }}>
-                                          <div>
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', color: 'var(--text-muted)' }}>
-                                              <span>Glow Radius</span>
-                                              <span>{settings.welcome.usernameGlowBlur || 10}px</span>
-                                            </div>
-                                            <input
-                                              type="range" min="1" max="40" step="1"
-                                              value={settings.welcome.usernameGlowBlur || 10}
-                                              onChange={(e) => handleInputChange('welcome.usernameGlowBlur', parseInt(e.target.value))}
-                                              style={{ width: '100%', accentColor: 'var(--primary)' }}
-                                            />
-                                          </div>
-                                          <div>
-                                            <label style={{ display: 'block', fontSize: '0.65rem', color: 'var(--text-muted)', textAlign: 'center', marginBottom: '2px' }}>Color</label>
-                                            <input
-                                              type="color"
-                                              value={settings.welcome.usernameGlowColor || '#2563eb'}
-                                              onChange={(e) => handleInputChange('welcome.usernameGlowColor', e.target.value)}
-                                              style={{ width: '100%', height: '20px', padding: '0', border: '1px solid var(--border-color)', borderRadius: '4px', cursor: 'pointer', background: 'none' }}
-                                            />
-                                          </div>
-                                        </div>
-                                      )}
-                                    </div>
-                                  </div>
-                                ) : (
-                                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontStyle: 'italic', padding: '4px 0' }}>
-                                    Username Text is disabled and hidden from the welcome card.
-                                  </div>
-                                )}
-                              </div>
-
-                              {/* Subtext Text Control Group */}
-                              <div style={{
-                                padding: '12px',
-                                borderRadius: '10px',
-                                backgroundColor: 'rgba(255, 255, 255, 0.02)',
-                                border: '1px solid rgba(255, 255, 255, 0.05)',
-                                marginBottom: '4px'
-                              }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                                  <span style={{ fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-primary)' }}>Subtext Text</span>
-                                  <label className="switch">
-                                    <input
-                                      type="checkbox"
-                                      checked={settings.welcome.subtextEnabled !== false}
-                                      onChange={() => handleInputChange('welcome.subtextEnabled', !(settings.welcome.subtextEnabled !== false))}
-                                    />
-                                    <span className="slider"></span>
-                                  </label>
-                                </div>
-
-                                {settings.welcome.subtextEnabled !== false ? (
-                                  <div style={{ marginTop: '6px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                                    <div>
-                                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                                        <span>Subtext Text Size</span>
-                                        <span>{settings.welcome.subtextSize || 22}px</span>
-                                      </div>
-                                      <input
-                                        type="range" min="10" max="60" step="1"
-                                        value={settings.welcome.subtextSize || 22}
-                                        onChange={(e) => handleInputChange('welcome.subtextSize', parseInt(e.target.value))}
-                                        style={{ width: '100%', accentColor: 'var(--primary)' }}
-                                      />
-                                    </div>
-
-                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '10px', alignItems: 'center' }}>
-                                      <div>
-                                        <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>Font Family</label>
-                                        <select
-                                          value={settings.welcome.subtextFontFamily || ''}
-                                          onChange={(e) => handleInputChange('welcome.subtextFontFamily', e.target.value)}
-                                          className="glass-input"
-                                          style={{ padding: '6px 10px', fontSize: '0.8rem' }}
-                                        >
-                                          <option value="">Use Global Font</option>
-                                          <option value="Sans">Sans-Serif (Default)</option>
-                                          <option value="Poppins">Poppins</option>
-                                          <option value="Montserrat">Montserrat</option>
-                                          <option value="Bebas Neue">Bebas Neue</option>
-                                          <option value="Orbitron">Orbitron</option>
-                                          <option value="Oswald">Oswald</option>
-                                          <option value="Inter">Inter</option>
-                                          <option value="Roboto">Roboto</option>
-                                          <option value="Ethnocentric">Ethnocentric (Futuristic)</option>
-                                          <option value="Oxanium">Oxanium (Cyberpunk)</option>
-                                          <option value="Permanent Marker">Permanent Marker (Brush)</option>
-                                        </select>
-                                      </div>
-                                      <div>
-                                        <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '4px', textAlign: 'center' }}>Italic</label>
-                                        <label className="switch" style={{ scale: '0.85' }}>
-                                          <input
-                                            type="checkbox"
-                                            checked={settings.welcome.subtextFontStyle === 'italic'}
-                                            onChange={(e) => handleInputChange('welcome.subtextFontStyle', e.target.checked ? 'italic' : 'normal')}
-                                          />
-                                          <span className="slider"></span>
-                                        </label>
-                                      </div>
-                                    </div>
-
-                                    <div style={{ borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '8px', marginTop: '4px' }}>
-                                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                        <span style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--text-secondary)' }}>Neon Glow Effect</span>
-                                        <label className="switch" style={{ scale: '0.8' }}>
-                                          <input
-                                            type="checkbox"
-                                            checked={settings.welcome.subtextGlowEnabled || false}
-                                            onChange={(e) => handleInputChange('welcome.subtextGlowEnabled', e.target.checked)}
-                                          />
-                                          <span className="slider"></span>
-                                        </label>
-                                      </div>
-                                      {settings.welcome.subtextGlowEnabled && (
-                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 60px', gap: '10px', alignItems: 'center', marginTop: '6px' }}>
-                                          <div>
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', color: 'var(--text-muted)' }}>
-                                              <span>Glow Radius</span>
-                                              <span>{settings.welcome.subtextGlowBlur || 10}px</span>
-                                            </div>
-                                            <input
-                                              type="range" min="1" max="40" step="1"
-                                              value={settings.welcome.subtextGlowBlur || 10}
-                                              onChange={(e) => handleInputChange('welcome.subtextGlowBlur', parseInt(e.target.value))}
-                                              style={{ width: '100%', accentColor: 'var(--primary)' }}
-                                            />
-                                          </div>
-                                          <div>
-                                            <label style={{ display: 'block', fontSize: '0.65rem', color: 'var(--text-muted)', textAlign: 'center', marginBottom: '2px' }}>Color</label>
-                                            <input
-                                              type="color"
-                                              value={settings.welcome.subtextGlowColor || '#00ff66'}
-                                              onChange={(e) => handleInputChange('welcome.subtextGlowColor', e.target.value)}
-                                              style={{ width: '100%', height: '20px', padding: '0', border: '1px solid var(--border-color)', borderRadius: '4px', cursor: 'pointer', background: 'none' }}
-                                            />
-                                          </div>
-                                        </div>
-                                      )}
-                                    </div>
-                                  </div>
-                                ) : (
-                                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontStyle: 'italic', padding: '4px 0' }}>
-                                    Subtext Text is disabled and hidden from the welcome card.
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-
-                            {/* Column 2: Advanced Visual Styles */}
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                              <h4 style={{ fontSize: '1rem', fontWeight: '700', color: 'var(--primary)', margin: 0, borderBottom: '1px solid var(--border-color)', paddingBottom: '4px', height: '28px', display: 'flex', alignItems: 'center' }}>Advanced Visual Styles</h4>
-
-                              {/* 1. Background Overlay Tint */}
-                              <div className="glass-panel" style={{ padding: '12px', border: '1px solid var(--border-color)', backgroundColor: 'rgba(0,0,0,0.1)', display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '8px', marginTop: '14px' }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                  <span style={{ fontSize: '0.85rem', fontWeight: '600' }}>Dark Background Overlay</span>
-                                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{Math.round((settings.welcome.overlayOpacity !== undefined ? settings.welcome.overlayOpacity : 0.3) * 100)}% Opacity</span>
-                                </div>
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 60px', gap: '10px', alignItems: 'center' }}>
-                                  <input
-                                    type="range" min="0" max="1" step="0.05"
-                                    value={settings.welcome.overlayOpacity !== undefined ? settings.welcome.overlayOpacity : 0.3}
-                                    onChange={(e) => handleInputChange('welcome.overlayOpacity', parseFloat(e.target.value))}
-                                    style={{ width: '100%', accentColor: 'var(--primary)' }}
-                                  />
-                                  <input
-                                    type="color"
-                                    value={settings.welcome.overlayColor || '#000000'}
-                                    onChange={(e) => handleInputChange('welcome.overlayColor', e.target.value)}
-                                    style={{ width: '100%', height: '24px', padding: '0', border: '1px solid var(--border-color)', borderRadius: '4px', cursor: 'pointer', background: 'none' }}
-                                  />
-                                </div>
-                              </div>
-
-                              {/* 2. Text Shadow Effect */}
-                              <div className="glass-panel" style={{ padding: '12px', border: '1px solid var(--border-color)', backgroundColor: 'rgba(0,0,0,0.1)', display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '8px' }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                  <div>
-                                    <span style={{ fontSize: '0.85rem', fontWeight: '600', display: 'block' }}>Text Shadow Glow</span>
-                                    <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Adds readable shadow behind card texts</span>
-                                  </div>
-                                  <label className="switch">
-                                    <input
-                                      type="checkbox"
-                                      checked={settings.welcome.textShadowEnabled || false}
-                                      onChange={() => handleToggle('welcome.textShadowEnabled')}
-                                    />
-                                    <span className="slider"></span>
-                                  </label>
-                                </div>
-                                {settings.welcome.textShadowEnabled && (
-                                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 60px', gap: '10px', alignItems: 'center', marginTop: '4px' }}>
-                                    <div>
-                                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-                                        <span>Blur Radius</span>
-                                        <span>{settings.welcome.textShadowBlur || 5}px</span>
-                                      </div>
-                                      <input
-                                        type="range" min="1" max="20" step="1"
-                                        value={settings.welcome.textShadowBlur || 5}
-                                        onChange={(e) => handleInputChange('welcome.textShadowBlur', parseInt(e.target.value))}
-                                        style={{ width: '100%', accentColor: 'var(--primary)' }}
-                                      />
-                                    </div>
-                                    <div>
-                                      <label style={{ display: 'block', fontSize: '0.7rem', color: 'var(--text-secondary)', textAlign: 'center', marginBottom: '2px' }}>Color</label>
-                                      <input
-                                        type="color"
-                                        value={settings.welcome.textShadowColor || '#000000'}
-                                        onChange={(e) => handleInputChange('welcome.textShadowColor', e.target.value)}
-                                        style={{ width: '100%', height: '24px', padding: '0', border: '1px solid var(--border-color)', borderRadius: '4px', cursor: 'pointer', background: 'none' }}
-                                      />
-                                    </div>
-                                  </div>
-                                )}
-                              </div>
-
-                              {/* 3. Avatar Shadow Glow */}
-                              <div className="glass-panel" style={{ padding: '12px', border: '1px solid var(--border-color)', backgroundColor: 'rgba(0,0,0,0.1)', display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '8px' }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                  <div>
-                                    <span style={{ fontSize: '0.85rem', fontWeight: '600', display: 'block' }}>Profile Picture Glow</span>
-                                    <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Neon glow around avatar circle</span>
-                                  </div>
-                                  <label className="switch">
-                                    <input
-                                      type="checkbox"
-                                      checked={settings.welcome.avatarShadowEnabled || false}
-                                      onChange={() => handleToggle('welcome.avatarShadowEnabled')}
-                                    />
-                                    <span className="slider"></span>
-                                  </label>
-                                </div>
-                                {settings.welcome.avatarShadowEnabled && (
-                                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 60px', gap: '10px', alignItems: 'center', marginTop: '4px' }}>
-                                    <div>
-                                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-                                        <span>Glow Radius</span>
-                                        <span>{settings.welcome.avatarShadowBlur || 15}px</span>
-                                      </div>
-                                      <input
-                                        type="range" min="1" max="40" step="1"
-                                        value={settings.welcome.avatarShadowBlur || 15}
-                                        onChange={(e) => handleInputChange('welcome.avatarShadowBlur', parseInt(e.target.value))}
-                                        style={{ width: '100%', accentColor: 'var(--primary)' }}
-                                      />
-                                    </div>
-                                    <div>
-                                      <label style={{ display: 'block', fontSize: '0.7rem', color: 'var(--text-secondary)', textAlign: 'center', marginBottom: '2px' }}>Color</label>
-                                      <input
-                                        type="color"
-                                        value={settings.welcome.avatarShadowColor || '#2563eb'}
-                                        onChange={(e) => handleInputChange('welcome.avatarShadowColor', e.target.value)}
-                                        style={{ width: '100%', height: '24px', padding: '0', border: '1px solid var(--border-color)', borderRadius: '4px', cursor: 'pointer', background: 'none' }}
-                                      />
-                                    </div>
-                                  </div>
-                                )}
-                              </div>
-
-                              {/* 4. Card Outer Border Frame */}
-                              <div className="glass-panel" style={{ padding: '12px', border: '1px solid var(--border-color)', backgroundColor: 'rgba(0,0,0,0.1)', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                  <div>
-                                    <span style={{ fontSize: '0.85rem', fontWeight: '600', display: 'block' }}>Outer Card Frame</span>
-                                    <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Draws frame border around canvas</span>
-                                  </div>
-                                  <label className="switch">
-                                    <input
-                                      type="checkbox"
-                                      checked={settings.welcome.cardBorderEnabled || false}
-                                      onChange={() => handleToggle('welcome.cardBorderEnabled')}
-                                    />
-                                    <span className="slider"></span>
-                                  </label>
-                                </div>
-                                {settings.welcome.cardBorderEnabled && (
-                                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 60px', gap: '10px', alignItems: 'center', marginTop: '4px' }}>
-                                    <div>
-                                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-                                        <span>Frame Thickness</span>
-                                        <span>{settings.welcome.cardBorderThickness || 8}px</span>
-                                      </div>
-                                      <input
-                                        type="range" min="1" max="25" step="1"
-                                        value={settings.welcome.cardBorderThickness || 8}
-                                        onChange={(e) => handleInputChange('welcome.cardBorderThickness', parseInt(e.target.value))}
-                                        style={{ width: '100%', accentColor: 'var(--primary)' }}
-                                      />
-                                    </div>
-                                    <div>
-                                      <label style={{ display: 'block', fontSize: '0.7rem', color: 'var(--text-secondary)', textAlign: 'center', marginBottom: '2px' }}>Color</label>
-                                      <input
-                                        type="color"
-                                        value={settings.welcome.cardBorderColor || '#2563eb'}
-                                        onChange={(e) => handleInputChange('welcome.cardBorderColor', e.target.value)}
-                                        style={{ width: '100%', height: '24px', padding: '0', border: '1px solid var(--border-color)', borderRadius: '4px', cursor: 'pointer', background: 'none' }}
-                                      />
-                                    </div>
-                                  </div>
-                                )}
                               </div>
                             </div>
 
@@ -5625,10 +5231,64 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
 
                         {/* Right Column: Sticky Discord Preview */}
                         <div className="welcome-preview-column">
-                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem', color: 'var(--text-secondary)', textTransform: 'uppercase', fontWeight: 'bold', marginBottom: '8px' }}>
-                            <Eye size={14} />
-                            Interactive Discord Chat Preview (Drag elements to position)
-                          </span>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem', color: 'var(--text-secondary)', textTransform: 'uppercase', fontWeight: 'bold' }}>
+                              <Eye size={14} />
+                              Interactive Discord Chat Preview
+                            </span>
+                          </div>
+
+                          {/* Live Test Buttons */}
+                          <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
+                            <button
+                              type="button"
+                              onClick={async () => {
+                                try {
+                                  setSaving(true);
+                                  // Save settings first
+                                  const sanitized = getSanitizedSettings(settings);
+                                  const updated = await api.saveSettings(guildId, sanitized);
+                                  setSettings(updated);
+                                  setSavedSettings(JSON.parse(JSON.stringify(updated)));
+                                  
+                                  const res = await api.testWelcome(guildId, 'channel');
+                                  showNotification(res.message || 'Test welcome message sent to channel!');
+                                } catch (err) {
+                                  setErrorMsg('Test Welcome failed: ' + err.message);
+                                } finally {
+                                  setSaving(false);
+                                }
+                              }}
+                              className="btn-primary"
+                              style={{ flex: 1, padding: '8px 10px', fontSize: '0.78rem', fontWeight: '700', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', cursor: 'pointer' }}
+                            >
+                              <Send size={14} /> Test in Channel
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={async () => {
+                                try {
+                                  setSaving(true);
+                                  const sanitized = getSanitizedSettings(settings);
+                                  const updated = await api.saveSettings(guildId, sanitized);
+                                  setSettings(updated);
+                                  setSavedSettings(JSON.parse(JSON.stringify(updated)));
+
+                                  const res = await api.testWelcome(guildId, 'dm');
+                                  showNotification(res.message || 'Test DM sent to your Discord!');
+                                } catch (err) {
+                                  setErrorMsg('Test DM failed: ' + err.message);
+                                } finally {
+                                  setSaving(false);
+                                }
+                              }}
+                              className="btn-secondary"
+                              style={{ flex: 1, padding: '8px 10px', fontSize: '0.78rem', fontWeight: '700', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', cursor: 'pointer' }}
+                            >
+                              <MessageSquare size={14} /> Test in DM
+                            </button>
+                          </div>
 
                           <div className="discord-chat-container">
                             <div className="discord-chat-header">
