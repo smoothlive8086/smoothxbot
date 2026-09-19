@@ -4197,8 +4197,70 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                       </label>
                     </div>
 
-                    {settings.welcome.enabled && (
-                      <div className="welcome-split-layout" style={{ borderTop: '1px solid rgba(255, 255, 255, 0.06)', paddingTop: '20px' }}>
+                    {settings.welcome.enabled && (() => {
+                      const renderRedirectButton = () => {
+                        const buttons = [];
+
+                        if (settings.welcome.websiteUrl && settings.welcome.websiteUrl.trim()) {
+                          let siteUrl = settings.welcome.websiteUrl.trim();
+                          if (!siteUrl.startsWith('http://') && !siteUrl.startsWith('https://')) {
+                            siteUrl = `https://${siteUrl}`;
+                          }
+                          buttons.push({
+                            label: '🌐 Website',
+                            url: siteUrl
+                          });
+                        }
+
+                        const redirect1 = channels.find(c => c.id === settings.welcome.redirectChannelId);
+                        const redirect2 = channels.find(c => c.id === settings.welcome.redirectChannelId2);
+                        const redirect3 = channels.find(c => c.id === settings.welcome.redirectChannelId3);
+
+                        if (redirect1) buttons.push({ label: `#${redirect1.name}`, url: '#' });
+                        if (redirect2) buttons.push({ label: `#${redirect2.name}`, url: '#' });
+                        if (redirect3) buttons.push({ label: `#${redirect3.name}`, url: '#' });
+
+                        if (buttons.length === 0) return null;
+
+                        return (
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '8px' }}>
+                            {buttons.map((btn, idx) => (
+                              <a
+                                key={idx}
+                                href={btn.url || '#'}
+                                target="_blank"
+                                rel="noreferrer"
+                                style={{
+                                  backgroundColor: '#4e5058',
+                                  color: '#ffffff',
+                                  padding: '6px 14px',
+                                  borderRadius: '4px',
+                                  fontSize: '0.85rem',
+                                  fontWeight: '600',
+                                  textDecoration: 'none',
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: '6px',
+                                  transition: 'background-color 0.15s ease'
+                                }}
+                                onClick={(e) => {
+                                  if (!btn.url || btn.url === '#') e.preventDefault();
+                                }}
+                              >
+                                <span>{btn.label}</span>
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                                  <polyline points="15 3 21 3 21 9"></polyline>
+                                  <line x1="10" y1="14" x2="21" y2="3"></line>
+                                </svg>
+                              </a>
+                            ))}
+                          </div>
+                        );
+                      };
+
+                      return (
+                        <div className="welcome-split-layout" style={{ borderTop: '1px solid rgba(255, 255, 255, 0.06)', paddingTop: '20px' }}>
 
                         {/* LEFT COLUMN: Controls matching screenshot */}
                         <div className="welcome-settings-column" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -4383,6 +4445,36 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                                 Enable Animated GIF URL Display
                               </label>
                             </div>
+                          </div>
+
+                          {/* Server Website URL Box */}
+                          <div style={{
+                            backgroundColor: '#0a0c16',
+                            border: '1px solid rgba(255, 255, 255, 0.06)',
+                            borderRadius: '12px',
+                            padding: '16px'
+                          }}>
+                            <h4 style={{ fontSize: '0.9rem', fontWeight: '600', color: '#f8fafc', marginBottom: '12px' }}>
+                              Server Website URL (Optional)
+                            </h4>
+                            <input
+                              type="text"
+                              value={settings.welcome.websiteUrl || ''}
+                              onChange={(e) => handleInputChange('welcome.websiteUrl', e.target.value)}
+                              className="glass-input"
+                              placeholder="https://yourwebsite.com"
+                              style={{
+                                backgroundColor: '#07080e',
+                                borderColor: 'rgba(255, 255, 255, 0.08)',
+                                borderRadius: '8px',
+                                color: '#ffffff',
+                                padding: '10px 14px',
+                                fontSize: '0.88rem'
+                              }}
+                            />
+                            <p style={{ fontSize: '0.78rem', color: '#64748b', margin: '6px 0 0 0' }}>
+                              Add your server's website link. An interactive "🌐 Website" button will be included in the welcome message.
+                            </p>
                           </div>
 
                           {/* Channel Quick-Link Buttons (Action Row) Box */}
@@ -4621,7 +4713,8 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                         </div>
 
                       </div>
-                    )}
+                    );
+                  })()}
                   </div>
                 </div>
               )}
