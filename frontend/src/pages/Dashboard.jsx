@@ -4211,6 +4211,8 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                         str = str.replace(/\{user\}/gi, username);
                         str = str.replace(/\{username\}/gi, user?.username || '_smooth_0007');
                         str = str.replace(/\{server\}/gi, server);
+                        str = str.replace(/members:\s*\{membercount\}/gi, '');
+                        str = str.replace(/\{membercount\}/gi, '');
                         str = str.replace(/\{channel\}/gi, ch1 ? `#${ch1.name}` : '#channel');
                         str = str.replace(/\{channel2\}/gi, ch2 ? `#${ch2.name}` : '#channel2');
                         str = str.replace(/\{channel3\}/gi, ch3 ? `#${ch3.name}` : '#channel3');
