@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { api } from '../utils/api';
-import { Edit3, Trash2, Plus, Folder, Hash, Volume2, Image, Server, Check, X, Loader, Users, Search, AlertTriangle, Save } from 'lucide-react';
+import { Edit3, Trash2, Plus, Folder, Hash, Volume2, Image, Server, Check, X, Loader, Users, Search, AlertTriangle, Save, Sparkles, Send, MessageSquare, Eye, Link as LinkIcon, Info, Sliders, Palette, Layout, ChevronDown, ChevronUp, RefreshCw } from 'lucide-react';
 import { io } from 'socket.io-client';
 
 const Youtube = ({ size = 24, className = '', style = {} }) => (
@@ -111,7 +111,7 @@ export default function AdminServerSettings({ guildId, onHasUnsavedChangesChange
   };
 
   useEffect(() => {
-    if (activeSubTab === 'youtube') {
+    if (activeSubTab === 'youtube' || activeSubTab === 'welcome') {
       fetchSettings();
       fetchRoles();
     }
@@ -206,7 +206,8 @@ export default function AdminServerSettings({ guildId, onHasUnsavedChangesChange
 
   const hasGuildChanges = !!(data && (serverName !== data.name || iconFile !== null || bannerFile !== null));
   const hasYoutubeChanges = !!(settings && savedSettings && !isSettingsEqual(settings.youtube, savedSettings.youtube));
-  const hasUnsavedChanges = hasGuildChanges || hasYoutubeChanges;
+  const hasWelcomeChanges = !!(settings && savedSettings && !isSettingsEqual(settings.welcome, savedSettings.welcome));
+  const hasUnsavedChanges = hasGuildChanges || hasYoutubeChanges || hasWelcomeChanges;
 
   useEffect(() => {
     if (onHasUnsavedChangesChange) {
@@ -221,6 +222,10 @@ export default function AdminServerSettings({ guildId, onHasUnsavedChangesChange
     }
     if (activeSubTab === 'youtube' && hasYoutubeChanges) {
       alert("You have unsaved YouTube announcements changes. Please save or reset before leaving this feature.");
+      return;
+    }
+    if (activeSubTab === 'welcome' && hasWelcomeChanges) {
+      alert("You have unsaved Welcome settings changes. Please save or reset before leaving this feature.");
       return;
     }
     setActiveSubTab(newSubTab);
@@ -268,6 +273,422 @@ export default function AdminServerSettings({ guildId, onHasUnsavedChangesChange
     } finally {
       setResolvingChannel(false);
     }
+  };
+
+  const resolveUploadUrl = (url) => {
+    if (!url) return '';
+    if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) {
+      return url;
+    }
+    const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+    const backendBase = apiBase.replace(/\/api\/?$/, '');
+    const cleanPath = url.startsWith('/') ? url : `/${url}`;
+    return `${backendBase}${cleanPath}`;
+  };
+
+  const handleDragStart = (e, elementKey) => {
+    e.preventDefault();
+    const container = e.currentTarget.closest('.welcome-canvas-container');
+    if (!container) return;
+
+    const rect = container.getBoundingClientRect();
+
+    const handleMouseMove = (moveEvent) => {
+      const clientX = moveEvent.touches ? moveEvent.touches[0].clientX : moveEvent.clientX;
+      const clientY = moveEvent.touches ? moveEvent.touches[0].clientY : moveEvent.clientY;
+
+      let newX = ((clientX - rect.left) / rect.width) * 800;
+      let newY = ((clientY - rect.top) / rect.height) * 450;
+
+      newX = Math.round(Math.max(0, Math.min(800, newX)));
+      newY = Math.round(Math.max(0, Math.min(450, newY)));
+
+      handleInputChange(`welcome.${elementKey}X`, newX);
+      handleInputChange(`welcome.${elementKey}Y`, newY);
+    };
+
+    const handleMouseUp = () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener('touchmove', handleMouseMove);
+      document.removeEventListener('touchend', handleMouseUp);
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+    document.addEventListener('touchmove', handleMouseMove, { passive: true });
+    document.addEventListener('touchend', handleMouseUp);
+  };
+
+  const handleResetWelcomeLayout = () => {
+    setSettings(prev => ({
+      ...prev,
+      welcome: {
+        ...prev?.welcome,
+        avatarSize: 140,
+        avatarX: 400,
+        avatarY: 130,
+        avatarRotation: 0,
+        avatarBorderThickness: 6,
+        avatarBorderColor: '#00ff66',
+        usernameX: 400,
+        usernameY: 320,
+        usernameSize: 38,
+        titleX: 400,
+        titleY: 260,
+        titleSize: 54,
+        subtextX: 400,
+        subtextY: 370,
+        subtextSize: 22,
+        textAlignment: 'center',
+        fontWeight: 'bold',
+        avatarEnabled: true,
+        titleEnabled: true,
+        usernameEnabled: true,
+        subtextEnabled: true,
+        layoutType: 'classic',
+        titleText: 'WELCOME',
+        subtextText: 'TO {server}',
+        textColor: '#ffffff',
+        usernameColor: '#ffffff',
+        subtextColor: '#00ff66',
+        fontFamily: 'Ethnocentric',
+        titleFontFamily: 'Ethnocentric',
+        usernameFontFamily: 'Ethnocentric',
+        subtextFontFamily: 'Ethnocentric',
+        textShadowEnabled: false,
+        textShadowColor: '#000000',
+        textShadowBlur: 5,
+        titleGlowEnabled: false,
+        titleGlowColor: '#00ff66',
+        titleGlowBlur: 15,
+        usernameGlowEnabled: false,
+        usernameGlowColor: '#00ff66',
+        usernameGlowBlur: 15,
+        subtextGlowEnabled: false,
+        subtextGlowColor: '#00ff66',
+        subtextGlowBlur: 15,
+        avatarShadowEnabled: false,
+        avatarShadowColor: '#00ff66',
+        avatarShadowBlur: 15,
+        overlayOpacity: 0.3,
+        overlayColor: '#000000',
+        cardBorderEnabled: false,
+        cardBorderColor: '#2563eb',
+        cardBorderThickness: 8
+      }
+    }));
+    setSuccessMsg('Layout reset to default positions, sizes & visibility!');
+    setTimeout(() => setSuccessMsg(null), 3000);
+  };
+
+  const formatWelcomeText = (rawText) => {
+    if (!rawText) return '';
+    const channelsList = data?.channels || [];
+    const redirectCh = channelsList.find(c => c.id === settings?.welcome?.redirectChannelId);
+    const channelName = redirectCh ? redirectCh.name : 'channel';
+    const redirectCh2 = channelsList.find(c => c.id === settings?.welcome?.redirectChannelId2);
+    const channelName2 = redirectCh2 ? redirectCh2.name : 'channel';
+    const redirectCh3 = channelsList.find(c => c.id === settings?.welcome?.redirectChannelId3);
+    const channelName3 = redirectCh3 ? redirectCh3.name : 'channel';
+
+    const now = new Date();
+    const formatDateStr = (d) => {
+      const pad = (n) => String(n).padStart(2, '0');
+      return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} – ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    };
+
+    let text = rawText
+      .replace(/{username}/g, 'Member')
+      .replace(/{displayName}/gi, 'Member')
+      .replace(/{user_name}/gi, 'Member')
+      .replace(/{server}/g, data?.name || 'Server')
+      .replace(/{memberCount}/gi, String(data?.approximateMemberCount || 118))
+      .replace(/{userPosition}/gi, String(data?.approximateMemberCount || 24149))
+      .replace(/{count}/gi, String(data?.approximateMemberCount || 118))
+      .replace(/{joinedAt}/gi, formatDateStr(now))
+      .replace(/{userJoinedAt}/gi, formatDateStr(now))
+      .replace(/{createdAt}/gi, formatDateStr(new Date(Date.now() - 4 * 24 * 60 * 60 * 1000)))
+      .replace(/{userCreatedAt}/gi, formatDateStr(new Date(Date.now() - 4 * 24 * 60 * 60 * 1000)));
+
+    const parts = text.split(/({user}|{channel}|{channel2}|{channel3})/g);
+
+    return parts.map((part, index) => {
+      if (part === '{user}') {
+        return (
+          <span key={`mention-user-${index}`} style={{ backgroundColor: 'rgba(88, 101, 242, 0.3)', color: '#c9cdfb', padding: '0 4px', borderRadius: '3px', fontWeight: '500' }}>
+            @Member
+          </span>
+        );
+      }
+      if (part === '{channel}') {
+        return (
+          <span key={`mention-ch-${index}`} style={{ backgroundColor: 'rgba(88, 101, 242, 0.3)', color: '#c9cdfb', padding: '0 4px', borderRadius: '3px', fontWeight: '500' }}>
+            #{channelName}
+          </span>
+        );
+      }
+      if (part === '{channel2}') {
+        return (
+          <span key={`mention-ch2-${index}`} style={{ backgroundColor: 'rgba(88, 101, 242, 0.3)', color: '#c9cdfb', padding: '0 4px', borderRadius: '3px', fontWeight: '500' }}>
+            #{channelName2}
+          </span>
+        );
+      }
+      if (part === '{channel3}') {
+        return (
+          <span key={`mention-ch3-${index}`} style={{ backgroundColor: 'rgba(88, 101, 242, 0.3)', color: '#c9cdfb', padding: '0 4px', borderRadius: '3px', fontWeight: '500' }}>
+            #{channelName3}
+          </span>
+        );
+      }
+
+      const boldParts = part.split(/(\*\*.*?\*\*)/g);
+      return boldParts.map((subPart, subIndex) => {
+        if (subPart.startsWith('**') && subPart.endsWith('**')) {
+          return (
+            <strong key={`bold-${index}-${subIndex}`} style={{ color: '#ffffff', fontWeight: '600' }}>
+              {subPart.slice(2, -2)}
+            </strong>
+          );
+        }
+        return subPart;
+      });
+    });
+  };
+
+  const renderRedirectButton = () => {
+    const redirectIds = [
+      settings?.welcome?.redirectChannelId,
+      settings?.welcome?.redirectChannelId2,
+      settings?.welcome?.redirectChannelId3
+    ].filter(Boolean);
+
+    const hasWebsite = Boolean(settings?.welcome?.websiteUrl && settings.welcome.websiteUrl.trim());
+    const customBtns = (settings?.welcome?.customButtons || []).filter(b => b && b.label && b.url);
+
+    if (redirectIds.length === 0 && !hasWebsite && customBtns.length === 0) return null;
+
+    return (
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '8px' }}>
+        {hasWebsite && (
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', backgroundColor: 'rgba(88, 101, 242, 0.25)', border: '1px solid rgba(88, 101, 242, 0.4)', padding: '6px 12px', borderRadius: '6px', fontSize: '0.82rem', color: '#ffffff', fontWeight: '600', cursor: 'pointer' }}>
+            <span>{settings.welcome.websiteLabel || '🌐 Official Website'}</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+              <polyline points="15 3 21 3 21 9"></polyline>
+              <line x1="10" y1="14" x2="21" y2="3"></line>
+            </svg>
+          </span>
+        )}
+
+        {customBtns.map((cb, idx) => (
+          <span key={`cb-${idx}`} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', backgroundColor: 'rgba(88, 101, 242, 0.25)', border: '1px solid rgba(88, 101, 242, 0.4)', padding: '6px 12px', borderRadius: '6px', fontSize: '0.82rem', color: '#ffffff', fontWeight: '600', cursor: 'pointer' }}>
+            <span>{cb.emoji ? `${cb.emoji} ` : ''}{cb.label}</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+              <polyline points="15 3 21 3 21 9"></polyline>
+              <line x1="10" y1="14" x2="21" y2="3"></line>
+            </svg>
+          </span>
+        ))}
+
+        {redirectIds.map((id, index) => {
+          const redirectCh = (data?.channels || []).find(c => c.id === id);
+          const channelName = redirectCh ? redirectCh.name : 'channel';
+          return (
+            <span key={id + index} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', backgroundColor: 'rgba(88, 101, 242, 0.25)', border: '1px solid rgba(88, 101, 242, 0.4)', padding: '6px 12px', borderRadius: '6px', fontSize: '0.82rem', color: '#ffffff', fontWeight: '600', cursor: 'pointer' }}>
+              <span>#{channelName}</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                <polyline points="15 3 21 3 21 9"></polyline>
+                <line x1="10" y1="14" x2="21" y2="3"></line>
+              </svg>
+            </span>
+          );
+        })}
+      </div>
+    );
+  };
+
+  const renderCanvasCard = () => {
+    if (!settings || !settings.welcome) return null;
+    const guildNameStr = data?.name || 'Server';
+    const previewUserAvatar = data?.icon || 'https://cdn.discordapp.com/embed/avatars/0.png';
+
+    return (
+      <div className="glass-panel welcome-canvas-container" style={{
+        width: '100%',
+        aspectRatio: '16/9',
+        borderRadius: '12px',
+        overflow: 'hidden',
+        position: 'relative',
+        containerType: 'inline-size',
+        background: settings.welcome.background ? (
+          (settings.welcome.background.startsWith('#') || settings.welcome.background.length === 6 || settings.welcome.background.length === 3)
+            ? (settings.welcome.background.startsWith('#') ? settings.welcome.background : `#${settings.welcome.background}`)
+            : `url(${resolveUploadUrl(settings.welcome.background)}) center/cover no-repeat`
+        ) : 'linear-gradient(135deg, #0F0C20 0%, #151030 50%, #060410 100%)',
+        border: (settings.welcome.cardBorderEnabled && settings.welcome.cardBorderThickness > 0)
+          ? `${(settings.welcome.cardBorderThickness || 8) / 8}cqw solid ${settings.welcome.cardBorderColor || '#00ff66'}`
+          : '1px solid rgba(255,255,255,0.05)',
+        userSelect: 'none',
+        boxSizing: 'border-box'
+      }}>
+        {((settings.welcome.overlayOpacity !== undefined ? settings.welcome.overlayOpacity : 0.3) > 0) && (
+          <div style={{
+            position: 'absolute',
+            inset: 0,
+            backgroundColor: settings.welcome.overlayColor || '#000000',
+            opacity: settings.welcome.overlayOpacity !== undefined ? settings.welcome.overlayOpacity : 0.3,
+            zIndex: 1,
+            pointerEvents: 'none'
+          }} />
+        )}
+
+        {/* Avatar element */}
+        {settings.welcome.avatarEnabled !== false && (
+          <div
+            onMouseDown={(e) => handleDragStart(e, 'avatar')}
+            onTouchStart={(e) => handleDragStart(e, 'avatar')}
+            style={{
+              position: 'absolute',
+              left: `${((settings.welcome.avatarX !== undefined ? settings.welcome.avatarX : 400) / 800) * 100}%`,
+              top: `${((settings.welcome.avatarY !== undefined ? settings.welcome.avatarY : 130) / 450) * 100}%`,
+              width: `${((settings.welcome.avatarSize || 140) / 800) * 100}%`,
+              aspectRatio: '1/1',
+              transform: `translate(-50%, -50%) rotate(${settings.welcome.avatarRotation || 0}deg)`,
+              cursor: 'move',
+              zIndex: 10,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
+            <img
+              src={previewUserAvatar}
+              alt="User avatar preview"
+              style={{
+                width: '100%',
+                height: '100%',
+                borderRadius: '50%',
+                objectFit: 'cover',
+                border: `${(settings.welcome.avatarBorderThickness !== undefined ? settings.welcome.avatarBorderThickness : 6) / 8}cqw solid ${settings.welcome.avatarBorderColor || settings.welcome.textColor || '#ffffff'}`,
+                boxShadow: settings.welcome.avatarShadowEnabled
+                  ? `0 0 ${(settings.welcome.avatarShadowBlur || 15) / 8}cqw ${settings.welcome.avatarShadowColor || '#00ff66'}`
+                  : '0 4px 20px rgba(0,0,0,0.5)',
+                pointerEvents: 'none'
+              }}
+            />
+          </div>
+        )}
+
+        {/* Title element */}
+        {settings.welcome.titleEnabled !== false && (
+          <div
+            onMouseDown={(e) => handleDragStart(e, 'title')}
+            onTouchStart={(e) => handleDragStart(e, 'title')}
+            style={{
+              position: 'absolute',
+              left: `${((settings.welcome.titleX !== undefined ? settings.welcome.titleX : 400) / 800) * 100}%`,
+              top: `${((settings.welcome.titleY !== undefined ? settings.welcome.titleY : 260) / 450) * 100}%`,
+              transform: settings.welcome.textAlignment === 'left' ? 'translate(-100%, -50%)' : (settings.welcome.textAlignment === 'right' ? 'translate(0%, -50%)' : 'translate(-50%, -50%)'),
+              cursor: 'move',
+              zIndex: 9,
+              textAlign: settings.welcome.textAlignment === 'left' ? 'right' : (settings.welcome.textAlignment === 'right' ? 'left' : 'center'),
+              whiteSpace: 'nowrap'
+            }}
+          >
+            <h1 style={{
+              fontSize: `${(settings.welcome.titleSize || 54) / 8}cqw`,
+              color: settings.welcome.textColor || '#ffffff',
+              fontFamily: settings.welcome.titleFontFamily || settings.welcome.fontFamily || 'Ethnocentric, sans-serif',
+              fontWeight: settings.welcome.fontWeight || 'bold',
+              fontStyle: settings.welcome.titleFontStyle || 'normal',
+              margin: 0,
+              textShadow: settings.welcome.titleGlowEnabled
+                ? `0 0 ${(settings.welcome.titleGlowBlur || 10) / 8}cqw ${settings.welcome.titleGlowColor || '#00ff66'}, 0 0 ${(settings.welcome.titleGlowBlur || 10) / 4}cqw ${settings.welcome.titleGlowColor || '#00ff66'}`
+                : (settings.welcome.textShadowEnabled
+                  ? `0 1px ${(settings.welcome.textShadowBlur || 5) / 8}cqw ${settings.welcome.textShadowColor || '#000000'}`
+                  : '0 2px 10px rgba(0,0,0,0.8)'),
+              pointerEvents: 'none'
+            }}>
+              {(settings.welcome.titleText || 'WELCOME').replace(/{server}/g, guildNameStr).replace(/{username}/g, 'MEMBER')}
+            </h1>
+          </div>
+        )}
+
+        {/* Username element */}
+        {settings.welcome.usernameEnabled !== false && (
+          <div
+            onMouseDown={(e) => handleDragStart(e, 'username')}
+            onTouchStart={(e) => handleDragStart(e, 'username')}
+            style={{
+              position: 'absolute',
+              left: `${((settings.welcome.usernameX !== undefined ? settings.welcome.usernameX : 400) / 800) * 100}%`,
+              top: `${((settings.welcome.usernameY !== undefined ? settings.welcome.usernameY : 320) / 450) * 100}%`,
+              transform: settings.welcome.textAlignment === 'left' ? 'translate(-100%, -50%)' : (settings.welcome.textAlignment === 'right' ? 'translate(0%, -50%)' : 'translate(-50%, -50%)'),
+              cursor: 'move',
+              zIndex: 9,
+              textAlign: settings.welcome.textAlignment === 'left' ? 'right' : (settings.welcome.textAlignment === 'right' ? 'left' : 'center'),
+              whiteSpace: 'nowrap'
+            }}
+          >
+            <h3 style={{
+              fontSize: `${(settings.welcome.usernameSize || 38) / 8}cqw`,
+              color: settings.welcome.usernameColor || '#ffffff',
+              fontFamily: settings.welcome.usernameFontFamily || settings.welcome.fontFamily || 'Ethnocentric, sans-serif',
+              fontWeight: settings.welcome.fontWeight || 'bold',
+              fontStyle: settings.welcome.usernameFontStyle || 'normal',
+              textShadow: settings.welcome.usernameGlowEnabled
+                ? `0 0 ${(settings.welcome.usernameGlowBlur || 10) / 8}cqw ${settings.welcome.usernameGlowColor || '#00ff66'}, 0 0 ${(settings.welcome.usernameGlowBlur || 10) / 4}cqw ${settings.welcome.usernameGlowColor || '#00ff66'}`
+                : (settings.welcome.textShadowEnabled
+                  ? `0 1px ${(settings.welcome.textShadowBlur || 5) / 8}cqw ${settings.welcome.textShadowColor || '#000000'}`
+                  : '0 2px 6px rgba(0,0,0,0.6)'),
+              margin: 0,
+              pointerEvents: 'none'
+            }}>
+              @MEMBER
+            </h3>
+          </div>
+        )}
+
+        {/* Subtext element */}
+        {settings.welcome.subtextEnabled !== false && (
+          <div
+            onMouseDown={(e) => handleDragStart(e, 'subtext')}
+            onTouchStart={(e) => handleDragStart(e, 'subtext')}
+            style={{
+              position: 'absolute',
+              left: `${((settings.welcome.subtextX !== undefined ? settings.welcome.subtextX : 400) / 800) * 100}%`,
+              top: `${((settings.welcome.subtextY !== undefined ? settings.welcome.subtextY : 370) / 450) * 100}%`,
+              transform: settings.welcome.textAlignment === 'left' ? 'translate(-100%, -50%)' : (settings.welcome.textAlignment === 'right' ? 'translate(0%, -50%)' : 'translate(-50%, -50%)'),
+              cursor: 'move',
+              zIndex: 9,
+              textAlign: settings.welcome.textAlignment === 'left' ? 'right' : (settings.welcome.textAlignment === 'right' ? 'left' : 'center'),
+              whiteSpace: 'nowrap'
+            }}
+          >
+            <p style={{
+              fontSize: `${(settings.welcome.subtextSize || 22) / 8}cqw`,
+              color: settings.welcome.subtextColor || 'rgba(255,255,255,0.8)',
+              fontFamily: settings.welcome.subtextFontFamily || settings.welcome.fontFamily || 'Ethnocentric, sans-serif',
+              fontWeight: settings.welcome.fontWeight || 'bold',
+              fontStyle: settings.welcome.subtextFontStyle || 'normal',
+              textShadow: settings.welcome.subtextGlowEnabled
+                ? `0 0 ${(settings.welcome.subtextGlowBlur || 10) / 8}cqw ${settings.welcome.subtextGlowColor || '#00ff66'}, 0 0 ${(settings.welcome.subtextGlowBlur || 10) / 4}cqw ${settings.welcome.subtextGlowColor || '#00ff66'}`
+                : (settings.welcome.textShadowEnabled
+                  ? `0 1px ${(settings.welcome.textShadowBlur || 5) / 8}cqw ${settings.welcome.textShadowColor || '#000000'}`
+                  : '0 1px 4px rgba(0,0,0,0.6)'),
+              margin: 0,
+              pointerEvents: 'none'
+            }}>
+              {(settings.welcome.subtextText || 'TO {server}').replace(/{server}/g, guildNameStr).replace(/{username}/g, 'MEMBER')}
+            </p>
+          </div>
+        )}
+      </div>
+    );
   };
 
   const formatPreviewMessage = (template, channelName) => {
@@ -862,6 +1283,24 @@ export default function AdminServerSettings({ guildId, onHasUnsavedChangesChange
           }}
         >
           Server Settings & Channels
+        </button>
+        <button
+          type="button"
+          onClick={() => handleSubTabClick('welcome')}
+          style={{
+            background: 'none',
+            border: 'none',
+            color: activeSubTab === 'welcome' ? '#ffffff' : 'var(--text-secondary)',
+            fontSize: '0.95rem',
+            fontWeight: activeSubTab === 'welcome' ? '700' : '400',
+            cursor: 'pointer',
+            padding: '10px 16px',
+            borderBottom: activeSubTab === 'welcome' ? '2px solid var(--primary)' : '2px solid transparent',
+            transition: 'all 0.2s ease',
+            fontFamily: 'Outfit'
+          }}
+        >
+          Welcome Messages & Cards
         </button>
         <button
           type="button"
@@ -1817,6 +2256,867 @@ export default function AdminServerSettings({ guildId, onHasUnsavedChangesChange
               </div>
             )}
           </div>
+        </div>
+      )}
+
+      {/* TAB: WELCOME MESSAGES & CARDS */}
+      {activeSubTab === 'welcome' && (
+        <div>
+          {loadingSettings ? (
+            <div style={{ textAlign: 'center', padding: '60px 0' }}>
+              <Loader size={30} className="spin" style={{ color: 'var(--primary)', marginBottom: '12px' }} />
+              <p style={{ color: 'var(--text-secondary)' }}>Loading Welcome configuration...</p>
+            </div>
+          ) : settings && (
+            <div className="glass-panel" style={{ padding: '24px', marginBottom: '24px', backgroundColor: 'rgba(255,255,255,0.01)', overflow: 'visible' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                <div>
+                  <h3 style={{ fontSize: '1.2rem', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <Sparkles size={20} style={{ color: 'var(--primary)' }} />
+                    Welcome Messages & Cards
+                  </h3>
+                  <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Automate customizable canvas cards, rich embeds, DM flows, and buttons when members join.</p>
+                </div>
+                <label className="switch">
+                  <input
+                    type="checkbox"
+                    checked={settings.welcome?.enabled || false}
+                    onChange={() => handleToggle('welcome.enabled')}
+                  />
+                  <span className="slider"></span>
+                </label>
+              </div>
+
+              {settings.welcome?.enabled && (
+                <div className="welcome-split-layout" style={{ borderTop: '1px solid var(--border-color)', paddingTop: '16px' }}>
+                  <div className="welcome-settings-column">
+
+                    {/* Quick Presets Bar */}
+                    <div className="glass-panel" style={{
+                      padding: '14px 18px',
+                      borderRadius: '12px',
+                      backgroundColor: 'rgba(139, 92, 246, 0.05)',
+                      border: '1px solid rgba(139, 92, 246, 0.2)',
+                      marginBottom: '16px'
+                    }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                        <span style={{ fontSize: '0.9rem', fontWeight: '800', color: '#ffffff', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <Sparkles size={16} style={{ color: '#a78bfa' }} />
+                          1-Click Welcome Design Presets
+                        </span>
+                        <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Select a template to auto-populate layout</span>
+                      </div>
+
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: '10px' }}>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            handleInputChange('welcome.layoutType', 'embed-only');
+                            handleInputChange('welcome.embedTitle', 'WELCOME TO OUR SERVER ✨✨');
+                            handleInputChange('welcome.embedColor', '#ff9ebb');
+                            handleInputChange('welcome.embedThumbnail', '{user_avatar}');
+                            handleInputChange('welcome.message', '– – – – – – – – – – –\n\nCheck out more channels\n\n,\,\circ\cdot^\curvearrowright\ \ 📖 Read Rules {channel}\n,\,\circ\cdot^\curvearrowright\ \ 📢 Check {channel2}\n,\,\circ\cdot^\curvearrowright\ \ 💬 Continue Chatting {channel3}\n\n– – – – – – – – – – –\n\nHave a Good Time in Server !');
+                            handleInputChange('welcome.embedFooterText', 'Members: {memberCount}');
+                            handleInputChange('welcome.embedTimestamp', true);
+                            handleInputChange('welcome.pingUser', true);
+                            setSuccessMsg('Applied Example Embed Preset (Image 1)!');
+                            setTimeout(() => setSuccessMsg(null), 3000);
+                          }}
+                          className="btn-secondary"
+                          style={{ padding: '8px 12px', fontSize: '0.78rem', fontWeight: '700', borderRadius: '8px', border: '1px solid rgba(255, 158, 187, 0.3)', backgroundColor: 'rgba(255, 158, 187, 0.1)', color: '#ffb3c6', cursor: 'pointer', textAlign: 'left' }}
+                        >
+                          ✨ Example Server Embed (Image 1)
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            handleInputChange('welcome.layoutType', 'embed-only');
+                            handleInputChange('welcome.embedAuthorName', '{server}');
+                            handleInputChange('welcome.embedAuthorIcon', '{server_icon}');
+                            handleInputChange('welcome.embedTitle', 'WELCOME');
+                            handleInputChange('welcome.embedColor', '#0088ff');
+                            handleInputChange('welcome.embedThumbnail', '{user_avatar}');
+                            handleInputChange('welcome.message', 'Hey {user}\n**Welcome to {server}**\nFollow the rules and Enjoy in our Server\n━━━━━━━━━━━━━━━━━━━━━━\n\n💫 **Read Rules** {channel}\n💫 **Chat with us** {channel2}\n💫 **Connect with us** {channel3}\n\n━━━━━━━━━━━━━━━━━━━━━━\n\n👥 **USER INFO**\n**User Name** : {username}\n**User Position**: {userPosition}\n**Joined at** : {joinedAt}\n**Created at**: {createdAt}');
+                            handleInputChange('welcome.embedTimestamp', true);
+                            handleInputChange('welcome.pingUser', true);
+                            setSuccessMsg('Applied User Info Detailed Welcome Preset (Image 2)!');
+                            setTimeout(() => setSuccessMsg(null), 3000);
+                          }}
+                          className="btn-secondary"
+                          style={{ padding: '8px 12px', fontSize: '0.78rem', fontWeight: '700', borderRadius: '8px', border: '1px solid rgba(0, 136, 255, 0.3)', backgroundColor: 'rgba(0, 136, 255, 0.1)', color: '#38bdf8', cursor: 'pointer', textAlign: 'left' }}
+                        >
+                          🔥 Detailed User Info (Image 2)
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            handleInputChange('welcome.layoutType', 'embed-card');
+                            handleInputChange('welcome.embedTitle', 'WELCOME AGENT ⚡');
+                            handleInputChange('welcome.embedColor', '#00ff66');
+                            handleInputChange('welcome.titleText', 'WELCOME');
+                            handleInputChange('welcome.subtextText', 'TO {server}');
+                            handleInputChange('welcome.embedThumbnail', '{user_avatar}');
+                            handleInputChange('welcome.embedFooterText', 'Member #{memberCount} • {server}');
+                            handleInputChange('welcome.embedTimestamp', true);
+                            setSuccessMsg('Applied Cyberpunk Neon Card Preset!');
+                            setTimeout(() => setSuccessMsg(null), 3000);
+                          }}
+                          className="btn-secondary"
+                          style={{ padding: '8px 12px', fontSize: '0.78rem', fontWeight: '700', borderRadius: '8px', border: '1px solid rgba(0, 255, 102, 0.3)', backgroundColor: 'rgba(0, 255, 102, 0.08)', color: '#6ee7b7', cursor: 'pointer', textAlign: 'left' }}
+                        >
+                          🚀 Cyberpunk Neon Card
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            handleInputChange('welcome.dmEnabled', true);
+                            handleInputChange('welcome.dmEmbedEnabled', true);
+                            handleInputChange('welcome.dmMessage', 'Hey {user}! Welcome to **{server}** 🎉\n\nWe are super happy to have you here! Please check out {channel} for rules.');
+                            setSuccessMsg('Applied DM Welcome Preset!');
+                            setTimeout(() => setSuccessMsg(null), 3000);
+                          }}
+                          className="btn-secondary"
+                          style={{ padding: '8px 12px', fontSize: '0.78rem', fontWeight: '700', borderRadius: '8px', border: '1px solid rgba(59, 130, 246, 0.3)', backgroundColor: 'rgba(59, 130, 246, 0.1)', color: '#93c5fd', cursor: 'pointer', textAlign: 'left' }}
+                        >
+                          ✉️ DM Welcome Flow
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Dynamic Variables Toolbar */}
+                    <div style={{
+                      display: 'flex',
+                      flexWrap: 'wrap',
+                      alignItems: 'center',
+                      gap: '6px',
+                      backgroundColor: 'rgba(0,0,0,0.25)',
+                      padding: '10px 14px',
+                      borderRadius: '8px',
+                      border: '1px solid rgba(255,255,255,0.06)',
+                      marginBottom: '16px'
+                    }}>
+                      <span style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-secondary)', marginRight: '6px' }}>
+                        ⚡ Dynamic Variables (Click to copy):
+                      </span>
+                      {[
+                        '{user}', '{username}', '{displayName}', '{server}', '{memberCount}', '{userPosition}', '{joinedAt}', '{createdAt}', '{channel}', '{channel2}', '{channel3}'
+                      ].map(tag => (
+                        <button
+                          key={tag}
+                          type="button"
+                          onClick={() => {
+                            navigator.clipboard.writeText(tag);
+                            setSuccessMsg(`Copied variable ${tag}!`);
+                            setTimeout(() => setSuccessMsg(null), 2500);
+                          }}
+                          title={`Click to copy ${tag}`}
+                          style={{
+                            backgroundColor: 'rgba(88, 101, 242, 0.15)',
+                            border: '1px solid rgba(88, 101, 242, 0.3)',
+                            color: '#a5b4fc',
+                            padding: '3px 8px',
+                            borderRadius: '4px',
+                            fontSize: '0.72rem',
+                            fontFamily: 'monospace',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          {tag}
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Website Link & Custom Action Buttons */}
+                    <div className="glass-panel" style={{
+                      padding: '16px',
+                      borderRadius: '12px',
+                      backgroundColor: 'rgba(15, 23, 42, 0.6)',
+                      border: '1px solid rgba(255, 255, 255, 0.08)',
+                      marginBottom: '16px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '12px'
+                    }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <h4 style={{ fontSize: '0.95rem', fontWeight: '700', color: '#ffffff', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <LinkIcon size={16} style={{ color: 'var(--primary)' }} />
+                          Website Link & Custom Action Buttons
+                        </h4>
+                        <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Attached to welcome message</span>
+                      </div>
+
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '12px' }}>
+                        <div>
+                          <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>
+                            Bot Website URL Link
+                          </label>
+                          <input
+                            type="text"
+                            value={settings.welcome?.websiteUrl || ''}
+                            onChange={(e) => handleInputChange('welcome.websiteUrl', e.target.value)}
+                            className="glass-input"
+                            placeholder="https://yourwebsite.com"
+                          />
+                        </div>
+
+                        <div>
+                          <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>
+                            Website Button Label
+                          </label>
+                          <input
+                            type="text"
+                            value={settings.welcome?.websiteLabel || '🌐 Official Website'}
+                            onChange={(e) => handleInputChange('welcome.websiteLabel', e.target.value)}
+                            className="glass-input"
+                            placeholder="🌐 Official Website"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Custom Link Buttons List */}
+                      <div style={{ marginTop: '4px', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '10px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                          <span style={{ fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-secondary)' }}>
+                            Custom URL Buttons ({settings.welcome?.customButtons?.length || 0})
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const current = settings.welcome?.customButtons || [];
+                              handleInputChange('welcome.customButtons', [...current, { label: '', url: '', emoji: '' }]);
+                            }}
+                            className="btn-secondary"
+                            style={{ padding: '4px 10px', fontSize: '0.75rem', borderRadius: '6px', display: 'flex', alignItems: 'center', gap: '4px' }}
+                          >
+                            <Plus size={14} /> Add Button
+                          </button>
+                        </div>
+
+                        {Array.isArray(settings.welcome?.customButtons) && settings.welcome.customButtons.length > 0 && (
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                            {settings.welcome.customButtons.map((cb, idx) => (
+                              <div key={idx} style={{ display: 'grid', gridTemplateColumns: '80px 1fr 1fr auto', gap: '8px', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.2)', padding: '8px 10px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                                <input
+                                  type="text"
+                                  value={cb.emoji || ''}
+                                  onChange={(e) => {
+                                    const newBtns = [...(settings.welcome?.customButtons || [])];
+                                    newBtns[idx].emoji = e.target.value;
+                                    handleInputChange('welcome.customButtons', newBtns);
+                                  }}
+                                  className="glass-input"
+                                  placeholder="Emoji"
+                                  style={{ fontSize: '0.8rem' }}
+                                />
+                                <input
+                                  type="text"
+                                  value={cb.label || ''}
+                                  onChange={(e) => {
+                                    const newBtns = [...(settings.welcome?.customButtons || [])];
+                                    newBtns[idx].label = e.target.value;
+                                    handleInputChange('welcome.customButtons', newBtns);
+                                  }}
+                                  className="glass-input"
+                                  placeholder="Button Label"
+                                  style={{ fontSize: '0.8rem' }}
+                                />
+                                <input
+                                  type="text"
+                                  value={cb.url || ''}
+                                  onChange={(e) => {
+                                    const newBtns = [...(settings.welcome?.customButtons || [])];
+                                    newBtns[idx].url = e.target.value;
+                                    handleInputChange('welcome.customButtons', newBtns);
+                                  }}
+                                  className="glass-input"
+                                  placeholder="https://link.com"
+                                  style={{ fontSize: '0.8rem' }}
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const newBtns = (settings.welcome?.customButtons || []).filter((_, i) => i !== idx);
+                                    handleInputChange('welcome.customButtons', newBtns);
+                                  }}
+                                  style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', padding: '4px' }}
+                                >
+                                  <Trash2 size={16} />
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* DM Greeting & Ping Controls */}
+                    <div className="glass-panel" style={{
+                      padding: '16px',
+                      borderRadius: '12px',
+                      backgroundColor: 'rgba(15, 23, 42, 0.6)',
+                      border: '1px solid rgba(255, 255, 255, 0.08)',
+                      marginBottom: '16px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '12px'
+                    }}>
+                      <h4 style={{ fontSize: '0.95rem', fontWeight: '700', color: '#ffffff', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <Send size={16} style={{ color: 'var(--primary)' }} />
+                        DM Greeting & Ping Controls
+                      </h4>
+
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.2)', padding: '10px 12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                          <div>
+                            <span style={{ fontSize: '0.82rem', fontWeight: '600', display: 'block' }}>Send Direct Message (DM)</span>
+                            <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Send greeting to user DMs</span>
+                          </div>
+                          <label className="switch">
+                            <input
+                              type="checkbox"
+                              checked={settings.welcome?.dmEnabled || false}
+                              onChange={() => handleToggle('welcome.dmEnabled')}
+                            />
+                            <span className="slider"></span>
+                          </label>
+                        </div>
+
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.2)', padding: '10px 12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                          <div>
+                            <span style={{ fontSize: '0.82rem', fontWeight: '600', display: 'block' }}>Include DM Rich Embed</span>
+                            <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Attach embed inside DM</span>
+                          </div>
+                          <label className="switch">
+                            <input
+                              type="checkbox"
+                              checked={settings.welcome?.dmEmbedEnabled || false}
+                              onChange={() => handleToggle('welcome.dmEmbedEnabled')}
+                            />
+                            <span className="slider"></span>
+                          </label>
+                        </div>
+
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.2)', padding: '10px 12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                          <div>
+                            <span style={{ fontSize: '0.82rem', fontWeight: '600', display: 'block' }}>Ping Member in Channel</span>
+                            <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Mention user in chat</span>
+                          </div>
+                          <label className="switch">
+                            <input
+                              type="checkbox"
+                              checked={settings.welcome?.pingUser !== false}
+                              onChange={() => handleToggle('welcome.pingUser')}
+                            />
+                            <span className="slider"></span>
+                          </label>
+                        </div>
+                      </div>
+
+                      {settings.welcome?.dmEnabled && (
+                        <div>
+                          <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-secondary)', marginBottom: '4px' }}>
+                            Direct Message (DM) Greeting Template
+                          </label>
+                          <textarea
+                            value={settings.welcome?.dmMessage || ''}
+                            onChange={(e) => handleInputChange('welcome.dmMessage', e.target.value)}
+                            className="glass-input"
+                            rows="2"
+                            placeholder="Welcome {user} to {server}! Enjoy your stay."
+                            style={{ width: '100%', fontSize: '0.85rem', resize: 'vertical' }}
+                          />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Welcome Layout Selection */}
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 'bold' }}>Welcome Message Layout Type</label>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '12px' }}>
+                        {[
+                          { id: 'classic', title: 'Classic Card', desc: 'Message text + image card attachment' },
+                          { id: 'embed-card', title: 'Embed with Card', desc: 'Rich embed with card image loaded inside' },
+                          { id: 'embed-only', title: 'Embed Only', desc: 'Rich embed only (no card image)' },
+                          { id: 'text-only', title: 'Text Message Only', desc: 'Plain text message only' }
+                        ].map(layoutOption => (
+                          <div
+                            key={layoutOption.id}
+                            onClick={() => handleInputChange('welcome.layoutType', layoutOption.id)}
+                            style={{
+                              padding: '12px 14px',
+                              borderRadius: '10px',
+                              border: `2px solid ${settings.welcome?.layoutType === layoutOption.id ? 'var(--primary)' : 'rgba(255,255,255,0.05)'}`,
+                              backgroundColor: settings.welcome?.layoutType === layoutOption.id ? 'var(--primary-glow)' : 'rgba(255,255,255,0.02)',
+                              cursor: 'pointer',
+                              transition: 'all 0.2s ease',
+                              display: 'flex',
+                              flexDirection: 'column',
+                              gap: '4px'
+                            }}
+                          >
+                            <span style={{ fontSize: '0.85rem', fontWeight: '700', color: settings.welcome?.layoutType === layoutOption.id ? '#ffffff' : 'var(--text-secondary)' }}>
+                              {layoutOption.title}
+                            </span>
+                            <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', lineHeight: '1rem' }}>
+                              {layoutOption.desc}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Greeting Channel & Font Family Row */}
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginBottom: '16px' }}>
+                      <div>
+                        <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Greeting Channel</label>
+                        <select
+                          value={settings.welcome?.channelId || ''}
+                          onChange={(e) => handleInputChange('welcome.channelId', e.target.value)}
+                          className="glass-input"
+                        >
+                          <option value="">-- Select Channel --</option>
+                          {(data?.channels || []).filter(c => c.type === 0).map(ch => (
+                            <option key={ch.id} value={ch.id}>#{ch.name}</option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div>
+                        <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Font Family</label>
+                        <select
+                          value={settings.welcome?.fontFamily || 'Ethnocentric'}
+                          onChange={(e) => handleInputChange('welcome.fontFamily', e.target.value)}
+                          className="glass-input"
+                        >
+                          <option value="Ethnocentric">Ethnocentric (Futuristic) (Default)</option>
+                          <option value="Oxanium">Oxanium (Cyberpunk)</option>
+                          <option value="Sans">Sans-Serif</option>
+                          <option value="Poppins">Poppins</option>
+                          <option value="Montserrat">Montserrat</option>
+                          <option value="Bebas Neue">Bebas Neue</option>
+                          <option value="Orbitron">Orbitron</option>
+                          <option value="Oswald">Oswald</option>
+                          <option value="Inter">Inter</option>
+                          <option value="Roboto">Roboto</option>
+                          <option value="Permanent Marker">Permanent Marker (Brush)</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* Redirect Channels Row */}
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '16px', marginBottom: '16px' }}>
+                      <div>
+                        <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Redirect Channel Link 1</label>
+                        <select
+                          value={settings.welcome?.redirectChannelId || ''}
+                          onChange={(e) => handleInputChange('welcome.redirectChannelId', e.target.value)}
+                          className="glass-input"
+                        >
+                          <option value="">-- No redirect channel --</option>
+                          {(data?.channels || []).filter(c => c.type === 0).map(ch => (
+                            <option key={ch.id} value={ch.id}>#{ch.name}</option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div>
+                        <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Redirect Channel Link 2</label>
+                        <select
+                          value={settings.welcome?.redirectChannelId2 || ''}
+                          onChange={(e) => handleInputChange('welcome.redirectChannelId2', e.target.value)}
+                          className="glass-input"
+                        >
+                          <option value="">-- No redirect channel --</option>
+                          {(data?.channels || []).filter(c => c.type === 0).map(ch => (
+                            <option key={ch.id} value={ch.id}>#{ch.name}</option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div>
+                        <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Redirect Channel Link 3</label>
+                        <select
+                          value={settings.welcome?.redirectChannelId3 || ''}
+                          onChange={(e) => handleInputChange('welcome.redirectChannelId3', e.target.value)}
+                          className="glass-input"
+                        >
+                          <option value="">-- No redirect channel --</option>
+                          {(data?.channels || []).filter(c => c.type === 0).map(ch => (
+                            <option key={ch.id} value={ch.id}>#{ch.name}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* Text Message Content */}
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>
+                        Welcome Message Content Template
+                      </label>
+                      <textarea
+                        value={settings.welcome?.message || ''}
+                        onChange={(e) => handleInputChange('welcome.message', e.target.value)}
+                        className="glass-input"
+                        rows="3"
+                        placeholder="Welcome {user} to the server!"
+                        style={{ minHeight: '80px', resize: 'vertical' }}
+                      />
+                    </div>
+
+                    {/* Canvas Card Customization Box */}
+                    {(settings.welcome?.layoutType === 'classic' || settings.welcome?.layoutType === 'embed-card') && (
+                      <div className="glass-panel" style={{ padding: '18px', borderRadius: '12px', backgroundColor: 'rgba(15, 23, 42, 0.5)', border: '1px solid rgba(255,255,255,0.08)', marginBottom: '16px' }}>
+                        <h4 style={{ fontSize: '0.95rem', fontWeight: '700', color: '#ffffff', marginBottom: '14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                          <span>🎨 Canvas Image Card Elements & Layout</span>
+                          <button
+                            type="button"
+                            onClick={handleResetWelcomeLayout}
+                            className="btn-secondary"
+                            style={{ padding: '4px 10px', fontSize: '0.75rem', borderRadius: '6px' }}
+                          >
+                            Reset Card Positions
+                          </button>
+                        </h4>
+
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '14px', marginBottom: '14px' }}>
+                          <div>
+                            <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>Card Title Text Template</label>
+                            <input
+                              type="text"
+                              value={settings.welcome?.titleText !== undefined ? settings.welcome.titleText : 'WELCOME'}
+                              onChange={(e) => handleInputChange('welcome.titleText', e.target.value)}
+                              className="glass-input"
+                              placeholder="e.g. WELCOME"
+                            />
+                          </div>
+
+                          <div>
+                            <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>Card Subtext Template</label>
+                            <input
+                              type="text"
+                              value={settings.welcome?.subtextText !== undefined ? settings.welcome.subtextText : 'TO {server}'}
+                              onChange={(e) => handleInputChange('welcome.subtextText', e.target.value)}
+                              className="glass-input"
+                              placeholder="e.g. TO {server}"
+                            />
+                          </div>
+                        </div>
+
+                        <div>
+                          <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>Background Image/GIF URL or Hex Color</label>
+                          <input
+                            type="text"
+                            value={settings.welcome?.background || ''}
+                            onChange={(e) => handleInputChange('welcome.background', e.target.value)}
+                            className="glass-input"
+                            placeholder="https://example.com/background.png or #0F0C20"
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Discord Embed Customization Box */}
+                    {(settings.welcome?.layoutType === 'embed-only' || settings.welcome?.layoutType === 'embed-card') && (
+                      <div className="glass-panel" style={{ padding: '18px', borderRadius: '12px', backgroundColor: 'rgba(15, 23, 42, 0.5)', border: '1px solid rgba(255,255,255,0.08)', marginBottom: '16px' }}>
+                        <h4 style={{ fontSize: '0.95rem', fontWeight: '700', color: '#ffffff', marginBottom: '14px' }}>
+                          ✨ Discord Rich Embed Customizer
+                        </h4>
+
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '14px', marginBottom: '14px' }}>
+                          <div>
+                            <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>Embed Title Text</label>
+                            <input
+                              type="text"
+                              value={settings.welcome?.embedTitle || ''}
+                              onChange={(e) => handleInputChange('welcome.embedTitle', e.target.value)}
+                              className="glass-input"
+                              placeholder="WELCOME TO OUR SERVER ✨✨"
+                            />
+                          </div>
+
+                          <div>
+                            <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>Embed Left Bar Color</label>
+                            <div style={{ display: 'flex', gap: '8px' }}>
+                              <input
+                                type="color"
+                                value={settings.welcome?.embedColor?.startsWith('#') ? settings.welcome.embedColor : `#${settings.welcome?.embedColor || 'ff9ebb'}`}
+                                onChange={(e) => handleInputChange('welcome.embedColor', e.target.value)}
+                                style={{ width: '40px', height: '38px', padding: '0', border: '1px solid var(--border-color)', borderRadius: '6px', background: 'none', cursor: 'pointer' }}
+                              />
+                              <input
+                                type="text"
+                                value={settings.welcome?.embedColor || '#ff9ebb'}
+                                onChange={(e) => handleInputChange('welcome.embedColor', e.target.value)}
+                                className="glass-input"
+                                placeholder="#ff9ebb"
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '14px', marginBottom: '14px' }}>
+                          <div>
+                            <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>Thumbnail Setting</label>
+                            <select
+                              value={settings.welcome?.embedThumbnail || '{user_avatar}'}
+                              onChange={(e) => handleInputChange('welcome.embedThumbnail', e.target.value)}
+                              className="glass-input"
+                            >
+                              <option value="{user_avatar}">User Avatar (Default)</option>
+                              <option value="{server_icon}">Server Icon</option>
+                              <option value="none">None</option>
+                            </select>
+                          </div>
+
+                          <div>
+                            <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>Footer Text Template</label>
+                            <input
+                              type="text"
+                              value={settings.welcome?.embedFooterText || ''}
+                              onChange={(e) => handleInputChange('welcome.embedFooterText', e.target.value)}
+                              className="glass-input"
+                              placeholder="Members: {memberCount}"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Bottom Save & Reset Action Bar */}
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '14px', borderTop: '1px solid var(--border-color)', paddingTop: '18px', marginTop: '10px' }}>
+                      <button
+                        type="button"
+                        onClick={handleResetSettings}
+                        disabled={saving || !hasWelcomeChanges}
+                        className="btn-secondary"
+                        style={{ padding: '10px 20px', display: 'flex', alignItems: 'center', gap: '8px' }}
+                      >
+                        Reset Changes
+                      </button>
+                      <button
+                        type="button"
+                        onClick={async (e) => {
+                          e.preventDefault();
+                          setSaving(true);
+                          setSuccessMsg(null);
+                          setErrorMsg(null);
+                          try {
+                            const updated = await api.saveSettings(guildId, settings);
+                            setSettings(updated);
+                            setSavedSettings(JSON.parse(JSON.stringify(updated)));
+                            setSuccessMsg('Welcome Messages & Cards settings saved successfully!');
+                            setTimeout(() => setSuccessMsg(null), 4000);
+                          } catch (err) {
+                            console.error(err);
+                            setErrorMsg('Failed to save Welcome settings. Please try again.');
+                          } finally {
+                            setSaving(false);
+                          }
+                        }}
+                        disabled={saving}
+                        className="btn-primary"
+                        style={{ padding: '10px 20px', display: 'flex', alignItems: 'center', gap: '8px' }}
+                      >
+                        <Save size={18} />
+                        {saving ? 'Saving...' : 'Save Welcome Settings'}
+                      </button>
+                    </div>
+
+                  </div>
+
+                  {/* Right Column: Interactive Live Preview */}
+                  <div className="welcome-preview-column">
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem', color: 'var(--text-secondary)', textTransform: 'uppercase', fontWeight: 'bold' }}>
+                        <Eye size={14} />
+                        Interactive Discord Chat Preview
+                      </span>
+                    </div>
+
+                    {/* Live Test Buttons */}
+                    <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          try {
+                            setSaving(true);
+                            const updated = await api.saveSettings(guildId, settings);
+                            setSettings(updated);
+                            setSavedSettings(JSON.parse(JSON.stringify(updated)));
+                            
+                            const res = await api.testWelcome(guildId, 'channel');
+                            setSuccessMsg(res.message || 'Test welcome message sent to channel!');
+                            setTimeout(() => setSuccessMsg(null), 4000);
+                          } catch (err) {
+                            setErrorMsg('Test Welcome failed: ' + err.message);
+                          } finally {
+                            setSaving(false);
+                          }
+                        }}
+                        className="btn-primary"
+                        style={{ flex: 1, padding: '8px 10px', fontSize: '0.78rem', fontWeight: '700', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', cursor: 'pointer' }}
+                      >
+                        <Send size={14} /> Test in Channel
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          try {
+                            setSaving(true);
+                            const updated = await api.saveSettings(guildId, settings);
+                            setSettings(updated);
+                            setSavedSettings(JSON.parse(JSON.stringify(updated)));
+
+                            const res = await api.testWelcome(guildId, 'dm');
+                            setSuccessMsg(res.message || 'Test DM sent to your Discord!');
+                            setTimeout(() => setSuccessMsg(null), 4000);
+                          } catch (err) {
+                            setErrorMsg('Test DM failed: ' + err.message);
+                          } finally {
+                            setSaving(false);
+                          }
+                        }}
+                        className="btn-secondary"
+                        style={{ flex: 1, padding: '8px 10px', fontSize: '0.78rem', fontWeight: '700', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', cursor: 'pointer' }}
+                      >
+                        <MessageSquare size={14} /> Test in DM
+                      </button>
+                    </div>
+
+                    {/* Discord Chat Window */}
+                    <div style={{ backgroundColor: '#313338', borderRadius: '8px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 8px 24px rgba(0,0,0,0.4)' }}>
+                      <div style={{ backgroundColor: '#2b2d31', padding: '10px 14px', borderBottom: '1px solid rgba(0,0,0,0.2)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span style={{ color: '#80848e', fontWeight: 'bold' }}>#</span>
+                        <span style={{ color: '#f2f3f5', fontWeight: '600', fontSize: '0.9rem' }}>
+                          {(data?.channels || []).find(c => c.id === settings.welcome?.channelId)?.name || 'welcome'}
+                        </span>
+                        <span style={{ color: '#949ba4', fontSize: '0.75rem', marginLeft: '6px' }}>Greeting channel preview</span>
+                      </div>
+
+                      <div style={{ padding: '16px' }}>
+                        <div style={{ display: 'flex', gap: '12px' }}>
+                          <img
+                            src={data?.icon || 'https://cdn.discordapp.com/embed/avatars/0.png'}
+                            alt="bot avatar"
+                            style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }}
+                          />
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
+                              <span style={{ fontWeight: '600', color: '#ffffff', fontSize: '0.95rem' }}>SMOOTH MODE</span>
+                              <span style={{ backgroundColor: '#5865F2', color: '#ffffff', fontSize: '0.625rem', fontWeight: '700', padding: '1px 4px', borderRadius: '3px' }}>BOT</span>
+                              <span style={{ fontSize: '0.72rem', color: '#949ba4' }}>Today at {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                            </div>
+
+                            {/* Text only layout */}
+                            {(settings.welcome?.layoutType === 'text-only' || !settings.welcome?.layoutType) && (
+                              <>
+                                <div style={{ fontSize: '0.9rem', color: '#dbdee1', whiteSpace: 'pre-wrap', marginBottom: '6px' }}>
+                                  {formatWelcomeText(settings.welcome?.message)}
+                                </div>
+                                {renderRedirectButton()}
+                              </>
+                            )}
+
+                            {/* Rich Embed layout */}
+                            {(settings.welcome?.layoutType === 'embed-only' || settings.welcome?.layoutType === 'embed-card') && (() => {
+                              let previewThumbUrl = null;
+                              const thumbSetting = settings.welcome?.embedThumbnail;
+                              if (thumbSetting === '{server_icon}') {
+                                previewThumbUrl = data?.icon || 'https://cdn.discordapp.com/embed/avatars/0.png';
+                              } else if (thumbSetting === 'none') {
+                                previewThumbUrl = null;
+                              } else if (thumbSetting && thumbSetting !== '{user_avatar}') {
+                                previewThumbUrl = resolveUploadUrl(thumbSetting);
+                              } else {
+                                previewThumbUrl = data?.icon || 'https://cdn.discordapp.com/embed/avatars/0.png';
+                              }
+
+                              const authorIconUrl = settings.welcome?.embedAuthorIcon ? resolveUploadUrl(settings.welcome.embedAuthorIcon) : null;
+                              const footerIconUrl = settings.welcome?.embedFooterIcon ? resolveUploadUrl(settings.welcome.embedFooterIcon) : null;
+                              const mainImageUrl = settings.welcome?.embedImage ? resolveUploadUrl(settings.welcome.embedImage) : null;
+
+                              return (
+                                <>
+                                  <div style={{ fontSize: '0.85rem', color: '#949ba4', fontStyle: 'italic', marginBottom: '4px' }}>
+                                    Mentions <span style={{ backgroundColor: 'rgba(88, 101, 242, 0.3)', color: '#c9cdfb', padding: '0 4px', borderRadius: '3px' }}>@Member</span>
+                                  </div>
+
+                                  <div style={{ borderLeft: `4px solid ${settings.welcome?.embedColor || '#2563eb'}`, padding: '12px 16px', borderRadius: '4px', backgroundColor: '#2b2d31' }}>
+                                    {/* Author */}
+                                    {settings.welcome?.embedAuthorName && (
+                                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                                        {authorIconUrl && <img src={authorIconUrl} alt="" style={{ width: '22px', height: '22px', borderRadius: '50%' }} />}
+                                        <span style={{ fontSize: '0.85rem', fontWeight: '600', color: '#ffffff' }}>
+                                          {formatWelcomeText(settings.welcome.embedAuthorName)}
+                                        </span>
+                                      </div>
+                                    )}
+
+                                    {/* Title & Thumbnail */}
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px' }}>
+                                      <div style={{ flex: 1 }}>
+                                        <div style={{ fontWeight: '700', color: '#38bdf8', fontSize: '1rem', marginBottom: '6px' }}>
+                                          {formatWelcomeText(settings.welcome?.embedTitle || `Welcome to ${data?.name || 'Server'}!`)}
+                                        </div>
+
+                                        {settings.welcome?.message && (
+                                          <div style={{ fontSize: '0.875rem', color: '#dbdee1', whiteSpace: 'pre-wrap', marginBottom: '8px' }}>
+                                            {formatWelcomeText(settings.welcome.message)}
+                                          </div>
+                                        )}
+                                      </div>
+
+                                      {previewThumbUrl && (
+                                        <img src={previewThumbUrl} alt="" style={{ width: '70px', height: '70px', borderRadius: '4px', objectFit: 'cover' }} />
+                                      )}
+                                    </div>
+
+                                    {/* Embed Card Image */}
+                                    {settings.welcome?.layoutType === 'embed-card' ? (
+                                      <div style={{ marginTop: '10px', borderRadius: '4px', overflow: 'hidden' }}>
+                                        {renderCanvasCard()}
+                                      </div>
+                                    ) : (
+                                      mainImageUrl && (
+                                        <div style={{ marginTop: '10px', borderRadius: '4px', overflow: 'hidden' }}>
+                                          <img src={mainImageUrl} alt="" style={{ maxWidth: '100%', maxHeight: '250px', borderRadius: '4px', objectFit: 'cover' }} />
+                                        </div>
+                                      )
+                                    )}
+
+                                    {/* Footer */}
+                                    {(settings.welcome?.embedFooterText || footerIconUrl || settings.welcome?.embedTimestamp !== false) && (
+                                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '10px', color: '#949ba4', fontSize: '0.75rem' }}>
+                                        {footerIconUrl && <img src={footerIconUrl} alt="" style={{ width: '18px', height: '18px', borderRadius: '50%' }} />}
+                                        {settings.welcome?.embedFooterText && <span>{formatWelcomeText(settings.welcome.embedFooterText)}</span>}
+                                        {settings.welcome?.embedTimestamp !== false && (
+                                          <>
+                                            {settings.welcome?.embedFooterText && <span>•</span>}
+                                            <span>Today at {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                          </>
+                                        )}
+                                      </div>
+                                    )}
+                                  </div>
+                                  {renderRedirectButton()}
+                                </>
+                              );
+                            })()}
+
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              )}
+            </div>
+          )}
         </div>
       )}
 
