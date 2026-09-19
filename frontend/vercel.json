@@ -3,15 +3,15 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "http://18.228.240.205:25565/api/:path*"
+      "destination": "http://oh-03.vexanode.gg:4059/api/:path*"
     },
     {
       "source": "/uploads/:path*",
-      "destination": "http://18.228.240.205:25565/uploads/:path*"
+      "destination": "http://oh-03.vexanode.gg:4059/uploads/:path*"
     },
     {
       "source": "/socket.io/:path*",
-      "destination": "http://18.228.240.205:25565/socket.io/:path*"
+      "destination": "http://oh-03.vexanode.gg:4059/socket.io/:path*"
     },
     {
       "source": "/(.*)",
