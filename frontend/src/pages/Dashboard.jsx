@@ -4983,12 +4983,6 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                     description: '',
                     categoryId: settings.tickets?.categoryId || '',
                     supportRoleId: settings.tickets?.supportRoleId || '',
-                    logChannelId: settings.tickets?.logChannelId || '',
-                    namingFormat: settings.tickets?.namingFormat || 'ticket-{username}',
-                    pingSupportRole: settings.tickets?.pingSupportRole ?? true,
-                    enableClaim: settings.tickets?.enableClaim ?? false,
-                    maxTicketsPerUser: settings.tickets?.maxTicketsPerUser ?? 1,
-                    customQuestion: settings.tickets?.customQuestion || '',
                     title: settings.tickets?.title || 'Support Ticket',
                     ticketMessage: settings.tickets?.ticketMessage || 'Welcome {user}! Please describe your issue. Support staff will assist you shortly.'
                   }];
@@ -5027,12 +5021,6 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                       description: '',
                       categoryId: settings.tickets?.categoryId || '',
                       supportRoleId: settings.tickets?.supportRoleId || '',
-                      logChannelId: settings.tickets?.logChannelId || '',
-                      namingFormat: 'ticket-{username}',
-                      pingSupportRole: true,
-                      enableClaim: false,
-                      maxTicketsPerUser: 1,
-                      customQuestion: '',
                       title: 'Support Ticket',
                       ticketMessage: 'Welcome {user}! Please describe your issue. Support staff will assist you shortly.'
                     }
@@ -5049,12 +5037,6 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                       description: '',
                       categoryId: '',
                       supportRoleId: '',
-                      logChannelId: '',
-                      namingFormat: 'ticket-{username}',
-                      pingSupportRole: true,
-                      enableClaim: false,
-                      maxTicketsPerUser: 1,
-                      customQuestion: '',
                       title: 'Support Ticket',
                       ticketMessage: 'Welcome {user}! Please describe your issue. Support staff will assist you shortly.'
                     }];
@@ -5065,8 +5047,59 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                   }
                 };
 
+                const handleSubOptionChange = (optIdx, subIdx, field, value) => {
+                  const nextOptions = currentOptions.map((opt, i) => {
+                    if (i === optIdx) {
+                      const existingSubs = Array.isArray(opt.subOptions) ? opt.subOptions : [];
+                      const updatedSubs = existingSubs.map((sub, sI) => {
+                        if (sI === subIdx) {
+                          return { ...sub, [field]: value };
+                        }
+                        return sub;
+                      });
+                      return { ...opt, subOptions: updatedSubs };
+                    }
+                    return opt;
+                  });
+                  updateTicketOptions(nextOptions);
+                };
+
+                const handleAddSubOption = (optIdx) => {
+                  const nextOptions = currentOptions.map((opt, i) => {
+                    if (i === optIdx) {
+                      const existingSubs = Array.isArray(opt.subOptions) ? opt.subOptions : [];
+                      if (existingSubs.length >= 10) return opt;
+                      const newSub = {
+                        label: `Sub-option #${existingSubs.length + 1}`,
+                        emoji: '📁',
+                        style: 'primary',
+                        description: '',
+                        categoryId: opt.categoryId || settings.tickets?.categoryId || '',
+                        supportRoleId: opt.supportRoleId || settings.tickets?.supportRoleId || '',
+                        title: opt.title || 'Support Ticket',
+                        ticketMessage: opt.ticketMessage || 'Welcome {user}! Please describe your issue. Support staff will assist you shortly.'
+                      };
+                      return { ...opt, subOptions: [...existingSubs, newSub] };
+                    }
+                    return opt;
+                  });
+                  updateTicketOptions(nextOptions);
+                };
+
+                const handleRemoveSubOption = (optIdx, subIdx) => {
+                  const nextOptions = currentOptions.map((opt, i) => {
+                    if (i === optIdx) {
+                      const existingSubs = Array.isArray(opt.subOptions) ? opt.subOptions : [];
+                      const updatedSubs = existingSubs.filter((_, sI) => sI !== subIdx);
+                      return { ...opt, subOptions: updatedSubs };
+                    }
+                    return opt;
+                  });
+                  updateTicketOptions(nextOptions);
+                };
+
                 const previewButtons = currentOptions.map(opt => ({
-                  label: (opt.emoji ? `${opt.emoji} ` : '') + (opt.label || 'Ticket')
+                  label: (opt.emoji ? `${opt.emoji} ` : '') + (opt.label || 'Ticket') + (Array.isArray(opt.subOptions) && opt.subOptions.length > 0 ? ` (${opt.subOptions.length} sub-options)` : '')
                 }));
 
                 const componentType = settings.tickets?.componentType || 'buttons';
@@ -5212,20 +5245,6 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                                     />
                                   </div>
                                 )}
-
-                                <div>
-                                  <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Ticket Log / Transcript Channel</label>
-                                  <select
-                                    value={settings.tickets.logChannelId || ''}
-                                    onChange={(e) => handleInputChange('tickets.logChannelId', e.target.value)}
-                                    className="glass-input"
-                                  >
-                                    <option value="">-- Disabled (No Logs) --</option>
-                                    {channels.map(ch => (
-                                      <option key={ch.id} value={ch.id}>#{ch.name}</option>
-                                    ))}
-                                  </select>
-                                </div>
                               </div>
 
                               <div>
@@ -5248,7 +5267,7 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                                     Ticket Categories & Options ({currentOptions.length} / 6)
                                   </h4>
                                   <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', margin: '2px 0 0 0' }}>
-                                    Configure individual categories, target roles, automated welcome responses, and advanced options.
+                                    Configure individual categories, target roles, and automated welcome responses.
                                   </p>
                                 </div>
                                 <button
@@ -5461,128 +5480,244 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                                         />
                                       </div>
 
-                                        {/* ADVANCED SECTION OPTIONS FOR THIS CHOSEN TICKET OPTION */}
-                                        <div style={{
-                                          marginTop: '12px',
-                                          paddingTop: '14px',
-                                          borderTop: '1px dashed rgba(255,255,255,0.1)',
-                                          display: 'flex',
-                                          flexDirection: 'column',
-                                          gap: '14px'
-                                        }}>
-                                          <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#60a5fa', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                                            ⚙️ Advanced Option Settings & Controls
-                                          </span>
+                                      {/* NESTED SUB-OPTIONS MANAGER FOR THIS TICKET SECTION */}
+                                      <div style={{
+                                        marginTop: '16px',
+                                        paddingTop: '16px',
+                                        borderTop: '1px dashed rgba(255, 255, 255, 0.12)',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        gap: '12px'
+                                      }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                          <div>
+                                            <span style={{ fontSize: '0.825rem', fontWeight: '700', color: '#60a5fa', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                              <span>🌿 Sub-Options for "{opt.label || `Option #${index + 1}`}"</span>
+                                              <span style={{ fontSize: '0.7rem', background: 'rgba(96, 165, 250, 0.15)', color: '#60a5fa', padding: '1px 6px', borderRadius: '4px' }}>
+                                                {(opt.subOptions || []).length} / 10 sub-categories
+                                              </span>
+                                            </span>
+                                            <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', margin: '2px 0 0 0' }}>
+                                              When a user selects this section, show them these sub-options to choose from before creating a ticket.
+                                            </p>
+                                          </div>
+                                          <button
+                                            type="button"
+                                            onClick={() => handleAddSubOption(index)}
+                                            disabled={(opt.subOptions || []).length >= 10}
+                                            style={{
+                                              background: 'rgba(96, 165, 250, 0.15)',
+                                              color: '#60a5fa',
+                                              border: '1px solid rgba(96, 165, 250, 0.3)',
+                                              borderRadius: '6px',
+                                              padding: '4px 10px',
+                                              fontSize: '0.75rem',
+                                              fontWeight: '600',
+                                              cursor: (opt.subOptions || []).length >= 10 ? 'not-allowed' : 'pointer',
+                                              opacity: (opt.subOptions || []).length >= 10 ? 0.5 : 1
+                                            }}
+                                          >
+                                            + Add Sub-Option
+                                          </button>
+                                        </div>
 
-                                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '14px' }}>
-                                            {/* Channel Naming Format */}
-                                            <div>
-                                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                                                <label style={{ fontSize: '0.825rem', color: 'var(--text-secondary)', margin: 0 }}>
-                                                  Channel Naming Format
-                                                </label>
-                                                <div style={{ display: 'flex', gap: '4px' }}>
-                                                  {['{username}', '{count}', '{label}'].map(tag => (
-                                                    <button
-                                                      key={tag}
-                                                      type="button"
-                                                      onClick={() => {
-                                                        const curr = opt.namingFormat || 'ticket-{username}';
-                                                        handleOptionChange(index, 'namingFormat', curr + '-' + tag);
-                                                      }}
-                                                      style={{
-                                                        background: 'rgba(255,255,255,0.06)',
-                                                        border: '1px solid rgba(255,255,255,0.15)',
-                                                        color: 'var(--primary)',
-                                                        borderRadius: '4px',
-                                                        padding: '2px 6px',
-                                                        fontSize: '0.68rem',
-                                                        cursor: 'pointer'
-                                                      }}
+                                        {(opt.subOptions && opt.subOptions.length > 0) && (
+                                          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '6px' }}>
+                                            {opt.subOptions.map((sub, sIdx) => (
+                                              <div
+                                                key={sIdx}
+                                                style={{
+                                                  backgroundColor: 'rgba(0, 0, 0, 0.25)',
+                                                  border: '1px solid rgba(96, 165, 250, 0.2)',
+                                                  borderRadius: '8px',
+                                                  padding: '14px',
+                                                  display: 'flex',
+                                                  flexDirection: 'column',
+                                                  gap: '12px'
+                                                }}
+                                              >
+                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                  <span style={{ fontSize: '0.775rem', fontWeight: '700', color: '#93c5fd', letterSpacing: '0.5px' }}>
+                                                    SUB-OPTION #{sIdx + 1}
+                                                  </span>
+                                                  <button
+                                                    type="button"
+                                                    onClick={() => handleRemoveSubOption(index, sIdx)}
+                                                    style={{
+                                                      background: 'rgba(239, 68, 68, 0.15)',
+                                                      color: '#ef4444',
+                                                      border: '1px solid rgba(239, 68, 68, 0.3)',
+                                                      borderRadius: '4px',
+                                                      padding: '2px 8px',
+                                                      fontSize: '0.7rem',
+                                                      fontWeight: '600',
+                                                      cursor: 'pointer'
+                                                    }}
+                                                  >
+                                                    Delete Sub-Option
+                                                  </button>
+                                                </div>
+
+                                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '10px' }}>
+                                                  <div>
+                                                    <label style={{ display: 'block', fontSize: '0.775rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>
+                                                      Sub-Option Label <span style={{ color: 'var(--danger)' }}>*</span>
+                                                    </label>
+                                                    <input
+                                                      type="text"
+                                                      value={sub.label || ''}
+                                                      onChange={(e) => handleSubOptionChange(index, sIdx, 'label', e.target.value)}
+                                                      className="glass-input"
+                                                      style={{ padding: '6px 10px', fontSize: '0.8rem' }}
+                                                      placeholder="e.g. Refund Request"
+                                                    />
+                                                  </div>
+
+                                                  <div>
+                                                    <label style={{ display: 'block', fontSize: '0.775rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>
+                                                      Sub-Option Emoji
+                                                    </label>
+                                                    <input
+                                                      type="text"
+                                                      value={sub.emoji || ''}
+                                                      onChange={(e) => handleSubOptionChange(index, sIdx, 'emoji', e.target.value)}
+                                                      className="glass-input"
+                                                      style={{ padding: '6px 10px', fontSize: '0.8rem' }}
+                                                      placeholder="e.g. 💸"
+                                                    />
+                                                  </div>
+
+                                                  {componentType === 'select' ? (
+                                                    <div>
+                                                      <label style={{ display: 'block', fontSize: '0.775rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>
+                                                        Subtext / Description
+                                                      </label>
+                                                      <input
+                                                        type="text"
+                                                        value={sub.description || ''}
+                                                        onChange={(e) => handleSubOptionChange(index, sIdx, 'description', e.target.value)}
+                                                        className="glass-input"
+                                                        style={{ padding: '6px 10px', fontSize: '0.8rem' }}
+                                                        placeholder="e.g. Request a refund for purchases"
+                                                      />
+                                                    </div>
+                                                  ) : (
+                                                    <div>
+                                                      <label style={{ display: 'block', fontSize: '0.775rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>
+                                                        Button Style
+                                                      </label>
+                                                      <select
+                                                        value={sub.style || 'primary'}
+                                                        onChange={(e) => handleSubOptionChange(index, sIdx, 'style', e.target.value)}
+                                                        className="glass-input"
+                                                        style={{ padding: '6px 10px', fontSize: '0.8rem' }}
+                                                      >
+                                                        <option value="primary">Primary (Blue)</option>
+                                                        <option value="secondary">Secondary (Grey)</option>
+                                                        <option value="success">Success (Green)</option>
+                                                        <option value="danger">Danger (Red)</option>
+                                                      </select>
+                                                    </div>
+                                                  )}
+                                                </div>
+
+                                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '10px' }}>
+                                                  <div>
+                                                    <label style={{ display: 'block', fontSize: '0.775rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>
+                                                      Category (Optional Override)
+                                                    </label>
+                                                    <select
+                                                      value={sub.categoryId || ''}
+                                                      onChange={(e) => handleSubOptionChange(index, sIdx, 'categoryId', e.target.value)}
+                                                      className="glass-input"
+                                                      style={{ padding: '6px 10px', fontSize: '0.8rem' }}
                                                     >
-                                                      +{tag}
-                                                    </button>
-                                                  ))}
+                                                      <option value="">-- Inherit Parent Category --</option>
+                                                      {categories.map(cat => (
+                                                        <option key={cat.id} value={cat.id}>{cat.name}</option>
+                                                      ))}
+                                                    </select>
+                                                  </div>
+
+                                                  <div>
+                                                    <label style={{ display: 'block', fontSize: '0.775rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>
+                                                      Support Role (Optional Override)
+                                                    </label>
+                                                    <select
+                                                      value={sub.supportRoleId || ''}
+                                                      onChange={(e) => handleSubOptionChange(index, sIdx, 'supportRoleId', e.target.value)}
+                                                      className="glass-input"
+                                                      style={{ padding: '6px 10px', fontSize: '0.8rem' }}
+                                                    >
+                                                      <option value="">-- Inherit Parent Role --</option>
+                                                      {roles.map(role => (
+                                                        <option key={role.id} value={role.id} style={{ color: role.color }}>{role.name}</option>
+                                                      ))}
+                                                    </select>
+                                                  </div>
+                                                </div>
+
+                                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                                  <div>
+                                                    <label style={{ display: 'block', fontSize: '0.775rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>
+                                                      Sub-Option Ticket Channel Title
+                                                    </label>
+                                                    <input
+                                                      type="text"
+                                                      value={sub.title || ''}
+                                                      onChange={(e) => handleSubOptionChange(index, sIdx, 'title', e.target.value)}
+                                                      className="glass-input"
+                                                      style={{ padding: '6px 10px', fontSize: '0.8rem' }}
+                                                      placeholder="e.g. Refund Ticket"
+                                                    />
+                                                  </div>
+
+                                                  <div>
+                                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                                                      <label style={{ fontSize: '0.775rem', color: 'var(--text-secondary)', margin: 0 }}>
+                                                        Welcome Message
+                                                      </label>
+                                                      <div style={{ display: 'flex', gap: '3px' }}>
+                                                        {['{user}', '{username}', '{server}'].map(tag => (
+                                                          <button
+                                                            key={tag}
+                                                            type="button"
+                                                            onClick={() => {
+                                                              const curr = sub.ticketMessage || '';
+                                                              handleSubOptionChange(index, sIdx, 'ticketMessage', curr + ' ' + tag);
+                                                            }}
+                                                            style={{
+                                                              background: 'rgba(255,255,255,0.06)',
+                                                              border: '1px solid rgba(255,255,255,0.15)',
+                                                              color: '#60a5fa',
+                                                              borderRadius: '4px',
+                                                              padding: '1px 5px',
+                                                              fontSize: '0.675rem',
+                                                              cursor: 'pointer'
+                                                            }}
+                                                          >
+                                                            +{tag}
+                                                          </button>
+                                                        ))}
+                                                      </div>
+                                                    </div>
+                                                    <textarea
+                                                      rows="2"
+                                                      value={sub.ticketMessage || ''}
+                                                      onChange={(e) => handleSubOptionChange(index, sIdx, 'ticketMessage', e.target.value)}
+                                                      className="glass-input"
+                                                      style={{ padding: '6px 10px', fontSize: '0.8rem' }}
+                                                      placeholder="Welcome {user}! Please describe your refund request. Staff will assist shortly."
+                                                    />
+                                                  </div>
                                                 </div>
                                               </div>
-                                              <input
-                                                type="text"
-                                                value={opt.namingFormat || 'ticket-{username}'}
-                                                onChange={(e) => handleOptionChange(index, 'namingFormat', e.target.value)}
-                                                className="glass-input"
-                                                placeholder="e.g. ticket-{username}"
-                                              />
-                                            </div>
-
-                                            {/* Max Open Tickets Per User */}
-                                            <div>
-                                              <label style={{ display: 'block', fontSize: '0.825rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>
-                                                Max Open Tickets / User
-                                              </label>
-                                              <select
-                                                value={opt.maxTicketsPerUser !== undefined ? opt.maxTicketsPerUser : 1}
-                                                onChange={(e) => handleOptionChange(index, 'maxTicketsPerUser', parseInt(e.target.value, 10))}
-                                                className="glass-input"
-                                              >
-                                                <option value={1}>1 Open Ticket</option>
-                                                <option value={2}>2 Open Tickets</option>
-                                                <option value={3}>3 Open Tickets</option>
-                                                <option value={5}>5 Open Tickets</option>
-                                                <option value={0}>Unlimited</option>
-                                              </select>
-                                            </div>
+                                            ))}
                                           </div>
-
-                                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '14px' }}>
-                                            {/* Ping Support Role Toggle */}
-                                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', background: 'rgba(255,255,255,0.02)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.06)' }}>
-                                              <div>
-                                                <div style={{ fontSize: '0.825rem', fontWeight: '600', color: '#fff' }}>Ping Support Role</div>
-                                                <div style={{ fontSize: '0.725rem', color: 'var(--text-secondary)' }}>Tag support role on open</div>
-                                              </div>
-                                              <label className="switch" style={{ margin: 0 }}>
-                                                <input
-                                                  type="checkbox"
-                                                  checked={opt.pingSupportRole !== false}
-                                                  onChange={(e) => handleOptionChange(index, 'pingSupportRole', e.target.checked)}
-                                                />
-                                                <span className="slider"></span>
-                                              </label>
-                                            </div>
-
-                                            {/* Enable Staff Claim Button */}
-                                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', background: 'rgba(255,255,255,0.02)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.06)' }}>
-                                              <div>
-                                                <div style={{ fontSize: '0.825rem', fontWeight: '600', color: '#fff' }}>Staff Claim Button</div>
-                                                <div style={{ fontSize: '0.725rem', color: 'var(--text-secondary)' }}>Add Claim Ticket button</div>
-                                              </div>
-                                              <label className="switch" style={{ margin: 0 }}>
-                                                <input
-                                                  type="checkbox"
-                                                  checked={opt.enableClaim === true}
-                                                  onChange={(e) => handleOptionChange(index, 'enableClaim', e.target.checked)}
-                                                />
-                                                <span className="slider"></span>
-                                              </label>
-                                            </div>
-                                          </div>
-
-                                          {/* Custom Modal Question Prompt */}
-                                          <div>
-                                            <label style={{ display: 'block', fontSize: '0.825rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>
-                                              Custom Modal Form Question <span style={{ fontSize: '0.75rem', opacity: 0.7 }}>(Optional modal prompt before ticket creation)</span>
-                                            </label>
-                                            <input
-                                              type="text"
-                                              value={opt.customQuestion || ''}
-                                              onChange={(e) => handleOptionChange(index, 'customQuestion', e.target.value)}
-                                              className="glass-input"
-                                              placeholder="e.g. Please describe your issue or enter your Order ID"
-                                            />
-                                          </div>
-                                        </div>
+                                        )}
                                       </div>
                                     </div>
+                                  </div>
                                 ))}
                               </div>
                             </div>
