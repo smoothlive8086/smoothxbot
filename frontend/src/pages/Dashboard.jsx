@@ -4983,6 +4983,12 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                     description: '',
                     categoryId: settings.tickets?.categoryId || '',
                     supportRoleId: settings.tickets?.supportRoleId || '',
+                    logChannelId: settings.tickets?.logChannelId || '',
+                    namingFormat: settings.tickets?.namingFormat || 'ticket-{username}',
+                    pingSupportRole: settings.tickets?.pingSupportRole ?? true,
+                    enableClaim: settings.tickets?.enableClaim ?? false,
+                    maxTicketsPerUser: settings.tickets?.maxTicketsPerUser ?? 1,
+                    customQuestion: settings.tickets?.customQuestion || '',
                     title: settings.tickets?.title || 'Support Ticket',
                     ticketMessage: settings.tickets?.ticketMessage || 'Welcome {user}! Please describe your issue. Support staff will assist you shortly.'
                   }];
@@ -5021,6 +5027,12 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                       description: '',
                       categoryId: settings.tickets?.categoryId || '',
                       supportRoleId: settings.tickets?.supportRoleId || '',
+                      logChannelId: settings.tickets?.logChannelId || '',
+                      namingFormat: 'ticket-{username}',
+                      pingSupportRole: true,
+                      enableClaim: false,
+                      maxTicketsPerUser: 1,
+                      customQuestion: '',
                       title: 'Support Ticket',
                       ticketMessage: 'Welcome {user}! Please describe your issue. Support staff will assist you shortly.'
                     }
@@ -5037,6 +5049,12 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                       description: '',
                       categoryId: '',
                       supportRoleId: '',
+                      logChannelId: '',
+                      namingFormat: 'ticket-{username}',
+                      pingSupportRole: true,
+                      enableClaim: false,
+                      maxTicketsPerUser: 1,
+                      customQuestion: '',
                       title: 'Support Ticket',
                       ticketMessage: 'Welcome {user}! Please describe your issue. Support staff will assist you shortly.'
                     }];
@@ -5194,6 +5212,20 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                                     />
                                   </div>
                                 )}
+
+                                <div>
+                                  <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Ticket Log / Transcript Channel</label>
+                                  <select
+                                    value={settings.tickets.logChannelId || ''}
+                                    onChange={(e) => handleInputChange('tickets.logChannelId', e.target.value)}
+                                    className="glass-input"
+                                  >
+                                    <option value="">-- Disabled (No Logs) --</option>
+                                    {channels.map(ch => (
+                                      <option key={ch.id} value={ch.id}>#{ch.name}</option>
+                                    ))}
+                                  </select>
+                                </div>
                               </div>
 
                               <div>
@@ -5216,7 +5248,7 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                                     Ticket Categories & Options ({currentOptions.length} / 6)
                                   </h4>
                                   <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', margin: '2px 0 0 0' }}>
-                                    Configure individual categories, target roles, and automated welcome responses.
+                                    Configure individual categories, target roles, automated welcome responses, and advanced options.
                                   </p>
                                 </div>
                                 <button
@@ -5428,8 +5460,129 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                                           placeholder="Welcome {user}! Please describe your issue. Support staff will assist you shortly."
                                         />
                                       </div>
+
+                                        {/* ADVANCED SECTION OPTIONS FOR THIS CHOSEN TICKET OPTION */}
+                                        <div style={{
+                                          marginTop: '12px',
+                                          paddingTop: '14px',
+                                          borderTop: '1px dashed rgba(255,255,255,0.1)',
+                                          display: 'flex',
+                                          flexDirection: 'column',
+                                          gap: '14px'
+                                        }}>
+                                          <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#60a5fa', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                                            ⚙️ Advanced Option Settings & Controls
+                                          </span>
+
+                                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '14px' }}>
+                                            {/* Channel Naming Format */}
+                                            <div>
+                                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                                                <label style={{ fontSize: '0.825rem', color: 'var(--text-secondary)', margin: 0 }}>
+                                                  Channel Naming Format
+                                                </label>
+                                                <div style={{ display: 'flex', gap: '4px' }}>
+                                                  {['{username}', '{count}', '{label}'].map(tag => (
+                                                    <button
+                                                      key={tag}
+                                                      type="button"
+                                                      onClick={() => {
+                                                        const curr = opt.namingFormat || 'ticket-{username}';
+                                                        handleOptionChange(index, 'namingFormat', curr + '-' + tag);
+                                                      }}
+                                                      style={{
+                                                        background: 'rgba(255,255,255,0.06)',
+                                                        border: '1px solid rgba(255,255,255,0.15)',
+                                                        color: 'var(--primary)',
+                                                        borderRadius: '4px',
+                                                        padding: '2px 6px',
+                                                        fontSize: '0.68rem',
+                                                        cursor: 'pointer'
+                                                      }}
+                                                    >
+                                                      +{tag}
+                                                    </button>
+                                                  ))}
+                                                </div>
+                                              </div>
+                                              <input
+                                                type="text"
+                                                value={opt.namingFormat || 'ticket-{username}'}
+                                                onChange={(e) => handleOptionChange(index, 'namingFormat', e.target.value)}
+                                                className="glass-input"
+                                                placeholder="e.g. ticket-{username}"
+                                              />
+                                            </div>
+
+                                            {/* Max Open Tickets Per User */}
+                                            <div>
+                                              <label style={{ display: 'block', fontSize: '0.825rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>
+                                                Max Open Tickets / User
+                                              </label>
+                                              <select
+                                                value={opt.maxTicketsPerUser !== undefined ? opt.maxTicketsPerUser : 1}
+                                                onChange={(e) => handleOptionChange(index, 'maxTicketsPerUser', parseInt(e.target.value, 10))}
+                                                className="glass-input"
+                                              >
+                                                <option value={1}>1 Open Ticket</option>
+                                                <option value={2}>2 Open Tickets</option>
+                                                <option value={3}>3 Open Tickets</option>
+                                                <option value={5}>5 Open Tickets</option>
+                                                <option value={0}>Unlimited</option>
+                                              </select>
+                                            </div>
+                                          </div>
+
+                                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '14px' }}>
+                                            {/* Ping Support Role Toggle */}
+                                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', background: 'rgba(255,255,255,0.02)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.06)' }}>
+                                              <div>
+                                                <div style={{ fontSize: '0.825rem', fontWeight: '600', color: '#fff' }}>Ping Support Role</div>
+                                                <div style={{ fontSize: '0.725rem', color: 'var(--text-secondary)' }}>Tag support role on open</div>
+                                              </div>
+                                              <label className="switch" style={{ margin: 0 }}>
+                                                <input
+                                                  type="checkbox"
+                                                  checked={opt.pingSupportRole !== false}
+                                                  onChange={(e) => handleOptionChange(index, 'pingSupportRole', e.target.checked)}
+                                                />
+                                                <span className="slider"></span>
+                                              </label>
+                                            </div>
+
+                                            {/* Enable Staff Claim Button */}
+                                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', background: 'rgba(255,255,255,0.02)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.06)' }}>
+                                              <div>
+                                                <div style={{ fontSize: '0.825rem', fontWeight: '600', color: '#fff' }}>Staff Claim Button</div>
+                                                <div style={{ fontSize: '0.725rem', color: 'var(--text-secondary)' }}>Add Claim Ticket button</div>
+                                              </div>
+                                              <label className="switch" style={{ margin: 0 }}>
+                                                <input
+                                                  type="checkbox"
+                                                  checked={opt.enableClaim === true}
+                                                  onChange={(e) => handleOptionChange(index, 'enableClaim', e.target.checked)}
+                                                />
+                                                <span className="slider"></span>
+                                              </label>
+                                            </div>
+                                          </div>
+
+                                          {/* Custom Modal Question Prompt */}
+                                          <div>
+                                            <label style={{ display: 'block', fontSize: '0.825rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>
+                                              Custom Modal Form Question <span style={{ fontSize: '0.75rem', opacity: 0.7 }}>(Optional modal prompt before ticket creation)</span>
+                                            </label>
+                                            <input
+                                              type="text"
+                                              value={opt.customQuestion || ''}
+                                              onChange={(e) => handleOptionChange(index, 'customQuestion', e.target.value)}
+                                              className="glass-input"
+                                              placeholder="e.g. Please describe your issue or enter your Order ID"
+                                            />
+                                          </div>
+                                        </div>
+                                      </div>
                                     </div>
-                                  </div>
                                 ))}
                               </div>
                             </div>
