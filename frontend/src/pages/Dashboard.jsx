@@ -4283,461 +4283,461 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                       return (
                         <div className="welcome-split-layout" style={{ borderTop: '1px solid rgba(255, 255, 255, 0.06)', paddingTop: '20px' }}>
 
-                        {/* LEFT COLUMN: Controls matching screenshot */}
-                        <div className="welcome-settings-column" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                          {/* LEFT COLUMN: Controls matching screenshot */}
+                          <div className="welcome-settings-column" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
 
-                          {/* Greeting Channel & Sidebar Accent Row */}
-                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
-                            {/* Greeting Channel */}
-                            <div>
-                              <label style={{ display: 'block', fontSize: '0.85rem', color: '#94a3b8', marginBottom: '8px', fontWeight: '500' }}>
-                                Greeting Channel
-                              </label>
-                              <select
-                                value={settings.welcome.channelId || ''}
-                                onChange={(e) => handleInputChange('welcome.channelId', e.target.value)}
-                                className="glass-input"
-                                style={{
-                                  backgroundColor: '#0c0e17',
-                                  borderColor: 'rgba(255,255,255,0.08)',
-                                  borderRadius: '8px',
-                                  padding: '10px 14px',
-                                  color: '#ffffff'
-                                }}
-                              >
-                                <option value="">-- Select Greeting Channel --</option>
-                                {channels.map(ch => (
-                                  <option key={ch.id} value={ch.id}>#{ch.name}</option>
-                                ))}
-                              </select>
-                            </div>
-
-                            {/* Sidebar Accent */}
-                            <div>
-                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                                <label style={{ fontSize: '0.85rem', color: '#94a3b8', fontWeight: '500' }}>
-                                  Sidebar Accent
-                                </label>
-                                <label className="switch" style={{ scale: '0.85' }}>
-                                  <input
-                                    type="checkbox"
-                                    checked={settings.welcome.sidebarAccentEnabled !== false}
-                                    onChange={(e) => handleInputChange('welcome.sidebarAccentEnabled', e.target.checked)}
-                                  />
-                                  <span className="slider"></span>
-                                </label>
-                              </div>
-
-                              <div style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '10px',
-                                backgroundColor: '#0c0e17',
-                                border: '1px solid rgba(255,255,255,0.08)',
-                                borderRadius: '8px',
-                                padding: '6px 12px',
-                                height: '42px'
-                              }}>
-                                <input
-                                  type="color"
-                                  value={settings.welcome.embedColor?.startsWith('#') ? settings.welcome.embedColor : `#${settings.welcome.embedColor || 'ffffff'}`}
-                                  onChange={(e) => handleInputChange('welcome.embedColor', e.target.value)}
-                                  style={{
-                                    width: '28px',
-                                    height: '28px',
-                                    padding: 0,
-                                    border: 'none',
-                                    borderRadius: '4px',
-                                    cursor: 'pointer',
-                                    background: 'none'
-                                  }}
-                                />
-                                <input
-                                  type="text"
-                                  value={settings.welcome.embedColor || '#ffffff'}
-                                  onChange={(e) => handleInputChange('welcome.embedColor', e.target.value)}
-                                  style={{
-                                    background: 'none',
-                                    border: 'none',
-                                    color: '#ffffff',
-                                    fontSize: '0.9rem',
-                                    fontFamily: 'monospace',
-                                    outline: 'none',
-                                    width: '100%'
-                                  }}
-                                  placeholder="#ffffff"
-                                />
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Custom Welcome Message Box */}
-                          <div style={{
-                            backgroundColor: '#0a0c16',
-                            border: '1px solid rgba(255, 255, 255, 0.06)',
-                            borderRadius: '12px',
-                            padding: '16px'
-                          }}>
-                            <h4 style={{ fontSize: '0.9rem', fontWeight: '600', color: '#f8fafc', marginBottom: '12px' }}>
-                              Custom Welcome Message
-                            </h4>
-                            <textarea
-                              value={settings.welcome.message || ''}
-                              onChange={(e) => handleInputChange('welcome.message', e.target.value)}
-                              className="glass-input"
-                              placeholder="Welcome {user} to {server}!"
-                              rows="3"
-                              style={{
-                                backgroundColor: '#07080e',
-                                borderColor: 'rgba(255, 255, 255, 0.08)',
-                                borderRadius: '8px',
-                                color: '#ffffff',
-                                minHeight: '85px',
-                                resize: 'vertical',
-                                fontFamily: 'inherit',
-                                fontSize: '0.9rem',
-                                padding: '10px 14px'
-                              }}
-                            />
-
-                            {/* Supported tags chips */}
-                            <div style={{ marginTop: '12px', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                              <span style={{ fontSize: '0.78rem', color: '#64748b' }}>Supported tags:</span>
-                              {['{user}', '{username}', '{server}', '{channel}', '{channel2}', '{channel3}'].map((tag) => (
-                                <button
-                                  key={tag}
-                                  type="button"
-                                  onClick={() => {
-                                    const currentMsg = settings.welcome.message || '';
-                                    handleInputChange('welcome.message', currentMsg + (currentMsg ? ' ' : '') + tag);
-                                  }}
-                                  style={{
-                                    background: 'rgba(59, 130, 246, 0.1)',
-                                    border: '1px solid rgba(59, 130, 246, 0.25)',
-                                    color: '#60a5fa',
-                                    padding: '3px 10px',
-                                    borderRadius: '6px',
-                                    fontSize: '0.78rem',
-                                    fontFamily: 'monospace',
-                                    cursor: 'pointer',
-                                    transition: 'all 0.15s ease'
-                                  }}
-                                >
-                                  {tag}
-                                </button>
-                              ))}
-                            </div>
-                          </div>
-
-                          {/* Welcome Banner Image / GIF Link Box */}
-                          <div style={{
-                            backgroundColor: '#0a0c16',
-                            border: '1px solid rgba(255, 255, 255, 0.06)',
-                            borderRadius: '12px',
-                            padding: '16px'
-                          }}>
-                            <h4 style={{ fontSize: '0.9rem', fontWeight: '600', color: '#f8fafc', marginBottom: '12px' }}>
-                              Welcome Banner Image / GIF Link
-                            </h4>
-                            <input
-                              type="text"
-                              value={settings.welcome.background || ''}
-                              onChange={(e) => handleInputChange('welcome.background', e.target.value)}
-                              className="glass-input"
-                              placeholder="https://example.com/banner.png or https://media.tenor.com/.../banner"
-                              style={{
-                                backgroundColor: '#07080e',
-                                borderColor: 'rgba(255, 255, 255, 0.08)',
-                                borderRadius: '8px',
-                                color: '#ffffff',
-                                padding: '10px 14px',
-                                fontSize: '0.88rem'
-                              }}
-                            />
-                            <div style={{ marginTop: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                              <input
-                                type="checkbox"
-                                id="enableGifSupportCheck"
-                                checked={Boolean(settings.welcome.gifSupport)}
-                                onChange={() => handleToggle('welcome.gifSupport')}
-                                style={{ cursor: 'pointer', accentColor: '#2563eb' }}
-                              />
-                              <label htmlFor="enableGifSupportCheck" style={{ fontSize: '0.82rem', color: '#94a3b8', cursor: 'pointer' }}>
-                                Enable Animated GIF URL Display
-                              </label>
-                            </div>
-                          </div>
-
-                          {/* Server Website URL Box */}
-                          <div style={{
-                            backgroundColor: '#0a0c16',
-                            border: '1px solid rgba(255, 255, 255, 0.06)',
-                            borderRadius: '12px',
-                            padding: '16px'
-                          }}>
-                            <h4 style={{ fontSize: '0.9rem', fontWeight: '600', color: '#f8fafc', marginBottom: '12px' }}>
-                              Server Website URL (Optional)
-                            </h4>
-                            <input
-                              type="text"
-                              value={settings.welcome.websiteUrl || ''}
-                              onChange={(e) => handleInputChange('welcome.websiteUrl', e.target.value)}
-                              className="glass-input"
-                              placeholder="https://yourwebsite.com"
-                              style={{
-                                backgroundColor: '#07080e',
-                                borderColor: 'rgba(255, 255, 255, 0.08)',
-                                borderRadius: '8px',
-                                color: '#ffffff',
-                                padding: '10px 14px',
-                                fontSize: '0.88rem'
-                              }}
-                            />
-                            <p style={{ fontSize: '0.78rem', color: '#64748b', margin: '6px 0 0 0' }}>
-                              Add your server's website link. An interactive "🌐 Website" button will be included in the welcome message.
-                            </p>
-                          </div>
-
-                          {/* Channel Quick-Link Buttons (Action Row) Box */}
-                          <div style={{
-                            backgroundColor: '#0a0c16',
-                            border: '1px solid rgba(255, 255, 255, 0.06)',
-                            borderRadius: '12px',
-                            padding: '16px'
-                          }}>
-                            <h4 style={{ fontSize: '0.9rem', fontWeight: '600', color: '#f8fafc', marginBottom: '12px' }}>
-                              Channel Quick-Link Buttons (Action Row)
-                            </h4>
-
-                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '14px', marginBottom: '12px' }}>
+                            {/* Greeting Channel & Sidebar Accent Row */}
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
+                              {/* Greeting Channel */}
                               <div>
-                                <label style={{ display: 'block', fontSize: '0.78rem', color: '#64748b', marginBottom: '6px' }}>Button Link 1</label>
+                                <label style={{ display: 'block', fontSize: '0.85rem', color: '#94a3b8', marginBottom: '8px', fontWeight: '500' }}>
+                                  Greeting Channel
+                                </label>
                                 <select
-                                  value={settings.welcome.redirectChannelId || ''}
-                                  onChange={(e) => handleInputChange('welcome.redirectChannelId', e.target.value)}
+                                  value={settings.welcome.channelId || ''}
+                                  onChange={(e) => handleInputChange('welcome.channelId', e.target.value)}
                                   className="glass-input"
-                                  style={{ backgroundColor: '#07080e', borderColor: 'rgba(255,255,255,0.08)', borderRadius: '8px', padding: '9px 12px', fontSize: '0.85rem' }}
+                                  style={{
+                                    backgroundColor: '#0c0e17',
+                                    borderColor: 'rgba(255,255,255,0.08)',
+                                    borderRadius: '8px',
+                                    padding: '10px 14px',
+                                    color: '#ffffff'
+                                  }}
                                 >
-                                  <option value="">-- No Button --</option>
+                                  <option value="">-- Select Greeting Channel --</option>
                                   {channels.map(ch => (
                                     <option key={ch.id} value={ch.id}>#{ch.name}</option>
                                   ))}
                                 </select>
                               </div>
 
+                              {/* Sidebar Accent */}
                               <div>
-                                <label style={{ display: 'block', fontSize: '0.78rem', color: '#64748b', marginBottom: '6px' }}>Button Link 2</label>
-                                <select
-                                  value={settings.welcome.redirectChannelId2 || ''}
-                                  onChange={(e) => handleInputChange('welcome.redirectChannelId2', e.target.value)}
-                                  className="glass-input"
-                                  style={{ backgroundColor: '#07080e', borderColor: 'rgba(255,255,255,0.08)', borderRadius: '8px', padding: '9px 12px', fontSize: '0.85rem' }}
-                                >
-                                  <option value="">-- No Button --</option>
-                                  {channels.map(ch => (
-                                    <option key={ch.id} value={ch.id}>#{ch.name}</option>
-                                  ))}
-                                </select>
-                              </div>
-                            </div>
-
-                            <div style={{ width: 'calc(50% - 7px)' }}>
-                              <label style={{ display: 'block', fontSize: '0.78rem', color: '#64748b', marginBottom: '6px' }}>Button Link 3</label>
-                              <select
-                                value={settings.welcome.redirectChannelId3 || ''}
-                                onChange={(e) => handleInputChange('welcome.redirectChannelId3', e.target.value)}
-                                className="glass-input"
-                                style={{ backgroundColor: '#07080e', borderColor: 'rgba(255,255,255,0.08)', borderRadius: '8px', padding: '9px 12px', fontSize: '0.85rem' }}
-                              >
-                                <option value="">-- No Button --</option>
-                                {channels.map(ch => (
-                                  <option key={ch.id} value={ch.id}>#{ch.name}</option>
-                                ))}
-                              </select>
-                            </div>
-                          </div>
-
-                        </div>
-
-                        {/* RIGHT COLUMN: Live Discord Message Preview matching screenshot */}
-                        <div className="welcome-preview-column" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-
-                          {/* Live Preview Header */}
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', color: '#94a3b8', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                            <Eye size={14} />
-                            <span>LIVE DISCORD MESSAGE PREVIEW</span>
-                          </div>
-
-                          {/* Discord Channel Bar */}
-                          <div style={{
-                            backgroundColor: '#2b2d31',
-                            borderRadius: '8px 8px 0 0',
-                            padding: '10px 16px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '8px',
-                            borderBottom: '1px solid rgba(0,0,0,0.2)'
-                          }}>
-                            <span style={{ color: '#80848e', fontSize: '1.1rem', fontWeight: '700' }}>#</span>
-                            <span style={{ color: '#f2f3f5', fontWeight: '600', fontSize: '0.9rem' }}>
-                              {channels.find(c => c.id === settings.welcome.channelId)?.name || 'welcome'}
-                            </span>
-                            <span style={{ color: '#4e5058', margin: '0 4px' }}>|</span>
-                            <span style={{ color: '#949ba4', fontSize: '0.8rem' }}>Greeting channel preview</span>
-                          </div>
-
-                          {/* Discord Message Area */}
-                          <div style={{
-                            backgroundColor: '#313338',
-                            borderRadius: '0 0 8px 8px',
-                            padding: '16px',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            gap: '12px'
-                          }}>
-                            <div style={{ display: 'flex', gap: '14px' }}>
-                              {/* Bot Avatar */}
-                              <div style={{
-                                width: '40px',
-                                height: '40px',
-                                borderRadius: '50%',
-                                backgroundColor: '#111214',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                overflow: 'hidden',
-                                flexShrink: 0
-                              }}>
-                                <img
-                                  src={guildIcon || 'https://cdn.discordapp.com/embed/avatars/0.png'}
-                                  alt="bot avatar"
-                                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                                />
-                              </div>
-
-                              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                                {/* Bot Name & Badge */}
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                  <span style={{ color: '#f2f3f5', fontWeight: '600', fontSize: '0.95rem' }}>
-                                    BrickGuard
-                                  </span>
-                                  <span style={{
-                                    backgroundColor: '#5865f2',
-                                    color: '#ffffff',
-                                    fontSize: '0.65rem',
-                                    fontWeight: '700',
-                                    padding: '1px 5px',
-                                    borderRadius: '3px',
-                                    letterSpacing: '0.02em'
-                                  }}>
-                                    BOT
-                                  </span>
-                                  <span style={{ color: '#949ba4', fontSize: '0.75rem' }}>
-                                    Today at {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                  </span>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                                  <label style={{ fontSize: '0.85rem', color: '#94a3b8', fontWeight: '500' }}>
+                                    Sidebar Accent
+                                  </label>
+                                  <label className="switch" style={{ scale: '0.85' }}>
+                                    <input
+                                      type="checkbox"
+                                      checked={settings.welcome.sidebarAccentEnabled !== false}
+                                      onChange={(e) => handleInputChange('welcome.sidebarAccentEnabled', e.target.checked)}
+                                    />
+                                    <span className="slider"></span>
+                                  </label>
                                 </div>
 
-                                {/* Discord Embed Container */}
                                 <div style={{
-                                  backgroundColor: '#2b2d31',
-                                  borderLeft: (settings.welcome.sidebarAccentEnabled !== false)
-                                    ? `4px solid ${settings.welcome.embedColor || '#ffffff'}`
-                                    : 'none',
-                                  borderRadius: '4px',
-                                  padding: '16px',
-                                  position: 'relative',
                                   display: 'flex',
-                                  flexDirection: 'column',
-                                  gap: '12px',
-                                  marginTop: '4px'
+                                  alignItems: 'center',
+                                  gap: '10px',
+                                  backgroundColor: '#0c0e17',
+                                  border: '1px solid rgba(255,255,255,0.08)',
+                                  borderRadius: '8px',
+                                  padding: '6px 12px',
+                                  height: '42px'
                                 }}>
-                                  {/* Embed Header Row: Title & Top-Right Thumbnail */}
-                                  <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px', alignItems: 'flex-start' }}>
-                                    <div style={{ flex: 1 }}>
-                                      {settings.welcome.embedTitle && settings.welcome.embedTitle.trim() ? (
-                                        <div style={{ color: '#ffffff', fontWeight: '700', fontSize: '1.1rem', marginBottom: '6px' }}>
-                                          {formatWelcomeText(settings.welcome.embedTitle)}
-                                        </div>
-                                      ) : null}
+                                  <input
+                                    type="color"
+                                    value={settings.welcome.embedColor?.startsWith('#') ? settings.welcome.embedColor : `#${settings.welcome.embedColor || 'ffffff'}`}
+                                    onChange={(e) => handleInputChange('welcome.embedColor', e.target.value)}
+                                    style={{
+                                      width: '28px',
+                                      height: '28px',
+                                      padding: 0,
+                                      border: 'none',
+                                      borderRadius: '4px',
+                                      cursor: 'pointer',
+                                      background: 'none'
+                                    }}
+                                  />
+                                  <input
+                                    type="text"
+                                    value={settings.welcome.embedColor || '#ffffff'}
+                                    onChange={(e) => handleInputChange('welcome.embedColor', e.target.value)}
+                                    style={{
+                                      background: 'none',
+                                      border: 'none',
+                                      color: '#ffffff',
+                                      fontSize: '0.9rem',
+                                      fontFamily: 'monospace',
+                                      outline: 'none',
+                                      width: '100%'
+                                    }}
+                                    placeholder="#ffffff"
+                                  />
+                                </div>
+                              </div>
+                            </div>
 
-                                      <div style={{ color: '#dbdee1', fontSize: '0.9rem', lineHeight: '1.4' }}>
-                                        {formatWelcomeText(settings.welcome.message || 'Welcome {user} to {server}!')}
+                            {/* Custom Welcome Message Box */}
+                            <div style={{
+                              backgroundColor: '#0a0c16',
+                              border: '1px solid rgba(255, 255, 255, 0.06)',
+                              borderRadius: '12px',
+                              padding: '16px'
+                            }}>
+                              <h4 style={{ fontSize: '0.9rem', fontWeight: '600', color: '#f8fafc', marginBottom: '12px' }}>
+                                Custom Welcome Message
+                              </h4>
+                              <textarea
+                                value={settings.welcome.message || ''}
+                                onChange={(e) => handleInputChange('welcome.message', e.target.value)}
+                                className="glass-input"
+                                placeholder="Welcome {user} to {server}!"
+                                rows="3"
+                                style={{
+                                  backgroundColor: '#07080e',
+                                  borderColor: 'rgba(255, 255, 255, 0.08)',
+                                  borderRadius: '8px',
+                                  color: '#ffffff',
+                                  minHeight: '85px',
+                                  resize: 'vertical',
+                                  fontFamily: 'inherit',
+                                  fontSize: '0.9rem',
+                                  padding: '10px 14px'
+                                }}
+                              />
+
+                              {/* Supported tags chips */}
+                              <div style={{ marginTop: '12px', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                                <span style={{ fontSize: '0.78rem', color: '#64748b' }}>Supported tags:</span>
+                                {['{user}', '{username}', '{server}', '{channel}', '{channel2}', '{channel3}'].map((tag) => (
+                                  <button
+                                    key={tag}
+                                    type="button"
+                                    onClick={() => {
+                                      const currentMsg = settings.welcome.message || '';
+                                      handleInputChange('welcome.message', currentMsg + (currentMsg ? ' ' : '') + tag);
+                                    }}
+                                    style={{
+                                      background: 'rgba(59, 130, 246, 0.1)',
+                                      border: '1px solid rgba(59, 130, 246, 0.25)',
+                                      color: '#60a5fa',
+                                      padding: '3px 10px',
+                                      borderRadius: '6px',
+                                      fontSize: '0.78rem',
+                                      fontFamily: 'monospace',
+                                      cursor: 'pointer',
+                                      transition: 'all 0.15s ease'
+                                    }}
+                                  >
+                                    {tag}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+
+                            {/* Welcome Banner Image / GIF Link Box */}
+                            <div style={{
+                              backgroundColor: '#0a0c16',
+                              border: '1px solid rgba(255, 255, 255, 0.06)',
+                              borderRadius: '12px',
+                              padding: '16px'
+                            }}>
+                              <h4 style={{ fontSize: '0.9rem', fontWeight: '600', color: '#f8fafc', marginBottom: '12px' }}>
+                                Welcome Banner Image / GIF Link
+                              </h4>
+                              <input
+                                type="text"
+                                value={settings.welcome.background || ''}
+                                onChange={(e) => handleInputChange('welcome.background', e.target.value)}
+                                className="glass-input"
+                                placeholder="https://example.com/banner.png or https://media.tenor.com/.../banner"
+                                style={{
+                                  backgroundColor: '#07080e',
+                                  borderColor: 'rgba(255, 255, 255, 0.08)',
+                                  borderRadius: '8px',
+                                  color: '#ffffff',
+                                  padding: '10px 14px',
+                                  fontSize: '0.88rem'
+                                }}
+                              />
+                              <div style={{ marginTop: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <input
+                                  type="checkbox"
+                                  id="enableGifSupportCheck"
+                                  checked={Boolean(settings.welcome.gifSupport)}
+                                  onChange={() => handleToggle('welcome.gifSupport')}
+                                  style={{ cursor: 'pointer', accentColor: '#2563eb' }}
+                                />
+                                <label htmlFor="enableGifSupportCheck" style={{ fontSize: '0.82rem', color: '#94a3b8', cursor: 'pointer' }}>
+                                  Enable Animated GIF URL Display
+                                </label>
+                              </div>
+                            </div>
+
+                            {/* Server Website URL Box */}
+                            <div style={{
+                              backgroundColor: '#0a0c16',
+                              border: '1px solid rgba(255, 255, 255, 0.06)',
+                              borderRadius: '12px',
+                              padding: '16px'
+                            }}>
+                              <h4 style={{ fontSize: '0.9rem', fontWeight: '600', color: '#f8fafc', marginBottom: '12px' }}>
+                                Server Website URL (Optional)
+                              </h4>
+                              <input
+                                type="text"
+                                value={settings.welcome.websiteUrl || ''}
+                                onChange={(e) => handleInputChange('welcome.websiteUrl', e.target.value)}
+                                className="glass-input"
+                                placeholder="https://yourwebsite.com"
+                                style={{
+                                  backgroundColor: '#07080e',
+                                  borderColor: 'rgba(255, 255, 255, 0.08)',
+                                  borderRadius: '8px',
+                                  color: '#ffffff',
+                                  padding: '10px 14px',
+                                  fontSize: '0.88rem'
+                                }}
+                              />
+                              <p style={{ fontSize: '0.78rem', color: '#64748b', margin: '6px 0 0 0' }}>
+                                Add your server's website link. An interactive "🌐 Website" button will be included in the welcome message.
+                              </p>
+                            </div>
+
+                            {/* Channel Quick-Link Buttons (Action Row) Box */}
+                            <div style={{
+                              backgroundColor: '#0a0c16',
+                              border: '1px solid rgba(255, 255, 255, 0.06)',
+                              borderRadius: '12px',
+                              padding: '16px'
+                            }}>
+                              <h4 style={{ fontSize: '0.9rem', fontWeight: '600', color: '#f8fafc', marginBottom: '12px' }}>
+                                Channel Quick-Link Buttons (Action Row)
+                              </h4>
+
+                              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '14px', marginBottom: '12px' }}>
+                                <div>
+                                  <label style={{ display: 'block', fontSize: '0.78rem', color: '#64748b', marginBottom: '6px' }}>Button Link 1</label>
+                                  <select
+                                    value={settings.welcome.redirectChannelId || ''}
+                                    onChange={(e) => handleInputChange('welcome.redirectChannelId', e.target.value)}
+                                    className="glass-input"
+                                    style={{ backgroundColor: '#07080e', borderColor: 'rgba(255,255,255,0.08)', borderRadius: '8px', padding: '9px 12px', fontSize: '0.85rem' }}
+                                  >
+                                    <option value="">-- No Button --</option>
+                                    {channels.map(ch => (
+                                      <option key={ch.id} value={ch.id}>#{ch.name}</option>
+                                    ))}
+                                  </select>
+                                </div>
+
+                                <div>
+                                  <label style={{ display: 'block', fontSize: '0.78rem', color: '#64748b', marginBottom: '6px' }}>Button Link 2</label>
+                                  <select
+                                    value={settings.welcome.redirectChannelId2 || ''}
+                                    onChange={(e) => handleInputChange('welcome.redirectChannelId2', e.target.value)}
+                                    className="glass-input"
+                                    style={{ backgroundColor: '#07080e', borderColor: 'rgba(255,255,255,0.08)', borderRadius: '8px', padding: '9px 12px', fontSize: '0.85rem' }}
+                                  >
+                                    <option value="">-- No Button --</option>
+                                    {channels.map(ch => (
+                                      <option key={ch.id} value={ch.id}>#{ch.name}</option>
+                                    ))}
+                                  </select>
+                                </div>
+                              </div>
+
+                              <div style={{ width: 'calc(50% - 7px)' }}>
+                                <label style={{ display: 'block', fontSize: '0.78rem', color: '#64748b', marginBottom: '6px' }}>Button Link 3</label>
+                                <select
+                                  value={settings.welcome.redirectChannelId3 || ''}
+                                  onChange={(e) => handleInputChange('welcome.redirectChannelId3', e.target.value)}
+                                  className="glass-input"
+                                  style={{ backgroundColor: '#07080e', borderColor: 'rgba(255,255,255,0.08)', borderRadius: '8px', padding: '9px 12px', fontSize: '0.85rem' }}
+                                >
+                                  <option value="">-- No Button --</option>
+                                  {channels.map(ch => (
+                                    <option key={ch.id} value={ch.id}>#{ch.name}</option>
+                                  ))}
+                                </select>
+                              </div>
+                            </div>
+
+                          </div>
+
+                          {/* RIGHT COLUMN: Live Discord Message Preview matching screenshot */}
+                          <div className="welcome-preview-column" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+
+                            {/* Live Preview Header */}
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', color: '#94a3b8', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                              <Eye size={14} />
+                              <span>LIVE DISCORD MESSAGE PREVIEW</span>
+                            </div>
+
+                            {/* Discord Channel Bar */}
+                            <div style={{
+                              backgroundColor: '#2b2d31',
+                              borderRadius: '8px 8px 0 0',
+                              padding: '10px 16px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '8px',
+                              borderBottom: '1px solid rgba(0,0,0,0.2)'
+                            }}>
+                              <span style={{ color: '#80848e', fontSize: '1.1rem', fontWeight: '700' }}>#</span>
+                              <span style={{ color: '#f2f3f5', fontWeight: '600', fontSize: '0.9rem' }}>
+                                {channels.find(c => c.id === settings.welcome.channelId)?.name || 'welcome'}
+                              </span>
+                              <span style={{ color: '#4e5058', margin: '0 4px' }}>|</span>
+                              <span style={{ color: '#949ba4', fontSize: '0.8rem' }}>Greeting channel preview</span>
+                            </div>
+
+                            {/* Discord Message Area */}
+                            <div style={{
+                              backgroundColor: '#313338',
+                              borderRadius: '0 0 8px 8px',
+                              padding: '16px',
+                              display: 'flex',
+                              flexDirection: 'column',
+                              gap: '12px'
+                            }}>
+                              <div style={{ display: 'flex', gap: '14px' }}>
+                                {/* Bot Avatar */}
+                                <div style={{
+                                  width: '40px',
+                                  height: '40px',
+                                  borderRadius: '50%',
+                                  backgroundColor: '#111214',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  overflow: 'hidden',
+                                  flexShrink: 0
+                                }}>
+                                  <img
+                                    src={guildIcon || 'https://cdn.discordapp.com/embed/avatars/0.png'}
+                                    alt="bot avatar"
+                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                  />
+                                </div>
+
+                                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                                  {/* Bot Name & Badge */}
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    <span style={{ color: '#f2f3f5', fontWeight: '600', fontSize: '0.95rem' }}>
+                                      BrickGuard
+                                    </span>
+                                    <span style={{
+                                      backgroundColor: '#5865f2',
+                                      color: '#ffffff',
+                                      fontSize: '0.65rem',
+                                      fontWeight: '700',
+                                      padding: '1px 5px',
+                                      borderRadius: '3px',
+                                      letterSpacing: '0.02em'
+                                    }}>
+                                      BOT
+                                    </span>
+                                    <span style={{ color: '#949ba4', fontSize: '0.75rem' }}>
+                                      Today at {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                    </span>
+                                  </div>
+
+                                  {/* Discord Embed Container */}
+                                  <div style={{
+                                    backgroundColor: '#2b2d31',
+                                    borderLeft: (settings.welcome.sidebarAccentEnabled !== false)
+                                      ? `4px solid ${settings.welcome.embedColor || '#ffffff'}`
+                                      : 'none',
+                                    borderRadius: '4px',
+                                    padding: '16px',
+                                    position: 'relative',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    gap: '12px',
+                                    marginTop: '4px'
+                                  }}>
+                                    {/* Embed Header Row: Title & Top-Right Thumbnail */}
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px', alignItems: 'flex-start' }}>
+                                      <div style={{ flex: 1 }}>
+                                        {settings.welcome.embedTitle && settings.welcome.embedTitle.trim() ? (
+                                          <div style={{ color: '#ffffff', fontWeight: '700', fontSize: '1.1rem', marginBottom: '6px' }}>
+                                            {formatWelcomeText(settings.welcome.embedTitle)}
+                                          </div>
+                                        ) : null}
+
+                                        <div style={{ color: '#dbdee1', fontSize: '0.9rem', lineHeight: '1.4' }}>
+                                          {formatWelcomeText(settings.welcome.message || 'Welcome {user} to {server}!')}
+                                        </div>
+                                      </div>
+
+                                      {/* Thumbnail with ALT badge */}
+                                      <div style={{ position: 'relative', width: '54px', height: '54px', borderRadius: '6px', overflow: 'hidden', flexShrink: 0 }}>
+                                        <img
+                                          src={user.avatar ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png` : 'https://cdn.discordapp.com/embed/avatars/0.png'}
+                                          alt="thumbnail preview"
+                                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                        />
+                                        <span style={{
+                                          position: 'absolute',
+                                          bottom: '2px',
+                                          right: '2px',
+                                          backgroundColor: 'rgba(0,0,0,0.85)',
+                                          color: '#ffffff',
+                                          fontSize: '0.55rem',
+                                          fontWeight: '700',
+                                          padding: '1px 3px',
+                                          borderRadius: '2px'
+                                        }}>
+                                          ALT
+                                        </span>
                                       </div>
                                     </div>
 
-                                    {/* Thumbnail with ALT badge */}
-                                    <div style={{ position: 'relative', width: '54px', height: '54px', borderRadius: '6px', overflow: 'hidden', flexShrink: 0 }}>
-                                      <img
-                                        src={user.avatar ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png` : 'https://cdn.discordapp.com/embed/avatars/0.png'}
-                                        alt="thumbnail preview"
-                                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                                      />
+                                    {/* Welcome Canvas Card / Banner Image Display */}
+                                    <div style={{
+                                      position: 'relative',
+                                      width: '100%',
+                                      minHeight: '220px',
+                                      borderRadius: '6px',
+                                      backgroundColor: '#111214',
+                                      overflow: 'hidden',
+                                      border: '1px solid rgba(255,255,255,0.05)',
+                                      marginTop: '4px'
+                                    }}>
+                                      {settings.welcome.background && (settings.welcome.background.startsWith('http') || settings.welcome.background.startsWith('/uploads/')) ? (
+                                        <img
+                                          src={resolveUploadUrl(settings.welcome.background)}
+                                          alt="welcome banner preview"
+                                          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                                        />
+                                      ) : (
+                                        renderCanvasCard()
+                                      )}
+
                                       <span style={{
                                         position: 'absolute',
-                                        bottom: '2px',
-                                        right: '2px',
+                                        bottom: '8px',
+                                        left: '8px',
                                         backgroundColor: 'rgba(0,0,0,0.85)',
                                         color: '#ffffff',
-                                        fontSize: '0.55rem',
+                                        fontSize: '0.65rem',
                                         fontWeight: '700',
-                                        padding: '1px 3px',
-                                        borderRadius: '2px'
+                                        padding: '2px 6px',
+                                        borderRadius: '3px'
                                       }}>
                                         ALT
                                       </span>
                                     </div>
+
                                   </div>
 
-                                  {/* Welcome Canvas Card / Banner Image Display */}
-                                  <div style={{
-                                    position: 'relative',
-                                    width: '100%',
-                                    minHeight: '220px',
-                                    borderRadius: '6px',
-                                    backgroundColor: '#111214',
-                                    overflow: 'hidden',
-                                    border: '1px solid rgba(255,255,255,0.05)',
-                                    marginTop: '4px'
-                                  }}>
-                                    {settings.welcome.background && (settings.welcome.background.startsWith('http') || settings.welcome.background.startsWith('/uploads/')) ? (
-                                      <img
-                                        src={resolveUploadUrl(settings.welcome.background)}
-                                        alt="welcome banner preview"
-                                        style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-                                      />
-                                    ) : (
-                                      renderCanvasCard()
-                                    )}
-
-                                    <span style={{
-                                      position: 'absolute',
-                                      bottom: '8px',
-                                      left: '8px',
-                                      backgroundColor: 'rgba(0,0,0,0.85)',
-                                      color: '#ffffff',
-                                      fontSize: '0.65rem',
-                                      fontWeight: '700',
-                                      padding: '2px 6px',
-                                      borderRadius: '3px'
-                                    }}>
-                                      ALT
-                                    </span>
-                                  </div>
+                                  {/* Channel Quick-Link Buttons (Action Row) */}
+                                  {renderRedirectButton()}
 
                                 </div>
-
-                                {/* Channel Quick-Link Buttons (Action Row) */}
-                                {renderRedirectButton()}
-
                               </div>
                             </div>
+
                           </div>
 
                         </div>
-
-                      </div>
-                    );
-                  })()}
+                      );
+                    })()}
                   </div>
                 </div>
               )}
@@ -5038,7 +5038,8 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                       categoryId: '',
                       supportRoleId: '',
                       title: 'Support Ticket',
-                      ticketMessage: 'Welcome {user}! Please describe your issue. Support staff will assist you shortly.'
+                      ticketMessage: 'Welcome {user}! Please describe your issue. Support staff will assist you shortly.',
+                      subOptions: []
                     }];
                     updateTicketOptions(next);
                   } else {
@@ -5047,59 +5048,63 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                   }
                 };
 
-                const handleSubOptionChange = (optIdx, subIdx, field, value) => {
-                  const nextOptions = currentOptions.map((opt, i) => {
-                    if (i === optIdx) {
-                      const existingSubs = Array.isArray(opt.subOptions) ? opt.subOptions : [];
-                      const updatedSubs = existingSubs.map((sub, sI) => {
-                        if (sI === subIdx) {
+                const handleAddSubOption = (optionIndex) => {
+                  const next = currentOptions.map((item, idx) => {
+                    if (idx === optionIndex) {
+                      const existingSubs = item.subOptions || [];
+                      if (existingSubs.length >= 10) return item;
+                      return {
+                        ...item,
+                        subOptions: [
+                          ...existingSubs,
+                          {
+                            label: `Sub-Option #${existingSubs.length + 1}`,
+                            emoji: '📌',
+                            description: '',
+                            categoryId: item.categoryId || '',
+                            supportRoleId: item.supportRoleId || '',
+                            title: item.title || 'Support Ticket',
+                            ticketMessage: item.ticketMessage || ''
+                          }
+                        ]
+                      };
+                    }
+                    return item;
+                  });
+                  updateTicketOptions(next);
+                };
+
+                const handleSubOptionChange = (optionIndex, subIndex, field, value) => {
+                  const next = currentOptions.map((item, idx) => {
+                    if (idx === optionIndex) {
+                      const existingSubs = item.subOptions || [];
+                      const updatedSubs = existingSubs.map((sub, sIdx) => {
+                        if (sIdx === subIndex) {
                           return { ...sub, [field]: value };
                         }
                         return sub;
                       });
-                      return { ...opt, subOptions: updatedSubs };
+                      return { ...item, subOptions: updatedSubs };
                     }
-                    return opt;
+                    return item;
                   });
-                  updateTicketOptions(nextOptions);
+                  updateTicketOptions(next);
                 };
 
-                const handleAddSubOption = (optIdx) => {
-                  const nextOptions = currentOptions.map((opt, i) => {
-                    if (i === optIdx) {
-                      const existingSubs = Array.isArray(opt.subOptions) ? opt.subOptions : [];
-                      if (existingSubs.length >= 10) return opt;
-                      const newSub = {
-                        label: `Sub-option #${existingSubs.length + 1}`,
-                        emoji: '📁',
-                        style: 'primary',
-                        description: '',
-                        categoryId: opt.categoryId || settings.tickets?.categoryId || '',
-                        supportRoleId: opt.supportRoleId || settings.tickets?.supportRoleId || '',
-                        title: opt.title || 'Support Ticket',
-                        ticketMessage: opt.ticketMessage || 'Welcome {user}! Please describe your issue. Support staff will assist you shortly.'
-                      };
-                      return { ...opt, subOptions: [...existingSubs, newSub] };
+                const handleRemoveSubOption = (optionIndex, subIndex) => {
+                  const next = currentOptions.map((item, idx) => {
+                    if (idx === optionIndex) {
+                      const existingSubs = item.subOptions || [];
+                      const updatedSubs = existingSubs.filter((_, sIdx) => sIdx !== subIndex);
+                      return { ...item, subOptions: updatedSubs };
                     }
-                    return opt;
+                    return item;
                   });
-                  updateTicketOptions(nextOptions);
-                };
-
-                const handleRemoveSubOption = (optIdx, subIdx) => {
-                  const nextOptions = currentOptions.map((opt, i) => {
-                    if (i === optIdx) {
-                      const existingSubs = Array.isArray(opt.subOptions) ? opt.subOptions : [];
-                      const updatedSubs = existingSubs.filter((_, sI) => sI !== subIdx);
-                      return { ...opt, subOptions: updatedSubs };
-                    }
-                    return opt;
-                  });
-                  updateTicketOptions(nextOptions);
+                  updateTicketOptions(next);
                 };
 
                 const previewButtons = currentOptions.map(opt => ({
-                  label: (opt.emoji ? `${opt.emoji} ` : '') + (opt.label || 'Ticket') + (Array.isArray(opt.subOptions) && opt.subOptions.length > 0 ? ` (${opt.subOptions.length} sub-options)` : '')
+                  label: (opt.emoji ? `${opt.emoji} ` : '') + (opt.label || 'Ticket')
                 }));
 
                 const componentType = settings.tickets?.componentType || 'buttons';
@@ -5479,243 +5484,160 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                                           placeholder="Welcome {user}! Please describe your issue. Support staff will assist you shortly."
                                         />
                                       </div>
+                                    </div>
 
-                                      {/* NESTED SUB-OPTIONS MANAGER FOR THIS TICKET SECTION */}
-                                      <div style={{
-                                        marginTop: '16px',
-                                        paddingTop: '16px',
-                                        borderTop: '1px dashed rgba(255, 255, 255, 0.12)',
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        gap: '12px'
-                                      }}>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                          <div>
-                                            <span style={{ fontSize: '0.825rem', fontWeight: '700', color: '#60a5fa', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                              <span>🌿 Sub-Options for "{opt.label || `Option #${index + 1}`}"</span>
-                                              <span style={{ fontSize: '0.7rem', background: 'rgba(96, 165, 250, 0.15)', color: '#60a5fa', padding: '1px 6px', borderRadius: '4px' }}>
-                                                {(opt.subOptions || []).length} / 10 sub-categories
-                                              </span>
-                                            </span>
-                                            <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', margin: '2px 0 0 0' }}>
-                                              When a user selects this section, show them these sub-options to choose from before creating a ticket.
-                                            </p>
-                                          </div>
-                                          <button
-                                            type="button"
-                                            onClick={() => handleAddSubOption(index)}
-                                            disabled={(opt.subOptions || []).length >= 10}
-                                            style={{
-                                              background: 'rgba(96, 165, 250, 0.15)',
-                                              color: '#60a5fa',
-                                              border: '1px solid rgba(96, 165, 250, 0.3)',
-                                              borderRadius: '6px',
-                                              padding: '4px 10px',
-                                              fontSize: '0.75rem',
-                                              fontWeight: '600',
-                                              cursor: (opt.subOptions || []).length >= 10 ? 'not-allowed' : 'pointer',
-                                              opacity: (opt.subOptions || []).length >= 10 ? 0.5 : 1
-                                            }}
-                                          >
-                                            + Add Sub-Option
-                                          </button>
+                                    {/* SUB-OPTIONS SECTION */}
+                                    <div style={{
+                                      marginTop: '16px',
+                                      padding: '14px',
+                                      backgroundColor: 'rgba(0, 0, 0, 0.25)',
+                                      border: '1px dashed rgba(255, 255, 255, 0.12)',
+                                      borderRadius: '8px'
+                                    }}>
+                                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                                        <div>
+                                          <span style={{ fontSize: '0.825rem', fontWeight: '700', color: '#93c5fd', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                            ↳ Sub-Options / Sub-Categories ({opt.subOptions?.length || 0})
+                                          </span>
+                                          <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', margin: '2px 0 0 0' }}>
+                                            When users click this option, they will be prompted to pick a sub-category.
+                                          </p>
                                         </div>
+                                        <button
+                                          type="button"
+                                          onClick={() => handleAddSubOption(index)}
+                                          style={{
+                                            background: 'rgba(59, 130, 246, 0.15)',
+                                            color: '#60a5fa',
+                                            border: '1px solid rgba(59, 130, 246, 0.3)',
+                                            borderRadius: '6px',
+                                            padding: '4px 10px',
+                                            fontSize: '0.75rem',
+                                            fontWeight: '600',
+                                            cursor: 'pointer'
+                                          }}
+                                        >
+                                          + Add Sub-Option
+                                        </button>
+                                      </div>
 
-                                        {(opt.subOptions && opt.subOptions.length > 0) && (
-                                          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '6px' }}>
-                                            {opt.subOptions.map((sub, sIdx) => (
-                                              <div
-                                                key={sIdx}
-                                                style={{
-                                                  backgroundColor: 'rgba(0, 0, 0, 0.25)',
-                                                  border: '1px solid rgba(96, 165, 250, 0.2)',
-                                                  borderRadius: '8px',
-                                                  padding: '14px',
-                                                  display: 'flex',
-                                                  flexDirection: 'column',
-                                                  gap: '12px'
-                                                }}
-                                              >
-                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                                  <span style={{ fontSize: '0.775rem', fontWeight: '700', color: '#93c5fd', letterSpacing: '0.5px' }}>
-                                                    SUB-OPTION #{sIdx + 1}
-                                                  </span>
-                                                  <button
-                                                    type="button"
-                                                    onClick={() => handleRemoveSubOption(index, sIdx)}
-                                                    style={{
-                                                      background: 'rgba(239, 68, 68, 0.15)',
-                                                      color: '#ef4444',
-                                                      border: '1px solid rgba(239, 68, 68, 0.3)',
-                                                      borderRadius: '4px',
-                                                      padding: '2px 8px',
-                                                      fontSize: '0.7rem',
-                                                      fontWeight: '600',
-                                                      cursor: 'pointer'
-                                                    }}
-                                                  >
-                                                    Delete Sub-Option
-                                                  </button>
+                                      {(!opt.subOptions || opt.subOptions.length === 0) ? (
+                                        <div style={{ fontSize: '0.78rem', color: '#64748b', fontStyle: 'italic', padding: '6px 0' }}>
+                                          No sub-options added. Clicking this option will create a ticket directly under this main category.
+                                        </div>
+                                      ) : (
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '8px' }}>
+                                          {opt.subOptions.map((sub, sIdx) => (
+                                            <div
+                                              key={sIdx}
+                                              style={{
+                                                backgroundColor: 'rgba(255, 255, 255, 0.03)',
+                                                border: '1px solid rgba(255, 255, 255, 0.08)',
+                                                borderRadius: '6px',
+                                                padding: '12px'
+                                              }}
+                                            >
+                                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                                                <span style={{ fontSize: '0.775rem', fontWeight: '700', color: '#94a3b8' }}>
+                                                  SUB-OPTION #{sIdx + 1}
+                                                </span>
+                                                <button
+                                                  type="button"
+                                                  onClick={() => handleRemoveSubOption(index, sIdx)}
+                                                  style={{
+                                                    background: 'rgba(239, 68, 68, 0.15)',
+                                                    color: '#ef4444',
+                                                    border: '1px solid rgba(239, 68, 68, 0.3)',
+                                                    borderRadius: '4px',
+                                                    padding: '2px 8px',
+                                                    fontSize: '0.7rem',
+                                                    cursor: 'pointer'
+                                                  }}
+                                                >
+                                                  Remove
+                                                </button>
+                                              </div>
+
+                                              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '10px', marginBottom: '8px' }}>
+                                                <div>
+                                                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>
+                                                    Sub-Option Label *
+                                                  </label>
+                                                  <input
+                                                    type="text"
+                                                    value={sub.label || ''}
+                                                    onChange={(e) => handleSubOptionChange(index, sIdx, 'label', e.target.value)}
+                                                    className="glass-input"
+                                                    placeholder="e.g. Account Help"
+                                                    style={{ padding: '6px 10px', fontSize: '0.8rem' }}
+                                                  />
                                                 </div>
-
-                                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '10px' }}>
-                                                  <div>
-                                                    <label style={{ display: 'block', fontSize: '0.775rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>
-                                                      Sub-Option Label <span style={{ color: 'var(--danger)' }}>*</span>
-                                                    </label>
-                                                    <input
-                                                      type="text"
-                                                      value={sub.label || ''}
-                                                      onChange={(e) => handleSubOptionChange(index, sIdx, 'label', e.target.value)}
-                                                      className="glass-input"
-                                                      style={{ padding: '6px 10px', fontSize: '0.8rem' }}
-                                                      placeholder="e.g. Refund Request"
-                                                    />
-                                                  </div>
-
-                                                  <div>
-                                                    <label style={{ display: 'block', fontSize: '0.775rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>
-                                                      Sub-Option Emoji
-                                                    </label>
-                                                    <input
-                                                      type="text"
-                                                      value={sub.emoji || ''}
-                                                      onChange={(e) => handleSubOptionChange(index, sIdx, 'emoji', e.target.value)}
-                                                      className="glass-input"
-                                                      style={{ padding: '6px 10px', fontSize: '0.8rem' }}
-                                                      placeholder="e.g. 💸"
-                                                    />
-                                                  </div>
-
-                                                  {componentType === 'select' ? (
-                                                    <div>
-                                                      <label style={{ display: 'block', fontSize: '0.775rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>
-                                                        Subtext / Description
-                                                      </label>
-                                                      <input
-                                                        type="text"
-                                                        value={sub.description || ''}
-                                                        onChange={(e) => handleSubOptionChange(index, sIdx, 'description', e.target.value)}
-                                                        className="glass-input"
-                                                        style={{ padding: '6px 10px', fontSize: '0.8rem' }}
-                                                        placeholder="e.g. Request a refund for purchases"
-                                                      />
-                                                    </div>
-                                                  ) : (
-                                                    <div>
-                                                      <label style={{ display: 'block', fontSize: '0.775rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>
-                                                        Button Style
-                                                      </label>
-                                                      <select
-                                                        value={sub.style || 'primary'}
-                                                        onChange={(e) => handleSubOptionChange(index, sIdx, 'style', e.target.value)}
-                                                        className="glass-input"
-                                                        style={{ padding: '6px 10px', fontSize: '0.8rem' }}
-                                                      >
-                                                        <option value="primary">Primary (Blue)</option>
-                                                        <option value="secondary">Secondary (Grey)</option>
-                                                        <option value="success">Success (Green)</option>
-                                                        <option value="danger">Danger (Red)</option>
-                                                      </select>
-                                                    </div>
-                                                  )}
+                                                <div>
+                                                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>
+                                                    Emoji
+                                                  </label>
+                                                  <input
+                                                    type="text"
+                                                    value={sub.emoji || ''}
+                                                    onChange={(e) => handleSubOptionChange(index, sIdx, 'emoji', e.target.value)}
+                                                    className="glass-input"
+                                                    placeholder="e.g. 🔑"
+                                                    style={{ padding: '6px 10px', fontSize: '0.8rem' }}
+                                                  />
                                                 </div>
-
-                                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '10px' }}>
-                                                  <div>
-                                                    <label style={{ display: 'block', fontSize: '0.775rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>
-                                                      Category (Optional Override)
-                                                    </label>
-                                                    <select
-                                                      value={sub.categoryId || ''}
-                                                      onChange={(e) => handleSubOptionChange(index, sIdx, 'categoryId', e.target.value)}
-                                                      className="glass-input"
-                                                      style={{ padding: '6px 10px', fontSize: '0.8rem' }}
-                                                    >
-                                                      <option value="">-- Inherit Parent Category --</option>
-                                                      {categories.map(cat => (
-                                                        <option key={cat.id} value={cat.id}>{cat.name}</option>
-                                                      ))}
-                                                    </select>
-                                                  </div>
-
-                                                  <div>
-                                                    <label style={{ display: 'block', fontSize: '0.775rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>
-                                                      Support Role (Optional Override)
-                                                    </label>
-                                                    <select
-                                                      value={sub.supportRoleId || ''}
-                                                      onChange={(e) => handleSubOptionChange(index, sIdx, 'supportRoleId', e.target.value)}
-                                                      className="glass-input"
-                                                      style={{ padding: '6px 10px', fontSize: '0.8rem' }}
-                                                    >
-                                                      <option value="">-- Inherit Parent Role --</option>
-                                                      {roles.map(role => (
-                                                        <option key={role.id} value={role.id} style={{ color: role.color }}>{role.name}</option>
-                                                      ))}
-                                                    </select>
-                                                  </div>
-                                                </div>
-
-                                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                                  <div>
-                                                    <label style={{ display: 'block', fontSize: '0.775rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>
-                                                      Sub-Option Ticket Channel Title
-                                                    </label>
-                                                    <input
-                                                      type="text"
-                                                      value={sub.title || ''}
-                                                      onChange={(e) => handleSubOptionChange(index, sIdx, 'title', e.target.value)}
-                                                      className="glass-input"
-                                                      style={{ padding: '6px 10px', fontSize: '0.8rem' }}
-                                                      placeholder="e.g. Refund Ticket"
-                                                    />
-                                                  </div>
-
-                                                  <div>
-                                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                                                      <label style={{ fontSize: '0.775rem', color: 'var(--text-secondary)', margin: 0 }}>
-                                                        Welcome Message
-                                                      </label>
-                                                      <div style={{ display: 'flex', gap: '3px' }}>
-                                                        {['{user}', '{username}', '{server}'].map(tag => (
-                                                          <button
-                                                            key={tag}
-                                                            type="button"
-                                                            onClick={() => {
-                                                              const curr = sub.ticketMessage || '';
-                                                              handleSubOptionChange(index, sIdx, 'ticketMessage', curr + ' ' + tag);
-                                                            }}
-                                                            style={{
-                                                              background: 'rgba(255,255,255,0.06)',
-                                                              border: '1px solid rgba(255,255,255,0.15)',
-                                                              color: '#60a5fa',
-                                                              borderRadius: '4px',
-                                                              padding: '1px 5px',
-                                                              fontSize: '0.675rem',
-                                                              cursor: 'pointer'
-                                                            }}
-                                                          >
-                                                            +{tag}
-                                                          </button>
-                                                        ))}
-                                                      </div>
-                                                    </div>
-                                                    <textarea
-                                                      rows="2"
-                                                      value={sub.ticketMessage || ''}
-                                                      onChange={(e) => handleSubOptionChange(index, sIdx, 'ticketMessage', e.target.value)}
-                                                      className="glass-input"
-                                                      style={{ padding: '6px 10px', fontSize: '0.8rem' }}
-                                                      placeholder="Welcome {user}! Please describe your refund request. Staff will assist shortly."
-                                                    />
-                                                  </div>
+                                                <div>
+                                                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>
+                                                    Subtext / Description
+                                                  </label>
+                                                  <input
+                                                    type="text"
+                                                    value={sub.description || ''}
+                                                    onChange={(e) => handleSubOptionChange(index, sIdx, 'description', e.target.value)}
+                                                    className="glass-input"
+                                                    placeholder="Brief info"
+                                                    style={{ padding: '6px 10px', fontSize: '0.8rem' }}
+                                                  />
                                                 </div>
                                               </div>
-                                            ))}
-                                          </div>
-                                        )}
-                                      </div>
+
+                                              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '10px' }}>
+                                                <div>
+                                                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>
+                                                    Category Override (Optional)
+                                                  </label>
+                                                  <select
+                                                    value={sub.categoryId || ''}
+                                                    onChange={(e) => handleSubOptionChange(index, sIdx, 'categoryId', e.target.value)}
+                                                    className="glass-input"
+                                                    style={{ padding: '6px 10px', fontSize: '0.8rem' }}
+                                                  >
+                                                    <option value="">Use Main Category</option>
+                                                    {categories.map(cat => (
+                                                      <option key={cat.id} value={cat.id}>{cat.name}</option>
+                                                    ))}
+                                                  </select>
+                                                </div>
+                                                <div>
+                                                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>
+                                                    Support Role Override (Optional)
+                                                  </label>
+                                                  <select
+                                                    value={sub.supportRoleId || ''}
+                                                    onChange={(e) => handleSubOptionChange(index, sIdx, 'supportRoleId', e.target.value)}
+                                                    className="glass-input"
+                                                    style={{ padding: '6px 10px', fontSize: '0.8rem' }}
+                                                  >
+                                                    <option value="">Use Main Support Role</option>
+                                                    {roles.map(role => (
+                                                      <option key={role.id} value={role.id} style={{ color: role.color }}>{role.name}</option>
+                                                    ))}
+                                                  </select>
+                                                </div>
+                                              </div>
+                                            </div>
+                                          ))}
+                                        </div>
+                                      )}
                                     </div>
                                   </div>
                                 ))}
