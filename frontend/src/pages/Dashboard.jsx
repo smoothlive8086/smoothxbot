@@ -4199,24 +4199,123 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
 
                     {settings.welcome.enabled && (() => {
                       const formatWelcomeText = (text) => {
-                        if (!text) return '';
-                        let str = text;
+                        if (!text) return null;
                         const username = user?.username ? `@${user.username}` : '@_smooth_0007';
-                        const server = guildName || 'SMOOTH';
+                        const server = guildName || 'SMOOTH RULE BOARD';
 
                         const ch1 = channels.find(c => c.id === settings.welcome.redirectChannelId);
                         const ch2 = channels.find(c => c.id === settings.welcome.redirectChannelId2);
                         const ch3 = channels.find(c => c.id === settings.welcome.redirectChannelId3);
 
-                        str = str.replace(/\{user\}/gi, username);
-                        str = str.replace(/\{username\}/gi, user?.username || '_smooth_0007');
-                        str = str.replace(/\{server\}/gi, server);
-                        str = str.replace(/members:\s*\{membercount\}/gi, '');
-                        str = str.replace(/\{membercount\}/gi, '');
-                        str = str.replace(/\{channel\}/gi, ch1 ? `#${ch1.name}` : '#channel');
-                        str = str.replace(/\{channel2\}/gi, ch2 ? `#${ch2.name}` : '#channel2');
-                        str = str.replace(/\{channel3\}/gi, ch3 ? `#${ch3.name}` : '#channel3');
-                        return str;
+                        const rawStr = text
+                          .replace(/\{user\}/gi, username)
+                          .replace(/\{username\}/gi, user?.username || '_smooth_0007')
+                          .replace(/\{server\}/gi, server)
+                          .replace(/members:\s*\{membercount\}/gi, `${memberCount || 2204}th Member`)
+                          .replace(/\{membercount\}/gi, `${memberCount || 2204}th`)
+                          .replace(/\{channel\}/gi, ch1 ? `#${ch1.name}` : 'Read our ToS')
+                          .replace(/\{channel2\}/gi, ch2 ? `#${ch2.name}` : 'Check out our latest Announcements')
+                          .replace(/\{channel3\}/gi, ch3 ? `#${ch3.name}` : 'Need help? Open a Support Ticket');
+
+                        const lines = rawStr.split('\n');
+
+                        return (
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                            {lines.map((line, idx) => {
+                              const trimmed = line.trim();
+
+                              if (/^[-_─=*]{3,}$/.test(trimmed)) {
+                                return (
+                                  <div key={idx} style={{
+                                    height: '1px',
+                                    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                                    margin: '6px 0',
+                                    width: '100%'
+                                  }} />
+                                );
+                              }
+
+                              if (trimmed.startsWith('»')) {
+                                const bulletText = trimmed.substring(1).trim();
+                                return (
+                                  <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem', fontStyle: 'italic', fontWeight: '700' }}>
+                                    <span style={{ color: settings.welcome.embedColor || '#ff2a2a', fontSize: '1rem', fontWeight: 'bold' }}>»</span>
+                                    <span style={{ color: '#ffffff' }}>{bulletText}</span>
+                                  </div>
+                                );
+                              }
+
+                              if (trimmed.includes('You are our') || trimmed.startsWith('👤')) {
+                                const textWithoutIcon = trimmed.replace(/^👤\s*/, '');
+                                return (
+                                  <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.92rem', fontStyle: 'italic', fontWeight: '700' }}>
+                                    <span style={{ color: settings.welcome.embedColor || '#ff2a2a', fontSize: '1.1rem' }}>👤</span>
+                                    <span style={{ color: '#ffffff' }}>{textWithoutIcon}</span>
+                                  </div>
+                                );
+                              }
+
+                              if (trimmed.toLowerCase().startsWith('joined')) {
+                                const joinedParts = trimmed.replace(/^Joined\s*/i, '').split('·');
+                                return (
+                                  <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', fontSize: '0.85rem', marginTop: '2px' }}>
+                                    <span style={{ fontWeight: '700', fontStyle: 'italic', color: '#ffffff' }}>Joined</span>
+                                    {joinedParts[0] && (
+                                      <span style={{
+                                        backgroundColor: '#1e1f22',
+                                        color: '#dbdee1',
+                                        padding: '2px 8px',
+                                        borderRadius: '4px',
+                                        fontSize: '0.8rem',
+                                        border: '1px solid rgba(255,255,255,0.05)'
+                                      }}>
+                                        {joinedParts[0].trim()}
+                                      </span>
+                                    )}
+                                    {joinedParts.length > 1 && <span style={{ color: '#949ba4' }}>·</span>}
+                                    {joinedParts[1] && (
+                                      <span style={{
+                                        backgroundColor: '#1e1f22',
+                                        color: '#dbdee1',
+                                        padding: '2px 8px',
+                                        borderRadius: '4px',
+                                        fontSize: '0.8rem',
+                                        border: '1px solid rgba(255,255,255,0.05)'
+                                      }}>
+                                        {joinedParts[1].trim()}
+                                      </span>
+                                    )}
+                                  </div>
+                                );
+                              }
+
+                              const parts = line.split(/(@[\w_.-]+)/g);
+
+                              return (
+                                <div key={idx} style={{ color: '#dbdee1', fontSize: '0.92rem', lineHeight: '1.4' }}>
+                                  {parts.map((p, pIdx) => {
+                                    if (p.startsWith('@')) {
+                                      return (
+                                        <span key={pIdx} style={{
+                                          backgroundColor: 'rgba(88, 101, 242, 0.3)',
+                                          color: '#c9cdfb',
+                                          padding: '1px 6px',
+                                          borderRadius: '3px',
+                                          fontWeight: '600',
+                                          margin: '0 2px',
+                                          fontSize: '0.9rem'
+                                        }}>
+                                          {p}
+                                        </span>
+                                      );
+                                    }
+                                    return p;
+                                  })}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        );
                       };
 
                       const renderRedirectButton = () => {
@@ -4237,14 +4336,38 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                         const redirect2 = channels.find(c => c.id === settings.welcome.redirectChannelId2);
                         const redirect3 = channels.find(c => c.id === settings.welcome.redirectChannelId3);
 
-                        if (redirect1) buttons.push({ label: `#${redirect1.name}`, url: '#' });
-                        if (redirect2) buttons.push({ label: `#${redirect2.name}`, url: '#' });
-                        if (redirect3) buttons.push({ label: `#${redirect3.name}`, url: '#' });
+                        if (redirect1) {
+                          const name = redirect1.name.toLowerCase();
+                          let icon = '📢';
+                          if (name.includes('tos') || name.includes('rule') || name.includes('term')) icon = '☑';
+                          else if (name.includes('ticket') || name.includes('support') || name.includes('help')) icon = '🎟';
+                          buttons.push({ label: `${icon} ${redirect1.name}`, url: '#' });
+                        }
 
-                        if (buttons.length === 0) return null;
+                        if (redirect2) {
+                          const name = redirect2.name.toLowerCase();
+                          let icon = '☑';
+                          if (name.includes('announc')) icon = '📢';
+                          else if (name.includes('ticket') || name.includes('support') || name.includes('help')) icon = '🎟';
+                          buttons.push({ label: `${icon} ${redirect2.name}`, url: '#' });
+                        }
+
+                        if (redirect3) {
+                          const name = redirect3.name.toLowerCase();
+                          let icon = '🎟';
+                          if (name.includes('tos') || name.includes('rule') || name.includes('term')) icon = '☑';
+                          else if (name.includes('announc')) icon = '📢';
+                          buttons.push({ label: `${icon} ${redirect3.name}`, url: '#' });
+                        }
+
+                        if (buttons.length === 0) {
+                          buttons.push({ label: '📢 Announcements', url: '#' });
+                          buttons.push({ label: '☑ ToS', url: '#' });
+                          buttons.push({ label: '🎟 Support', url: '#' });
+                        }
 
                         return (
-                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '8px' }}>
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '12px' }}>
                             {buttons.map((btn, idx) => (
                               <a
                                 key={idx}
@@ -4252,24 +4375,27 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                                 target="_blank"
                                 rel="noreferrer"
                                 style={{
-                                  backgroundColor: '#4e5058',
-                                  color: '#ffffff',
-                                  padding: '6px 14px',
-                                  borderRadius: '4px',
+                                  backgroundColor: '#2b2d31',
+                                  border: '1px solid rgba(255, 255, 255, 0.08)',
+                                  color: '#f2f3f5',
+                                  padding: '7px 16px',
+                                  borderRadius: '6px',
                                   fontSize: '0.85rem',
                                   fontWeight: '600',
+                                  fontStyle: 'italic',
                                   textDecoration: 'none',
                                   display: 'inline-flex',
                                   alignItems: 'center',
-                                  gap: '6px',
-                                  transition: 'background-color 0.15s ease'
+                                  gap: '8px',
+                                  boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+                                  transition: 'all 0.15s ease'
                                 }}
                                 onClick={(e) => {
                                   if (!btn.url || btn.url === '#') e.preventDefault();
                                 }}
                               >
                                 <span>{btn.label}</span>
-                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.8 }}>
                                   <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
                                   <polyline points="15 3 21 3 21 9"></polyline>
                                   <line x1="10" y1="14" x2="21" y2="3"></line>
@@ -4654,14 +4780,17 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                                   {/* Embed Header Row: Title & Top-Right Thumbnail */}
                                   <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px', alignItems: 'flex-start' }}>
                                     <div style={{ flex: 1 }}>
-                                      {settings.welcome.embedTitle && settings.welcome.embedTitle.trim() ? (
-                                        <div style={{ color: '#ffffff', fontWeight: '700', fontSize: '1.1rem', marginBottom: '6px' }}>
-                                          {formatWelcomeText(settings.welcome.embedTitle)}
-                                        </div>
-                                      ) : null}
+                                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#ffffff', fontWeight: '700', fontSize: '1.1rem', fontStyle: 'italic', marginBottom: '8px' }}>
+                                        <span style={{ color: settings.welcome.embedColor || '#ff2a2a', fontSize: '1.2rem' }}>🏠</span>
+                                        <span>
+                                          {(settings.welcome.embedTitle && settings.welcome.embedTitle.trim())
+                                            ? settings.welcome.embedTitle.replace(/\{server\}/gi, guildName || 'SMOOTH RULE BOARD')
+                                            : `Welcome to ${guildName || 'SMOOTH RULE BOARD!'}`}
+                                        </span>
+                                      </div>
 
                                       <div style={{ color: '#dbdee1', fontSize: '0.9rem', lineHeight: '1.4' }}>
-                                        {formatWelcomeText(settings.welcome.message || 'Welcome {user} to {server}!')}
+                                        {formatWelcomeText(settings.welcome.message || "Hey {user}!\n───────────────────\n👤 You are our {membercount} Member\nJoined 15 hours ago · Sunday, 20 September, 2026 17:34\n───────────────────\n» {channel}\n» {channel2}\n» {channel3}")}
                                       </div>
                                     </div>
 
