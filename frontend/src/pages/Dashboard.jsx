@@ -744,6 +744,29 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
   const [testingWelcomeMessage, setTestingWelcomeMessage] = useState(false);
   const welcomeBannerFileRef = useRef(null);
 
+  const [uploadingTicketImage, setUploadingTicketImage] = useState(false);
+  const ticketImageFileRef = useRef(null);
+
+  const handleTicketImageUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    e.target.value = '';
+    setUploadingTicketImage(true);
+    setErrorMsg(null);
+    try {
+      const res = await api.uploadTicketImage(guildId, file);
+      handleInputChange('tickets.imageUrl', res.url);
+      setSuccessMsg('Ticket panel embed image uploaded successfully!');
+      setTimeout(() => setSuccessMsg(null), 4000);
+    } catch (err) {
+      console.error(err);
+      setErrorMsg(err.message || 'Failed to upload ticket panel image.');
+    } finally {
+      setUploadingTicketImage(false);
+    }
+  };
+
   const handleWelcomeFileUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -5588,6 +5611,145 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                                   placeholder="Click an option below to open a ticket. Our support team will help you shortly."
                                 />
                               </div>
+
+                              {/* Panel Embed Image Upload & URL input */}
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '14px' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+                                  <div>
+                                    <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: '600', margin: 0 }}>
+                                      <ImageIcon size={15} color="var(--primary)" />
+                                      Panel Embed Image / Banner (Optional)
+                                    </label>
+                                    <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', opacity: 0.8 }}>
+                                      Upload an image/GIF or paste a media URL to display inside the ticket panel embed.
+                                    </span>
+                                  </div>
+
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    <input
+                                      type="file"
+                                      ref={ticketImageFileRef}
+                                      onChange={handleTicketImageUpload}
+                                      accept="image/png, image/jpeg, image/gif, image/webp"
+                                      style={{ display: 'none' }}
+                                    />
+                                    <button
+                                      type="button"
+                                      onClick={() => ticketImageFileRef.current?.click()}
+                                      disabled={uploadingTicketImage}
+                                      style={{
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        gap: '6px',
+                                        backgroundColor: 'rgba(59, 130, 246, 0.15)',
+                                        border: '1px solid rgba(59, 130, 246, 0.35)',
+                                        color: '#60a5fa',
+                                        padding: '6px 12px',
+                                        borderRadius: '6px',
+                                        fontSize: '0.8rem',
+                                        fontWeight: '600',
+                                        cursor: uploadingTicketImage ? 'not-allowed' : 'pointer',
+                                        transition: 'all 0.15s ease'
+                                      }}
+                                    >
+                                      {uploadingTicketImage ? (
+                                        <>
+                                          <RotateCw size={14} className="spin-animation" />
+                                          <span>Uploading...</span>
+                                        </>
+                                      ) : (
+                                        <>
+                                          <UploadCloud size={14} />
+                                          <span>Upload Image / GIF</span>
+                                        </>
+                                      )}
+                                    </button>
+
+                                    {settings.tickets?.imageUrl && (
+                                      <button
+                                        type="button"
+                                        onClick={() => handleInputChange('tickets.imageUrl', '')}
+                                        title="Remove panel embed image"
+                                        style={{
+                                          display: 'inline-flex',
+                                          alignItems: 'center',
+                                          gap: '4px',
+                                          backgroundColor: 'rgba(239, 68, 68, 0.12)',
+                                          border: '1px solid rgba(239, 68, 68, 0.25)',
+                                          color: '#f87171',
+                                          padding: '6px 10px',
+                                          borderRadius: '6px',
+                                          fontSize: '0.8rem',
+                                          cursor: 'pointer'
+                                        }}
+                                      >
+                                        <Trash2 size={14} />
+                                        <span>Clear</span>
+                                      </button>
+                                    )}
+                                  </div>
+                                </div>
+
+                                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                  <input
+                                    type="text"
+                                    value={settings.tickets?.imageUrl || ''}
+                                    onChange={(e) => handleInputChange('tickets.imageUrl', e.target.value)}
+                                    className="glass-input"
+                                    placeholder="Paste image link, GIF URL, Tenor/Imgur URL or click Upload"
+                                    style={{
+                                      backgroundColor: '#07080e',
+                                      borderColor: 'rgba(255, 255, 255, 0.08)',
+                                      borderRadius: '8px',
+                                      color: '#ffffff',
+                                      padding: '10px 14px',
+                                      fontSize: '0.88rem',
+                                      flex: 1
+                                    }}
+                                  />
+                                </div>
+
+                                {settings.tickets?.imageUrl && (
+                                  <div style={{
+                                    marginTop: '6px',
+                                    borderRadius: '8px',
+                                    overflow: 'hidden',
+                                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                                    backgroundColor: 'rgba(0, 0, 0, 0.25)',
+                                    position: 'relative',
+                                    maxHeight: '180px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center'
+                                  }}>
+                                    <img
+                                      src={resolveUploadUrl(settings.tickets.imageUrl)}
+                                      alt="Ticket Panel Embed Preview"
+                                      style={{
+                                        maxWidth: '100%',
+                                        maxHeight: '180px',
+                                        objectFit: 'contain'
+                                      }}
+                                      onError={(e) => {
+                                        e.target.style.display = 'none';
+                                      }}
+                                    />
+                                    <div style={{
+                                      position: 'absolute',
+                                      bottom: '6px',
+                                      left: '8px',
+                                      backgroundColor: 'rgba(0, 0, 0, 0.65)',
+                                      backdropFilter: 'blur(4px)',
+                                      padding: '2px 8px',
+                                      borderRadius: '4px',
+                                      fontSize: '0.72rem',
+                                      color: '#a1a1aa'
+                                    }}>
+                                      Embed Image Preview
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
                             </div>
 
                             {/* CONTAINER V2: TICKET OPTIONS BUILDER */}
@@ -5868,8 +6030,8 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                             embedTitle={settings.tickets.title || 'Support Ticket System'}
                             embedDesc={settings.tickets.welcomeMessage || 'Click an option below to open a ticket. Our support team will help you shortly.'}
                             embedColor="#2563eb"
-                            embedThumb=""
-                            embedImage=""
+                            embedThumb={guildIcon || ''}
+                            embedImage={resolveUploadUrl(settings.tickets?.imageUrl || '')}
                             isDM={false}
                           />
                         )}
