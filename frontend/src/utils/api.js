@@ -152,6 +152,24 @@ export const api = {
   publishTickets: (guildId) => request(`/settings/${guildId}/tickets-embed`, {
     method: 'POST'
   }),
+  uploadTicketImage: (guildId, file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    const token = getToken();
+    return fetch(`${API_URL}/settings/${guildId}/tickets-upload`, {
+      method: 'POST',
+      headers: {
+        ...(token && { Authorization: `Bearer ${token}` })
+      },
+      body: formData
+    }).then(async (res) => {
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || 'Failed to upload ticket image.');
+      }
+      return res.json();
+    });
+  },
   getAdminGuildDetails: (guildId) => request(`/admin/guilds/${guildId}`),
   updateAdminGuildDetails: (guildId, formData) => {
     const token = getToken();
