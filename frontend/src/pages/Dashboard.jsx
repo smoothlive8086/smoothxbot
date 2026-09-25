@@ -762,6 +762,46 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
   const [uploadingTicketImage, setUploadingTicketImage] = useState(false);
   const ticketImageFileRef = useRef(null);
 
+  // Determine if the current administrator has permission to view/open Server Settings under Full Moderation
+  const canAccessServerSettings = (() => {
+    if (!user || !user.isAdmin) return false;
+
+    // If Full Moderation is disabled or preventServerSettings is turned off, all administrators can access
+    if (!settings?.fullModeration?.enabled || settings.fullModeration.preventServerSettings === false) {
+      return true;
+    }
+
+    const userId = user.id || user.discordId;
+
+    // 1. Check Global Whitelist Users
+    const globalUsers = settings.fullModeration.whitelistedUsers || [];
+    if (globalUsers.some(u => (typeof u === 'string' ? u === userId : u.userId === userId))) {
+      return true;
+    }
+
+    // 2. Check Action-Specific Whitelist Users for 'server_settings'
+    const actionData = settings.fullModeration.actionWhitelists?.server_settings;
+    const actionUsers = actionData?.users || [];
+    if (actionUsers.some(u => (typeof u === 'string' ? u === userId : u.userId === userId))) {
+      return true;
+    }
+
+    // 3. Check Role Whitelists (global or action-specific)
+    const currentMember = allMembers.find(m => m.id === userId);
+    if (currentMember && Array.isArray(currentMember.roles)) {
+      const globalRoles = settings.fullModeration.whitelistedRoles || [];
+      if (globalRoles.some(rId => currentMember.roles.includes(rId))) {
+        return true;
+      }
+      const actionRoles = actionData?.roles || [];
+      if (actionRoles.some(rId => currentMember.roles.includes(rId))) {
+        return true;
+      }
+    }
+
+    return false;
+  })();
+
   const handleTicketImageUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -3453,7 +3493,7 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
               Giveaways
             </button>
 
-            {user && user.isAdmin && (
+            {user && user.isAdmin && canAccessServerSettings && (
               <>
                 <div style={{ height: '1px', backgroundColor: 'var(--border-color)', margin: '8px 0' }} />
                 <button
@@ -3463,7 +3503,7 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                   style={{ color: 'var(--primary)', fontWeight: 'bold' }}
                 >
                   <Server size={16} />
-                  Server Control
+                  Server Settings
                 </button>
               </>
             )}
@@ -3512,11 +3552,44 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
             </div>
           )}
 
-          {activeTab === 'server-control' && user && user.isAdmin ? (
-            <AdminServerSettings
-              guildId={guildId}
-              onHasUnsavedChangesChange={setAdminHasUnsavedChanges}
-            />
+          {activeTab === 'server-control' ? (
+            canAccessServerSettings ? (
+              <AdminServerSettings
+                guildId={guildId}
+                onHasUnsavedChangesChange={setAdminHasUnsavedChanges}
+              />
+            ) : (
+              <div className="glass-panel" style={{ padding: '40px', textAlign: 'center', maxWidth: '600px', margin: '40px auto' }}>
+                <div style={{
+                  width: '64px',
+                  height: '64px',
+                  borderRadius: '16px',
+                  background: 'rgba(239, 68, 68, 0.15)',
+                  border: '1px solid rgba(239, 68, 68, 0.3)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  margin: '0 auto 20px auto',
+                  color: '#f87171'
+                }}>
+                  <Lock size={32} />
+                </div>
+                <h3 style={{ fontSize: '1.4rem', fontWeight: '700', marginBottom: '10px' }}>
+                  Server Settings Locked
+                </h3>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: '1.6', marginBottom: '20px' }}>
+                  Under <strong>Full Moderation</strong>, Server Settings access is strictly locked. Administrators cannot view or open Server Settings unless they have been explicitly added to the Server Settings whitelist.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => handleTabClick('overview')}
+                  className="btn-primary"
+                  style={{ padding: '10px 24px' }}
+                >
+                  Return to Overview
+                </button>
+              </div>
+            )
           ) : (
             <form onSubmit={handleSave} onKeyDown={handleFormKeyDown}>
 
@@ -4750,6 +4823,14 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                               desc: 'Admins cannot delete other members\' messages without whitelist. Admin is penalized and logged.',
                               icon: MessageSquare,
                               color: '#06b6d4'
+                            },
+                            {
+                              key: 'server_settings',
+                              field: 'preventServerSettings',
+                              title: 'Server Settings Access',
+                              desc: 'Admins cannot view or open Server Settings in dashboard or modify server settings in Discord without whitelist.',
+                              icon: Settings,
+                              color: '#f97316'
                             }
                           ].map(opt => {
                             const IconComponent = opt.icon;
