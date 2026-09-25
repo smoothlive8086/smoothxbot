@@ -3628,28 +3628,32 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                         </div>
 
                         <div>
-                          <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Photo Spam Whitelisted Channels</label>
-                          <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '8px' }}>Select channels here where users are ALLOWED to spam photos (bypasses protection).</p>
-                          <div style={{ maxHeight: '120px', overflowY: 'auto', border: '1px solid var(--border-color)', borderRadius: '8px', padding: '10px', backgroundColor: 'rgba(0,0,0,0.2)' }}>
-                            {channels.map(ch => (
-                              <label key={ch.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '4px 0', cursor: 'pointer', fontSize: '0.9rem' }}>
-                                <input
-                                  type="checkbox"
-                                  checked={(settings.moderation?.photoSpam?.whitelistedChannels || []).includes(ch.id)}
-                                  onChange={(e) => {
-                                    const current = [...(settings.moderation?.photoSpam?.whitelistedChannels || [])];
-                                    if (e.target.checked) {
-                                      current.push(ch.id);
-                                    } else {
-                                      const index = current.indexOf(ch.id);
-                                      if (index > -1) current.splice(index, 1);
-                                    }
-                                    handleInputChange('moderation.photoSpam.whitelistedChannels', current);
-                                  }}
-                                />
-                                #{ch.name}
-                              </label>
-                            ))}
+                          <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Photo Spam Protected Channels</label>
+                          <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '8px' }}>Select channels here where photo spam protection will be active. Uploading more than the allowed photos in these selected channels issues an immediate spot timeout.</p>
+                          <div style={{ maxHeight: '140px', overflowY: 'auto', border: '1px solid var(--border-color)', borderRadius: '8px', padding: '10px', backgroundColor: 'rgba(0,0,0,0.2)' }}>
+                            {channels.map(ch => {
+                              const isChecked = (settings.moderation?.photoSpam?.protectedChannels || settings.moderation?.photoSpam?.whitelistedChannels || []).includes(ch.id);
+                              return (
+                                <label key={ch.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '4px 0', cursor: 'pointer', fontSize: '0.9rem' }}>
+                                  <input
+                                    type="checkbox"
+                                    checked={isChecked}
+                                    onChange={(e) => {
+                                      const current = [...(settings.moderation?.photoSpam?.protectedChannels || settings.moderation?.photoSpam?.whitelistedChannels || [])];
+                                      if (e.target.checked) {
+                                        current.push(ch.id);
+                                      } else {
+                                        const index = current.indexOf(ch.id);
+                                        if (index > -1) current.splice(index, 1);
+                                      }
+                                      handleInputChange('moderation.photoSpam.protectedChannels', current);
+                                      handleInputChange('moderation.photoSpam.whitelistedChannels', current);
+                                    }}
+                                  />
+                                  #{ch.name}
+                                </label>
+                              );
+                            })}
                           </div>
                         </div>
 
