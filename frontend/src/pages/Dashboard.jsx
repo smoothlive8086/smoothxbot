@@ -47,7 +47,8 @@ import {
   Lock,
   UserX,
   MicOff,
-  PhoneOff
+  PhoneOff,
+  Download
 } from 'lucide-react';
 
 const Youtube = ({ size = 24, className = '', style = {} }) => (
@@ -7278,19 +7279,16 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                               </div>
                             </div>
 
-                            {/* CONTAINER V2: TICKET TRANSCRIPTS & MEMBER DM AUTOMATION */}
-                            <div className="glass-panel" style={{ padding: '22px', display: 'flex', flexDirection: 'column', gap: '18px' }}>
+                            {/* CONTAINER V2: TICKET TRANSCRIPTS & DM SETTINGS */}
+                            <div className="glass-panel" style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
                               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                 <div>
                                   <h4 style={{ fontSize: '1rem', fontWeight: '700', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                    <FileText size={18} color="var(--primary)" />
-                                    Ticket Transcripts & DM Automation
-                                    <span style={{ fontSize: '0.72rem', background: 'rgba(37, 99, 235, 0.2)', color: '#60a5fa', border: '1px solid rgba(59, 130, 246, 0.3)', padding: '1px 8px', borderRadius: '10px', fontWeight: '600' }}>
-                                      Auto-DM
-                                    </span>
+                                    <Download size={18} color="var(--primary)" />
+                                    Direct Message Ticket Transcript
                                   </h4>
                                   <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', margin: '4px 0 0 0' }}>
-                                    Automatically generate Discord-styled interactive HTML chat transcripts and send them directly to members when tickets close.
+                                    Automatically export and send a full chat history HTML transcript to the member's DM when their ticket is closed.
                                   </p>
                                 </div>
                                 <label className="switch">
@@ -7303,167 +7301,31 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                                 </label>
                               </div>
 
-                              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px', borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '16px' }}>
-                                {/* DM Transcript Setting Details */}
-                                <div>
-                                  <label style={{ display: 'block', fontSize: '0.825rem', color: 'var(--text-secondary)', marginBottom: '6px', fontWeight: '600' }}>
-                                    DM Chat Transcript on Close
-                                  </label>
-                                  <p style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.7)', margin: 0, lineHeight: '1.4' }}>
-                                    When enabled, the bot compiles all chat messages, attachments, and embeds into an HTML transcript and sends it directly to the user who opened the ticket.
-                                  </p>
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '12px' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', backgroundColor: 'rgba(37, 99, 235, 0.08)', border: '1px solid rgba(37, 99, 235, 0.2)', padding: '12px', borderRadius: '8px' }}>
+                                  <FileText size={20} color="var(--primary)" style={{ flexShrink: 0 }} />
+                                  <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                                    <strong style={{ color: '#ffffff' }}>Chat Download Attachment:</strong> When closed, the member receives a rich DM embed containing the ticket details and an interactive <code style={{ color: '#60a5fa' }}>transcript.html</code> file download that renders the complete chat session, timestamps, and images locally.
+                                  </div>
                                 </div>
 
-                                {/* Staff Log Channel */}
                                 <div>
-                                  <label style={{ display: 'block', fontSize: '0.825rem', color: 'var(--text-secondary)', marginBottom: '6px', fontWeight: '600' }}>
-                                    Staff Transcript Log Channel (Optional)
+                                  <label style={{ display: 'block', fontSize: '0.825rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>
+                                    Transcript Archive Channel (Optional Staff Backup)
                                   </label>
                                   <select
                                     value={settings.tickets?.transcriptChannelId || ''}
                                     onChange={(e) => handleInputChange('tickets.transcriptChannelId', e.target.value)}
                                     className="glass-input"
                                   >
-                                    <option value="">-- None (Do not log to server channel) --</option>
+                                    <option value="">-- No Backup Channel (DM Only) --</option>
                                     {channels.map(ch => (
                                       <option key={ch.id} value={ch.id}>#{ch.name}</option>
                                     ))}
                                   </select>
-                                  <span style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', opacity: 0.8, marginTop: '4px', display: 'block' }}>
-                                    Archive a duplicate copy of all closed ticket transcripts to an internal staff channel.
+                                  <span style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', opacity: 0.8, display: 'block', marginTop: '4px' }}>
+                                    Send an additional copy of the transcript to this channel for staff auditing.
                                   </span>
-                                </div>
-                              </div>
-
-                              {/* Realistic Member DM Transcript Preview */}
-                              <div style={{
-                                backgroundColor: 'rgba(0, 0, 0, 0.35)',
-                                border: '1px solid rgba(255, 255, 255, 0.08)',
-                                borderRadius: '10px',
-                                padding: '16px',
-                                display: 'flex',
-                                flexDirection: 'column',
-                                gap: '12px'
-                              }}>
-                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                  <span style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                    <Send size={13} color="#60a5fa" />
-                                    Member DM Notification Preview
-                                  </span>
-                                  <span style={{ fontSize: '0.7rem', color: '#10b981', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                    <CheckCircle size={12} /> Active on Close
-                                  </span>
-                                </div>
-
-                                {/* Discord DM Message Box */}
-                                <div style={{
-                                  backgroundColor: '#313338',
-                                  borderRadius: '8px',
-                                  padding: '14px 16px',
-                                  display: 'flex',
-                                  gap: '14px',
-                                  fontFamily: "'gg sans', 'Noto Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif"
-                                }}>
-                                  {/* Bot Avatar */}
-                                  <div style={{
-                                    width: '40px',
-                                    height: '40px',
-                                    borderRadius: '50%',
-                                    backgroundColor: '#5865F2',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    fontWeight: 'bold',
-                                    color: '#ffffff',
-                                    fontSize: '0.9rem',
-                                    flexShrink: 0
-                                  }}>
-                                    BOT
-                                  </div>
-
-                                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flex: 1 }}>
-                                    {/* Author & Tag */}
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                      <span style={{ fontWeight: '600', color: '#f2f3f5', fontSize: '0.92rem' }}>
-                                        {user?.username || 'SMOOTH BOT'}
-                                      </span>
-                                      <span style={{
-                                        backgroundColor: '#5865F2',
-                                        color: '#ffffff',
-                                        fontSize: '0.62rem',
-                                        fontWeight: '700',
-                                        padding: '1px 5px',
-                                        borderRadius: '3px',
-                                        letterSpacing: '0.4px'
-                                      }}>
-                                        APP
-                                      </span>
-                                      <span style={{ color: '#949ba4', fontSize: '0.75rem' }}>Today at 12:00</span>
-                                    </div>
-
-                                    {/* Embed Box */}
-                                    <div style={{
-                                      backgroundColor: '#2b2d31',
-                                      borderLeft: '4px solid #5865F2',
-                                      borderRadius: '4px',
-                                      padding: '12px 14px',
-                                      display: 'flex',
-                                      flexDirection: 'column',
-                                      gap: '8px',
-                                      maxWidth: '440px'
-                                    }}>
-                                      <div style={{ fontWeight: '700', color: '#f2f3f5', fontSize: '0.95rem' }}>
-                                        Ticket Transcript
-                                      </div>
-                                      <div style={{ color: '#dbdee1', fontSize: '0.85rem', lineHeight: '1.4' }}>
-                                        Your ticket in <strong>{selectedGuild?.name || 'Server'}</strong> has been closed by moderator
-                                      </div>
-                                      <div style={{
-                                        borderLeft: '3px solid #4e5058',
-                                        paddingLeft: '8px',
-                                        color: '#dbdee1',
-                                        fontSize: '0.82rem',
-                                        margin: '2px 0'
-                                      }}>
-                                        <strong style={{ color: '#f2f3f5' }}>Ticket Category</strong> Support
-                                      </div>
-                                    </div>
-
-                                    {/* Transcript File Attachment Card */}
-                                    <div style={{
-                                      backgroundColor: '#2b2d31',
-                                      border: '1px solid #1e1f22',
-                                      borderRadius: '8px',
-                                      padding: '10px 14px',
-                                      display: 'inline-flex',
-                                      alignItems: 'center',
-                                      gap: '12px',
-                                      maxWidth: '320px'
-                                    }}>
-                                      <div style={{
-                                        width: '36px',
-                                        height: '42px',
-                                        backgroundColor: '#5865f2',
-                                        borderRadius: '4px',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        color: '#ffffff',
-                                        fontSize: '0.85rem',
-                                        fontWeight: '700'
-                                      }}>
-                                        &lt;/&gt;
-                                      </div>
-                                      <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                        <span style={{ color: '#00a8fc', fontSize: '0.875rem', fontWeight: '500', textDecoration: 'none' }}>
-                                          transcript-166.html
-                                        </span>
-                                        <span style={{ color: '#949ba4', fontSize: '0.72rem' }}>
-                                          639.39 KB · HTML Transcript
-                                        </span>
-                                      </div>
-                                    </div>
-                                  </div>
                                 </div>
                               </div>
                             </div>
