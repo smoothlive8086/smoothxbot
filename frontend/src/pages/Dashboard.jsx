@@ -7330,6 +7330,97 @@ export default function Dashboard({ guildId, guildName, guildIcon, memberCount, 
                               </div>
                             </div>
 
+                            {/* CONTAINER V2: TICKET PERMISSIONS & STAFF CONTROLS */}
+                            <div className="glass-panel" style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <div>
+                                  <h4 style={{ fontSize: '1rem', fontWeight: '700', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    <Shield size={18} color="var(--primary)" />
+                                    Ticket Close & Staff Permissions
+                                  </h4>
+                                  <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', margin: '4px 0 0 0' }}>
+                                    Configure who is authorized to close tickets and manage staff claim tools.
+                                  </p>
+                                </div>
+                              </div>
+
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '16px' }}>
+                                {/* Staff Claim Button Toggle */}
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                  <div>
+                                    <div style={{ fontSize: '0.875rem', fontWeight: '600', color: '#ffffff' }}>
+                                      Staff Ticket Claim Button
+                                    </div>
+                                    <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
+                                      Show a <strong>📌 Claim</strong> button next to Close Ticket so support staff can claim open tickets.
+                                    </div>
+                                  </div>
+                                  <label className="switch">
+                                    <input
+                                      type="checkbox"
+                                      checked={settings.tickets?.enableClaim !== false}
+                                      onChange={() => handleInputChange('tickets.enableClaim', settings.tickets?.enableClaim === false ? true : false)}
+                                    />
+                                    <span className="slider"></span>
+                                  </label>
+                                </div>
+
+                                {/* Allow Member Who Opened Ticket to Close Toggle */}
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '12px' }}>
+                                  <div>
+                                    <div style={{ fontSize: '0.875rem', fontWeight: '600', color: '#ffffff' }}>
+                                      Allow Member Who Opened Ticket to Close
+                                    </div>
+                                    <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
+                                      When disabled (recommended), members who opened the ticket cannot close it. Only administrators and staff can close tickets.
+                                    </div>
+                                  </div>
+                                  <label className="switch">
+                                    <input
+                                      type="checkbox"
+                                      checked={settings.tickets?.allowUserClose === true}
+                                      onChange={() => handleInputChange('tickets.allowUserClose', settings.tickets?.allowUserClose === true ? false : true)}
+                                    />
+                                    <span className="slider"></span>
+                                  </label>
+                                </div>
+
+                                {/* Authorized Staff Roles Allowed to Close Tickets */}
+                                <div style={{ borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '12px' }}>
+                                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#ffffff', marginBottom: '4px' }}>
+                                    Roles Allowed to Close Tickets
+                                  </label>
+                                  <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', margin: '0 0 10px 0' }}>
+                                    Server Administrators and Support Team roles can always close tickets. Select any additional staff roles permitted to close tickets:
+                                  </p>
+
+                                  <div style={{ maxHeight: '160px', overflowY: 'auto', border: '1px solid var(--border-color)', borderRadius: '8px', padding: '10px 14px', backgroundColor: 'rgba(0,0,0,0.25)', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '8px' }}>
+                                    {roles.filter(r => r.name !== '@everyone').map(role => {
+                                      const closeRoles = Array.isArray(settings.tickets?.closeRoles) ? settings.tickets.closeRoles : [];
+                                      const isChecked = closeRoles.includes(role.id);
+                                      return (
+                                        <label key={role.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.83rem', userSelect: 'none' }}>
+                                          <input
+                                            type="checkbox"
+                                            checked={isChecked}
+                                            onChange={() => {
+                                              const updated = isChecked
+                                                ? closeRoles.filter(id => id !== role.id)
+                                                : [...closeRoles, role.id];
+                                              handleInputChange('tickets.closeRoles', updated);
+                                            }}
+                                          />
+                                          <span style={{ color: role.color ? `#${role.color.toString(16).padStart(6, '0')}` : '#ffffff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                            @{role.name}
+                                          </span>
+                                        </label>
+                                      );
+                                    })}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
                             {/* CONTAINER V2: PUBLISH PANEL COMPONENT */}
                             <div className="glass-panel" style={{ padding: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'rgba(16, 185, 129, 0.05)', borderColor: 'rgba(16, 185, 129, 0.2)' }}>
                               <div>
